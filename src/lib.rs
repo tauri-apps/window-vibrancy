@@ -16,7 +16,7 @@ pub trait Vibrancy {
     ///
     /// ## Platform-specific
     ///
-    /// - **Windows**: works only on Windows 10 v1803 and greater.
+    /// - **Windows**: works only on Windows 10 v1803 and above.
     /// - **Linux / macOS:** Unsupported
     fn set_acrylic(&self, color: &str);
 
