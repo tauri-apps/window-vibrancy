@@ -1,6 +1,9 @@
 # tauri-plugin-vibrancy
 Add vibrancy/blur/acrylic to your tauri window.
 
+## Note:
+This plugin is an experiment to gather enough feedback that will help me decide how and whether this will be directly included in Tao/Tauri directly or kept as a plugin.
+
 ## Installation
 Add it as a dependency in `src-tauri/Cargo.toml`.
 ```toml
@@ -11,11 +14,12 @@ tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next" }
 ```
 
 ## Usage
-1. import the vibrancy trait
+1. enable transparency on your window, either through `tauri.conf.json` or programmatically. It is also recommended to disable decorations.
+2. import the vibrancy trait
     ```rs
     use tauri_plugin_vibrancy::Vibrnacy;
     ```
-2. use the trait [methods](src/lib.rs:) on the `tauri::Window` type.
+3. use the trait [methods](src/lib.rs:) on the `tauri::Window` type.
     ```rs
     tauri::Builder::default()
         .setup(|app|{
@@ -29,7 +33,7 @@ tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next" }
 
 ## Available methods:
 1. `set_acrylic()` - works only on Windows 10 v1809 and above.
-2. `set_blur()`.
+2. `set_blur()`. - Need someone to confirm if it works in Windows 10 versions below v1809.
 
 ## TODOS:
 - [ ] actually parse the color instead of using a dummy value internally.
