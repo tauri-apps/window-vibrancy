@@ -16,7 +16,7 @@ categories = [ "gui" ]
 [dependencies]
 tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next" }
 
-[dependencies.windows]
+[target.'cfg(windows)'.dependencies.windows]
   version = "0.28.0"
   features = [
   "alloc",
@@ -27,4 +27,3 @@ tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next" }
   "Win32_Graphics_Dwm",
   "Win32_UI_WindowsAndMessaging"
 ]
-
