@@ -28,8 +28,8 @@ tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next" }
     ```
 
 ## Available methods:
-1. `set_acrylic()` - works only on Windows 10 v1803 and above.
-2. `set_blur()` - currently works only on Windows 10 v1803 and above.
+1. `set_acrylic()` - works only on Windows 10 v1809 and above.
+2. `set_blur()`.
 
 ## TODOS:
 - [ ] actually parse the color instead of using a dummy value internally.

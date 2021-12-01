@@ -2,7 +2,6 @@
 mod utils;
 mod swca;
 
-use swca::{set_window_composition_attribute, AccentState};
 use tauri::Window;
 
 pub trait Vibrancy {
@@ -10,13 +9,14 @@ pub trait Vibrancy {
     ///
     /// ## WARNING:
     ///
-    /// This method has poor performance when resizing or moving the window.
+    /// This method has poor performance on Windows 10 v1903 and above,
+    /// the window will lag when resizing or dragging the window.
     /// It is an issue in the undocumented api used for this method
     /// and microsoft needs to fix it (they probably won't).
     ///
     /// ## Platform-specific
     ///
-    /// - **Windows**: works only on Windows 10 v1803 and above.
+    /// - **Windows**: has no effect on Windows 10 versions below v1809.
     /// - **Linux / macOS:** Unsupported
     fn set_acrylic(&self, color: &str);
 
@@ -31,19 +31,23 @@ pub trait Vibrancy {
 impl Vibrancy for Window {
     fn set_acrylic(&self, color: &str) {
         unsafe {
-            set_window_composition_attribute(
-                self.hwnd().unwrap(),
-                AccentState::EnableAcrylicBlurBehind,
-                color,
-            );
+            if let Some(v) = utils::get_windows10_build_ver() {
+                if v >= 17763 {
+                    swca::set_window_composition_attribute(
+                        self.hwnd().unwrap(),
+                        swca::AccentState::EnableAcrylicBlurBehind,
+                        color,
+                    );
+                }
+            }
         }
     }
 
     fn set_blur(&self, color: &str) {
         unsafe {
-            set_window_composition_attribute(
+            swca::set_window_composition_attribute(
                 self.hwnd().unwrap(),
-                AccentState::EnableBlurBehind,
+                swca::AccentState::EnableBlurBehind,
                 color,
             );
         }
