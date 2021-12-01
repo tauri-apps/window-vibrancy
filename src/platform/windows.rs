@@ -129,7 +129,7 @@ unsafe fn set_window_composition_attribute(hwnd: HWND, accent_state: AccentState
         let mut policy = ACCENT_POLICY {
             AccentState: accent_state.into(),
             AccentFlags: 2,
-            GradientColor: 0,
+            GradientColor: 16777216,
             AnimationId: 0,
         };
 
