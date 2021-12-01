@@ -10,7 +10,7 @@ fn main() {
   tauri::Builder::default()
     .setup(|app| {
       let window = app.get_window("main").unwrap();
-      window.set_acrylic("#1f1f1f");
+      window.set_blur();
       Ok(())
     })
     .run(tauri::generate_context!())

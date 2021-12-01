@@ -1,5 +1,7 @@
+use std::ffi::c_void;
+
 use windows::Win32::{
-    Foundation::FARPROC,
+    Foundation::{BOOL, FARPROC, HWND},
     System::{
         LibraryLoader::{GetProcAddress, LoadLibraryA},
         SystemInformation::OSVERSIONINFOW,
@@ -25,7 +27,8 @@ macro_rules! get_function {
     };
 }
 
-pub fn get_windows10_build_ver() -> Option<u32> {
+/// Returns a tuple of (major, minor, buildnumber)
+pub fn get_windows_ver() -> Option<(u32, u32, u32)> {
     type RtlGetVersion = unsafe extern "system" fn(*mut OSVERSIONINFOW) -> i32;
     let handle = get_function!("ntdll.dll", RtlGetVersion);
     if let Some(rtl_get_version) = handle {
@@ -41,13 +44,72 @@ pub fn get_windows10_build_ver() -> Option<u32> {
 
             let status = (rtl_get_version)(&mut vi as _);
 
-            if status >= 0 && vi.dwMajorVersion == 10 && vi.dwMinorVersion == 0 {
-                Some(vi.dwBuildNumber)
+            if status >= 0 {
+                Some((vi.dwMajorVersion, vi.dwMinorVersion, vi.dwBuildNumber))
             } else {
                 None
             }
         }
     } else {
         None
+    }
+}
+
+type SetWindowCompositionAttribute =
+    unsafe extern "system" fn(HWND, *mut WINDOWCOMPOSITIONATTRIBDATA) -> BOOL;
+
+#[allow(non_snake_case)]
+type WINDOWCOMPOSITIONATTRIB = u32;
+
+#[allow(non_camel_case_types)]
+#[allow(non_snake_case)]
+#[repr(C)]
+struct ACCENT_POLICY {
+    AccentState: u32,
+    AccentFlags: u32,
+    GradientColor: u32,
+    AnimationId: u32,
+}
+
+#[allow(non_snake_case)]
+#[repr(C)]
+struct WINDOWCOMPOSITIONATTRIBDATA {
+    Attrib: WINDOWCOMPOSITIONATTRIB,
+    pvData: *mut c_void,
+    cbData: usize,
+}
+
+pub enum AccentState {
+    EnableBlurBehind,
+    EnableAcrylicBlurBehind,
+}
+
+impl From<AccentState> for u32 {
+    fn from(state: AccentState) -> Self {
+        match state {
+            AccentState::EnableBlurBehind => 3,
+            AccentState::EnableAcrylicBlurBehind => 4,
+        }
+    }
+}
+
+pub unsafe fn set_window_composition_attribute(hwnd: HWND, accent_state: AccentState) {
+    if let Some(set_window_composition_attribute) =
+        get_function!("user32.dll", SetWindowCompositionAttribute)
+    {
+        let mut policy = ACCENT_POLICY {
+            AccentState: accent_state.into(),
+            AccentFlags: 2,
+            GradientColor: 0,
+            AnimationId: 0,
+        };
+
+        let mut data = WINDOWCOMPOSITIONATTRIBDATA {
+            Attrib: 0x13,
+            pvData: &mut policy as *mut _ as _,
+            cbData: std::mem::size_of_val(&policy),
+        };
+
+        set_window_composition_attribute(hwnd, &mut data as *mut _ as _);
     }
 }
