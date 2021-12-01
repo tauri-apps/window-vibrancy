@@ -1,3 +1,29 @@
+//! Add vibrancy/blur/acrylic to your tauri window.
+//!
+//! # Note:
+//!
+//! This plugin is an experiment to gather enough feedback that will help me
+//! decide how and whether this will be included in Tao/Tauri directly or kept as a plugin.
+//!
+//! # Usage:
+//!
+//! 1. Enable transparency on your window, either through `tauri.conf.json` or programmatically. It is also recommended to disable decorations.
+//! 2. Import the vibrancy trait
+//!     ```no_run
+//!     use tauri_plugin_vibrancy::Vibrancy;
+//!     ```
+//! 3. Use the [`Vibrancy`] trait methods on the `tauri::Window` type.
+//!     ```no_run
+//!     tauri::Builder::default()
+//!         .setup(|app|{
+//!             let window = app.get_window("main").unwrap();
+//!             window.set_blur();
+//!             Ok(())
+//!         })
+//!         .run(tauri::generate_context!())
+//!         .expect("error while running tauri application");
+//!     ```
+
 use tauri::Window;
 mod platform;
 
