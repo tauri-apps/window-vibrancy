@@ -17,7 +17,7 @@ tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next" }
 1. enable transparency on your window, either through `tauri.conf.json` or programmatically. It is also recommended to disable decorations.
 2. import the vibrancy trait
     ```rs
-    use tauri_plugin_vibrancy::Vibrnacy;
+    use tauri_plugin_vibrancy::Vibrancy;
     ```
 3. use the trait [methods](src/lib.rs:) on the `tauri::Window` type.
     ```rs
