@@ -32,7 +32,7 @@ tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next" }
     ```
 
 ## Available methods:
-1. `set_acrylic()` - works only on Windows 10 v1809 and above.
+1. `set_acrylic()` - works only on Windows 10 v1809 and above, it also has bad performance when resizing/dragging the window.
 2. `set_blur()`. - Need someone to confirm if it works on Windows 7 and Windows 10 versions below v1809.
 
 ## TODOS:
