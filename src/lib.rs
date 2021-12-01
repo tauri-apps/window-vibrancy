@@ -1,15 +1,10 @@
-#[macro_use]
-mod utils;
-
 use tauri::Window;
-use utils::{get_windows_ver, set_window_composition_attribute, AccentState};
-use windows::Win32::{
-    Foundation::HWND,
-    Graphics::{
-        Dwm::{DwmEnableBlurBehindWindow, DWM_BB_ENABLE, DWM_BLURBEHIND},
-        Gdi::HRGN,
-    },
-};
+mod platform;
+
+#[cfg(target_os = "windows")]
+use ::windows::Win32::Foundation::HWND;
+#[cfg(target_os = "windows")]
+use platform::windows;
 
 pub trait Vibrancy {
     /// Adds Acrylic effect to you tauri window.
@@ -23,53 +18,30 @@ pub trait Vibrancy {
     ///
     /// ## Platform-specific
     ///
-    /// - **Windows**: has no effect on Windows 10 versions below v1809.
-    /// - **Linux / macOS:** Unsupported
+    /// - **Windows**: has no effect on Windows 10 versions below v1809
+    /// - **Linux / macOS:** has no effect
     fn set_acrylic(&self);
 
     /// Adds blur effect to tauri window.
     ///
     /// ## Platform-specific
     ///
-    /// - **Linux / macOS:** Unsupported
+    /// - **Linux / macOS:** has no effect
     fn set_blur(&self);
 }
 
 impl Vibrancy for Window {
     fn set_acrylic(&self) {
+        #[cfg(target_os = "windows")]
         unsafe {
-            if let Some(v) = get_windows_ver() {
-                if v.2 >= 17763 {
-                    set_window_composition_attribute(
-                        HWND(self.hwnd().unwrap() as _),
-                        AccentState::EnableAcrylicBlurBehind,
-                    );
-                }
-            }
+            windows::set_acrylic(HWND(self.hwnd().unwrap() as _));
         }
     }
 
     fn set_blur(&self) {
+        #[cfg(target_os = "windows")]
         unsafe {
-            if let Some(v) = get_windows_ver() {
-                // windows 7 is 6.1
-                if v.0 == 6 && v.1 == 1 {
-                    let bb = DWM_BLURBEHIND {
-                        dwFlags: DWM_BB_ENABLE,
-                        fEnable: true.into(),
-                        hRgnBlur: HRGN::default(),
-                        ..Default::default()
-                    };
-
-                    let _ = DwmEnableBlurBehindWindow(HWND(self.hwnd().unwrap() as _), &bb);
-                    return;
-                }
-            }
-
-            set_window_composition_attribute(
-                HWND(self.hwnd().unwrap() as _),
-                AccentState::EnableBlurBehind,
-            );
+            windows::set_blur(HWND(self.hwnd().unwrap() as _));
         }
     }
 }

@@ -1,14 +1,43 @@
 use std::ffi::c_void;
-
 use windows::Win32::{
     Foundation::{BOOL, FARPROC, HWND},
+    Graphics::{
+        Dwm::{DwmEnableBlurBehindWindow, DWM_BB_ENABLE, DWM_BLURBEHIND},
+        Gdi::HRGN,
+    },
     System::{
         LibraryLoader::{GetProcAddress, LoadLibraryA},
         SystemInformation::OSVERSIONINFOW,
     },
 };
 
-pub fn get_function_impl(library: &str, function: &str) -> Option<FARPROC> {
+pub unsafe fn set_acrylic(hwnd: HWND) {
+    if let Some(v) = get_windows_ver() {
+        if v.2 >= 17763 {
+            set_window_composition_attribute(hwnd, AccentState::EnableAcrylicBlurBehind);
+        }
+    }
+}
+pub unsafe fn set_blur(hwnd: HWND) {
+    if let Some(v) = get_windows_ver() {
+        // windows 7 is 6.1
+        if v.0 == 6 && v.1 == 1 {
+            let bb = DWM_BLURBEHIND {
+                dwFlags: DWM_BB_ENABLE,
+                fEnable: true.into(),
+                hRgnBlur: HRGN::default(),
+                ..Default::default()
+            };
+
+            let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
+            return;
+        }
+    }
+
+    set_window_composition_attribute(hwnd, AccentState::EnableBlurBehind);
+}
+
+fn get_function_impl(library: &str, function: &str) -> Option<FARPROC> {
     assert_eq!(library.chars().last(), Some('\0'));
     assert_eq!(function.chars().last(), Some('\0'));
 
@@ -21,14 +50,14 @@ pub fn get_function_impl(library: &str, function: &str) -> Option<FARPROC> {
 
 macro_rules! get_function {
     ($lib:expr, $func:ident) => {
-        crate::utils::get_function_impl(concat!($lib, '\0'), concat!(stringify!($func), '\0')).map(
-            |f| unsafe { std::mem::transmute::<windows::Win32::Foundation::FARPROC, $func>(f) },
-        )
+        get_function_impl(concat!($lib, '\0'), concat!(stringify!($func), '\0')).map(|f| unsafe {
+            std::mem::transmute::<windows::Win32::Foundation::FARPROC, $func>(f)
+        })
     };
 }
 
 /// Returns a tuple of (major, minor, buildnumber)
-pub fn get_windows_ver() -> Option<(u32, u32, u32)> {
+fn get_windows_ver() -> Option<(u32, u32, u32)> {
     type RtlGetVersion = unsafe extern "system" fn(*mut OSVERSIONINFOW) -> i32;
     let handle = get_function!("ntdll.dll", RtlGetVersion);
     if let Some(rtl_get_version) = handle {
@@ -93,7 +122,7 @@ impl From<AccentState> for u32 {
     }
 }
 
-pub unsafe fn set_window_composition_attribute(hwnd: HWND, accent_state: AccentState) {
+unsafe fn set_window_composition_attribute(hwnd: HWND, accent_state: AccentState) {
     if let Some(set_window_composition_attribute) =
         get_function!("user32.dll", SetWindowCompositionAttribute)
     {
