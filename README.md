@@ -19,7 +19,7 @@ tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next" }
     ```rs
     use tauri_plugin_vibrancy::Vibrancy;
     ```
-3. use the trait [methods](src/lib.rs:) on the `tauri::Window` type.
+3. use the trait [methods](src/lib.rs) on the `tauri::Window` type.
     ```rs
     tauri::Builder::default()
         .setup(|app|{
