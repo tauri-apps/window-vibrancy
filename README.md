@@ -34,7 +34,7 @@
 
 ## TODOS:
 - [ ] `apply_mica()` for Windows 11
-- [ ] `apply_vibrancy()` for macOS
+- [ ] `apply_vibrancy()` for macOS, I'd like some help because I am not a macOS developer.
 
 ## License
 [MIT](./LICENSE) License © 2021 [Amr Bashir](https://github.com/amrbashir)
