@@ -13,14 +13,16 @@ use windows::Win32::{
     },
 };
 
-pub unsafe fn set_acrylic(hwnd: HWND) {
+pub fn apply_acrylic(hwnd: HWND) {
     if let Some(v) = get_windows_ver() {
         if v.2 >= 17763 {
-            set_window_composition_attribute(hwnd, AccentState::EnableAcrylicBlurBehind);
+            unsafe {
+                set_window_composition_attribute(hwnd, AccentState::EnableAcrylicBlurBehind);
+            }
         }
     }
 }
-pub unsafe fn set_blur(hwnd: HWND) {
+pub fn apply_blur(hwnd: HWND) {
     if let Some(v) = get_windows_ver() {
         // windows 7 is 6.1
         if v.0 == 6 && v.1 == 1 {
@@ -30,13 +32,15 @@ pub unsafe fn set_blur(hwnd: HWND) {
                 hRgnBlur: HRGN::default(),
                 ..Default::default()
             };
-
-            let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
+            unsafe {
+                let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
+            }
             return;
         }
     }
-
-    set_window_composition_attribute(hwnd, AccentState::EnableBlurBehind);
+    unsafe {
+        set_window_composition_attribute(hwnd, AccentState::EnableBlurBehind);
+    }
 }
 
 fn get_function_impl(library: &str, function: &str) -> Option<FARPROC> {

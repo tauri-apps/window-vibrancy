@@ -1,4 +1,4 @@
-//! Add vibrancy/blur/acrylic to your tauri window.
+//! Make your Tao/Tauri windows vibrant.
 //!
 //! # Note:
 //!
@@ -7,33 +7,40 @@
 //!
 //! # Usage:
 //!
-//! 1. Enable transparency on your window, either through `tauri.conf.json` or programmatically. It is also recommended to disable decorations.
+//! 1. Enable transparency on your window
+//!     - **Tauri:** edit your window in `tauri.conf.json > tauri > windows` and add `"transparent": true`
+//!       or use [`tauri::WindowBuilder::transparent`]
+//!     - **Tao:** use [`tao::window::WindowBuilder::with_transparent`]
 //! 2. Import the vibrancy trait
 //!     ```no_run
 //!     use tauri_plugin_vibrancy::Vibrancy;
 //!     ```
-//! 3. Use the [`Vibrancy`] trait methods on the `tauri::Window` type.
-//!     ```no_run
-//!     tauri::Builder::default()
-//!         .setup(|app|{
-//!             let window = app.get_window("main").unwrap();
-//!             window.set_blur();
-//!             Ok(())
-//!         })
-//!         .run(tauri::generate_context!())
-//!         .expect("error while running tauri application");
-//!     ```
+//! 3. Use the [`Vibrancy`] trait methods on your window type
+//!     - Tauri:
+//!         ```no_run
+//!         let window = app.get_window("main").unwrap();
+//!         window.apply_blur();
+//!         ```
+//!     - Tao:
+//!         ```no_run
+//!         let window = WindowBuilder::new().with_transparent(true).build().unwrap();
+//!         window.apply_blur();
+//!         ```
 
-use tauri::Window;
 mod platform;
 
+use tao::window::Window as TaoWindow;
+use tauri::Window as TauriWindow;
+
+#[cfg(target_os = "windows")]
+use crate::platform::windows;
 #[cfg(target_os = "windows")]
 use ::windows::Win32::Foundation::HWND;
 #[cfg(target_os = "windows")]
-use platform::windows;
+use tao::platform::windows::WindowExtWindows;
 
 pub trait Vibrancy {
-    /// Adds Acrylic effect to you tauri window.
+    /// Applies Acrylic effect to you tao/tauri window.
     ///
     /// ## WARNING:
     ///
@@ -46,28 +53,36 @@ pub trait Vibrancy {
     ///
     /// - **Windows**: has no effect on Windows 10 versions below v1809
     /// - **Linux / macOS:** has no effect
-    fn set_acrylic(&self);
+    fn apply_acrylic(&self);
 
-    /// Adds blur effect to tauri window.
+    /// Applies blur effect to tao/tauri window.
     ///
     /// ## Platform-specific
     ///
     /// - **Linux / macOS:** has no effect
-    fn set_blur(&self);
+    fn apply_blur(&self);
 }
 
-impl Vibrancy for Window {
-    fn set_acrylic(&self) {
+impl Vibrancy for TauriWindow {
+    fn apply_acrylic(&self) {
         #[cfg(target_os = "windows")]
-        unsafe {
-            windows::set_acrylic(HWND(self.hwnd().unwrap() as _));
-        }
+        windows::apply_acrylic(HWND(self.hwnd().unwrap() as _));
     }
 
-    fn set_blur(&self) {
+    fn apply_blur(&self) {
         #[cfg(target_os = "windows")]
-        unsafe {
-            windows::set_blur(HWND(self.hwnd().unwrap() as _));
-        }
+        windows::apply_blur(HWND(self.hwnd().unwrap() as _));
+    }
+}
+
+impl Vibrancy for TaoWindow {
+    fn apply_acrylic(&self) {
+        #[cfg(target_os = "windows")]
+        windows::apply_acrylic(HWND(self.hwnd() as _));
+    }
+
+    fn apply_blur(&self) {
+        #[cfg(target_os = "windows")]
+        windows::apply_blur(HWND(self.hwnd() as _));
     }
 }
