@@ -32,10 +32,14 @@ mod platform;
 use tao::window::Window as TaoWindow;
 use tauri::Window as TauriWindow;
 
+#[cfg(target_os = "macos")]
+use crate::platform::macos;
 #[cfg(target_os = "windows")]
 use crate::platform::windows;
 #[cfg(target_os = "windows")]
 use ::windows::Win32::Foundation::HWND;
+#[cfg(target_os = "macos")]
+use tao::platform::macos::WindowExtMacOS;
 #[cfg(target_os = "windows")]
 use tao::platform::windows::WindowExtWindows;
 
@@ -72,6 +76,9 @@ impl Vibrancy for TauriWindow {
     fn apply_blur(&self) {
         #[cfg(target_os = "windows")]
         windows::apply_blur(HWND(self.hwnd().unwrap() as _));
+
+        #[cfg(target_os = "macos")]
+        macos::apply_blur(self.ns_window().unwrap() as _);
     }
 }
 
@@ -84,5 +91,8 @@ impl Vibrancy for TaoWindow {
     fn apply_blur(&self) {
         #[cfg(target_os = "windows")]
         windows::apply_blur(HWND(self.hwnd() as _));
+
+        #[cfg(target_os = "macos")]
+        macos::apply_blur(self.ns_window() as _);
     }
 }
