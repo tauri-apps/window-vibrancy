@@ -188,7 +188,8 @@ pub fn apply_blur(window: id) {
 pub fn apply_blur_with_material(window: id, material: NSVisualEffectMaterial) {
     unsafe {
         if NSAppKitVersionNumber < NSAppKitVersionNumber10_10 {
-            panic!("Sorry, 'NSVisualEffectView' is only available on macOS 10.10 or newer");
+            // panic!("Sorry, 'NSVisualEffectView' is only available on macOS 10.10 or newer");
+            return;
         }
 
         if !msg_send![class!(NSThread), isMainThread] {
