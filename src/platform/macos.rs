@@ -7,24 +7,39 @@
 
 use cocoa::{
     appkit::{
+        NSAppKitVersionNumber, NSAppKitVersionNumber10_10, NSAppKitVersionNumber10_11,
         NSAutoresizingMaskOptions, NSView, NSViewHeightSizable, NSViewWidthSizable, NSWindow,
         NSWindowOrderingMode,
     },
     base::{id, nil, BOOL},
     foundation::{NSAutoreleasePool, NSPoint, NSRect, NSSize},
 };
-use lazy_static::lazy_static;
-use objc::{class, msg_send, runtime::Class, sel, sel_impl};
+use objc::{class, msg_send, sel, sel_impl};
 
-lazy_static! {
-    static ref NSVISUALEFFECTVIEW: Option<&'static Class> = Class::get("NSVisualEffectView");
-}
+pub const NSAppKitVersionNumber10_14: f64 = 1671.0;
+// pub const NSAppKitVersionNumber10_14_1: f64 = 1671.1;
+// pub const NSAppKitVersionNumber10_14_2: f64 = 1671.2;
+// pub const NSAppKitVersionNumber10_14_3: f64 = 1671.3;
+// pub const NSAppKitVersionNumber10_14_4: f64 = 1671.4;
+// pub const NSAppKitVersionNumber10_14_5: f64 = 1671.5;
+// pub const NSAppKitVersionNumber10_15: f64 = 1894.0;
+// pub const NSAppKitVersionNumber10_15_1: f64 = 1894.1;
+// pub const NSAppKitVersionNumber10_15_2: f64 = 1894.2;
+// pub const NSAppKitVersionNumber10_15_3: f64 = 1894.3;
+// pub const NSAppKitVersionNumber10_15_4: f64 = 1894.4;
+// pub const NSAppKitVersionNumber10_15_5: f64 = 1894.5;
+// pub const NSAppKitVersionNumber10_15_6: f64 = 1894.6;
+// pub const NSAppKitVersionNumber11_0: f64 = 2022.0;
+// pub const NSAppKitVersionNumber11_1: f64 = 2022.2;
+// pub const NSAppKitVersionNumber11_2: f64 = 2022.3;
+// pub const NSAppKitVersionNumber11_3: f64 = 2022.4;
+// pub const NSAppKitVersionNumber11_4: f64 = 2022.5;
 
 // https://developer.apple.com/documentation/appkit/nsvisualeffectview/blendingmode
 #[allow(dead_code)]
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum NSVisualEffectViewBlendingMode {
+pub enum NSVisualEffectBlendingMode {
     BehindWindow = 0,
     WithinWindow = 1,
 }
@@ -33,7 +48,7 @@ pub enum NSVisualEffectViewBlendingMode {
 #[allow(dead_code)]
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum NSVisualEffectViewState {
+pub enum NSVisualEffectState {
     FollowsWindowActiveState = 0,
     Active = 1,
     Inactive = 2,
@@ -43,19 +58,19 @@ pub enum NSVisualEffectViewState {
 #[allow(dead_code)]
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum NSVisualEffectViewMaterial {
+pub enum NSVisualEffectMaterial {
     #[deprecated(
         since = "macOS 10.14",
-        note = "A default material for the view’s effective appearance. But deprecated"
+        note = "A default material appropriate for the view's effectiveAppearance.  You should instead choose an appropriate semantic material."
     )]
     AppearanceBased = 0, // Default, Deprecated macOS 10.10–10.14
-    #[deprecated(since = "macOS 10.14")]
+    #[deprecated(since = "macOS 10.14", note = "Use a semantic material instead.")]
     Light = 1, // Deprecated macOS 10.10–10.14
-    #[deprecated(since = "macOS 10.14")]
+    #[deprecated(since = "macOS 10.14", note = "Use a semantic material instead.")]
     Dark = 2, // Deprecated macOS 10.10–10.14
-    #[deprecated(since = "macOS 10.14")]
+    #[deprecated(since = "macOS 10.14", note = "Use a semantic material instead.")]
     MediumLight = 8, // Deprecated macOS 10.11–10.14
-    #[deprecated(since = "macOS 10.14")]
+    #[deprecated(since = "macOS 10.14", note = "Use a semantic material instead.")]
     UltraDark = 9, // Deprecated macOS 10.11–10.14
 
     Titlebar = 3,  // macOS 10.10+
@@ -94,11 +109,14 @@ pub trait NSVisualEffectView: Sized {
     unsafe fn removeFromSuperview(self);
     unsafe fn setAutoresizingMask_(self, autoresizingMask: NSAutoresizingMaskOptions);
 
+    // API_AVAILABLE(macos(10.12));
     unsafe fn isEmphasized(self) -> BOOL;
+    // API_AVAILABLE(macos(10.12));
     unsafe fn setEmphasized_(self, emphasized: BOOL);
-    unsafe fn setMaterial_(self, material: NSVisualEffectViewMaterial);
-    unsafe fn setState_(self, state: NSVisualEffectViewState);
-    unsafe fn setBlendingMode_(self, mode: NSVisualEffectViewBlendingMode);
+
+    unsafe fn setMaterial_(self, material: NSVisualEffectMaterial);
+    unsafe fn setState_(self, state: NSVisualEffectState);
+    unsafe fn setBlendingMode_(self, mode: NSVisualEffectBlendingMode);
 }
 
 impl NSVisualEffectView for id {
@@ -138,55 +156,67 @@ impl NSVisualEffectView for id {
         msg_send![self, setAutoresizingMask: autoresizingMask]
     }
 
+    // API_AVAILABLE(macos(10.12));
     unsafe fn isEmphasized(self) -> BOOL {
         msg_send![self, isEmphasized]
     }
 
+    // API_AVAILABLE(macos(10.12));
     unsafe fn setEmphasized_(self, emphasized: BOOL) {
         msg_send![self, setEmphasized: emphasized]
     }
 
-    unsafe fn setMaterial_(self, material: NSVisualEffectViewMaterial) {
+    unsafe fn setMaterial_(self, material: NSVisualEffectMaterial) {
         msg_send![self, setMaterial: material]
     }
 
-    unsafe fn setState_(self, state: NSVisualEffectViewState) {
+    unsafe fn setState_(self, state: NSVisualEffectState) {
         msg_send![self, setState: state]
     }
 
-    unsafe fn setBlendingMode_(self, mode: NSVisualEffectViewBlendingMode) {
+    unsafe fn setBlendingMode_(self, mode: NSVisualEffectBlendingMode) {
         msg_send![self, setBlendingMode: mode]
     }
 }
 
 #[allow(deprecated)]
 pub fn apply_blur(window: id) {
-    apply_blur_with_material(window, NSVisualEffectViewMaterial::AppearanceBased)
+    apply_blur_with_material(window, NSVisualEffectMaterial::Sidebar)
 }
 
-pub fn apply_blur_with_material(window: id, material: NSVisualEffectViewMaterial) {
+#[allow(deprecated)]
+pub fn apply_blur_with_material(window: id, material: NSVisualEffectMaterial) {
     unsafe {
+        if NSAppKitVersionNumber < NSAppKitVersionNumber10_10 {
+            panic!("Sorry, 'NSVisualEffectView' is only available on macOS 10.10 or newer");
+        }
+
         if !msg_send![class!(NSThread), isMainThread] {
             panic!("Views can only be created on the main thread on macOS");
         }
 
-        if let Some(_) = *NSVISUALEFFECTVIEW {
-            let ns_view: id = window.contentView();
-            let bounds = NSView::bounds(ns_view);
-
-            let blurred_view =
-                NSVisualEffectView::initWithFrame_(NSVisualEffectView::alloc(nil), bounds);
-            blurred_view.autorelease();
-
-            blurred_view.setMaterial_(material);
-            blurred_view.setBlendingMode_(NSVisualEffectViewBlendingMode::BehindWindow);
-            blurred_view.setState_(NSVisualEffectViewState::FollowsWindowActiveState);
-            NSVisualEffectView::setAutoresizingMask_(
-                blurred_view,
-                NSViewWidthSizable | NSViewHeightSizable,
-            );
-
-            let _: () = msg_send![ns_view, addSubview: blurred_view.clone() positioned: NSWindowOrderingMode::NSWindowBelow relativeTo: 0];
+        let mut m = material;
+        if material as u32 > 9 && NSAppKitVersionNumber < NSAppKitVersionNumber10_14 {
+            m = NSVisualEffectMaterial::AppearanceBased;
+        } else if material as u32 > 4 && NSAppKitVersionNumber < NSAppKitVersionNumber10_11 {
+            m = NSVisualEffectMaterial::AppearanceBased;
         }
+
+        let ns_view: id = window.contentView();
+        let bounds = NSView::bounds(ns_view);
+
+        let blurred_view =
+            NSVisualEffectView::initWithFrame_(NSVisualEffectView::alloc(nil), bounds);
+        blurred_view.autorelease();
+
+        blurred_view.setMaterial_(m);
+        blurred_view.setBlendingMode_(NSVisualEffectBlendingMode::BehindWindow);
+        blurred_view.setState_(NSVisualEffectState::FollowsWindowActiveState);
+        NSVisualEffectView::setAutoresizingMask_(
+            blurred_view,
+            NSViewWidthSizable | NSViewHeightSizable,
+        );
+
+        let _: () = msg_send![ns_view, addSubview: blurred_view.clone() positioned: NSWindowOrderingMode::NSWindowBelow relativeTo: 0];
     }
 }
