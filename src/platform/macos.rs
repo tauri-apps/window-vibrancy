@@ -202,6 +202,6 @@ pub fn apply_blur_with_material(window: id, material: NSVisualEffectMaterial) {
             NSViewWidthSizable | NSViewHeightSizable,
         );
 
-        let _: () = msg_send![ns_view, addSubview: blurred_view.clone() positioned: NSWindowOrderingMode::NSWindowBelow relativeTo: 0];
+        let _: () = msg_send![ns_view, addSubview: blurred_view positioned: NSWindowOrderingMode::NSWindowBelow relativeTo: 0];
     }
 }
