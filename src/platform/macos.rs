@@ -1,9 +1,7 @@
-//! most of the code comes from https://github.com/joboet/winit/tree/macos_blurred_background
-//! just rewrote part of it.
+//! The use of NSVisualEffectView comes from https://github.com/joboet/winit/tree/macos_blurred_background
+//! just rewrite it to make it more like cocoa::appkit style .
 
 #![cfg(target_os = "macos")]
-#![allow(non_upper_case_globals)]
-#![allow(non_snake_case)]
 
 use cocoa::{
     appkit::{
@@ -16,24 +14,13 @@ use cocoa::{
 };
 use objc::{class, msg_send, sel, sel_impl};
 
+#[allow(deprecated)]
+pub fn apply_blur(window: id) {
+    apply_blur_with_material(window, NSVisualEffectMaterial::AppearanceBased)
+}
+
+#[allow(non_upper_case_globals)]
 pub const NSAppKitVersionNumber10_14: f64 = 1671.0;
-// pub const NSAppKitVersionNumber10_14_1: f64 = 1671.1;
-// pub const NSAppKitVersionNumber10_14_2: f64 = 1671.2;
-// pub const NSAppKitVersionNumber10_14_3: f64 = 1671.3;
-// pub const NSAppKitVersionNumber10_14_4: f64 = 1671.4;
-// pub const NSAppKitVersionNumber10_14_5: f64 = 1671.5;
-// pub const NSAppKitVersionNumber10_15: f64 = 1894.0;
-// pub const NSAppKitVersionNumber10_15_1: f64 = 1894.1;
-// pub const NSAppKitVersionNumber10_15_2: f64 = 1894.2;
-// pub const NSAppKitVersionNumber10_15_3: f64 = 1894.3;
-// pub const NSAppKitVersionNumber10_15_4: f64 = 1894.4;
-// pub const NSAppKitVersionNumber10_15_5: f64 = 1894.5;
-// pub const NSAppKitVersionNumber10_15_6: f64 = 1894.6;
-// pub const NSAppKitVersionNumber11_0: f64 = 2022.0;
-// pub const NSAppKitVersionNumber11_1: f64 = 2022.2;
-// pub const NSAppKitVersionNumber11_2: f64 = 2022.3;
-// pub const NSAppKitVersionNumber11_3: f64 = 2022.4;
-// pub const NSAppKitVersionNumber11_4: f64 = 2022.5;
 
 // https://developer.apple.com/documentation/appkit/nsvisualeffectview/blendingmode
 #[allow(dead_code)]
@@ -93,6 +80,7 @@ pub enum NSVisualEffectMaterial {
 
 // macos 10.10+
 // https://developer.apple.com/documentation/appkit/nsvisualeffectview
+#[allow(non_snake_case)]
 pub trait NSVisualEffectView: Sized {
     unsafe fn alloc(_: Self) -> id {
         msg_send![class!(NSVisualEffectView), alloc]
@@ -119,6 +107,7 @@ pub trait NSVisualEffectView: Sized {
     unsafe fn setBlendingMode_(self, mode: NSVisualEffectBlendingMode);
 }
 
+#[allow(non_snake_case)]
 impl NSVisualEffectView for id {
     unsafe fn init(self) -> id {
         msg_send![self, init]
@@ -177,11 +166,6 @@ impl NSVisualEffectView for id {
     unsafe fn setBlendingMode_(self, mode: NSVisualEffectBlendingMode) {
         msg_send![self, setBlendingMode: mode]
     }
-}
-
-#[allow(deprecated)]
-pub fn apply_blur(window: id) {
-    apply_blur_with_material(window, NSVisualEffectMaterial::Sidebar)
 }
 
 #[allow(deprecated)]
