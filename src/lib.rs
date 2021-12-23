@@ -34,6 +34,8 @@ use tauri::Window as TauriWindow;
 
 #[cfg(target_os = "macos")]
 use crate::platform::macos;
+#[cfg(target_os = "macos")]
+use crate::platform::macos::MacVibrancy;
 #[cfg(target_os = "windows")]
 use crate::platform::windows;
 #[cfg(target_os = "windows")]
@@ -65,6 +67,13 @@ pub trait Vibrancy {
     ///
     /// - **Linux / macOS:** has no effect
     fn apply_blur(&self);
+
+    /// Applies vibrancy effect to tao/tauri window.
+    ///
+    /// ## Platform-specific
+    ///
+    /// - **macOS**: has no effect on macOS versions below 10.10
+    fn apply_vibrancy(&self);
 }
 
 impl Vibrancy for TauriWindow {
@@ -76,9 +85,12 @@ impl Vibrancy for TauriWindow {
     fn apply_blur(&self) {
         #[cfg(target_os = "windows")]
         windows::apply_blur(HWND(self.hwnd().unwrap() as _));
+    }
 
+    fn apply_vibrancy(&self) {
         #[cfg(target_os = "macos")]
-        macos::apply_blur(self.ns_window().unwrap() as _);
+        #[allow(deprecated)]
+        macos::apply_vibrancy(self.ns_window().unwrap() as _, MacVibrancy::AppearanceBased);
     }
 }
 
@@ -91,8 +103,11 @@ impl Vibrancy for TaoWindow {
     fn apply_blur(&self) {
         #[cfg(target_os = "windows")]
         windows::apply_blur(HWND(self.hwnd() as _));
+    }
 
+    fn apply_vibrancy(&self) {
         #[cfg(target_os = "macos")]
-        macos::apply_blur(self.ns_window() as _);
+        #[allow(deprecated)]
+        macos::apply_vibrancy(self.ns_window() as _, MacVibrancy::AppearanceBased);
     }
 }

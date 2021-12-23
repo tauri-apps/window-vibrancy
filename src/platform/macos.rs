@@ -12,11 +12,47 @@ use cocoa::{
     base::{id, nil, BOOL},
     foundation::{NSAutoreleasePool, NSPoint, NSRect, NSSize},
 };
+use log::debug;
 use objc::{class, msg_send, sel, sel_impl};
 
+pub use NSVisualEffectMaterial as MacVibrancy;
+
 #[allow(deprecated)]
-pub fn apply_blur(window: id) {
-    apply_blur_with_material(window, NSVisualEffectMaterial::AppearanceBased)
+pub fn apply_vibrancy(window: id, appearance: NSVisualEffectMaterial) {
+    unsafe {
+        if NSAppKitVersionNumber < NSAppKitVersionNumber10_10 {
+            debug!("Sorry, 'NSVisualEffectView' is only available on macOS 10.10 or newer");
+            return;
+        }
+
+        if !msg_send![class!(NSThread), isMainThread] {
+            panic!("Views can only be created on the main thread on macOS");
+        }
+
+        let mut m = appearance;
+        if appearance as u32 > 9 && NSAppKitVersionNumber < NSAppKitVersionNumber10_14 {
+            m = NSVisualEffectMaterial::AppearanceBased;
+        } else if appearance as u32 > 4 && NSAppKitVersionNumber < NSAppKitVersionNumber10_11 {
+            m = NSVisualEffectMaterial::AppearanceBased;
+        }
+
+        let ns_view: id = window.contentView();
+        let bounds = NSView::bounds(ns_view);
+
+        let blurred_view =
+            NSVisualEffectView::initWithFrame_(NSVisualEffectView::alloc(nil), bounds);
+        blurred_view.autorelease();
+
+        blurred_view.setMaterial_(m);
+        blurred_view.setBlendingMode_(NSVisualEffectBlendingMode::BehindWindow);
+        blurred_view.setState_(NSVisualEffectState::FollowsWindowActiveState);
+        NSVisualEffectView::setAutoresizingMask_(
+            blurred_view,
+            NSViewWidthSizable | NSViewHeightSizable,
+        );
+
+        let _: () = msg_send![ns_view, addSubview: blurred_view positioned: NSWindowOrderingMode::NSWindowBelow relativeTo: 0];
+    }
 }
 
 #[allow(non_upper_case_globals)]
@@ -165,43 +201,5 @@ impl NSVisualEffectView for id {
 
     unsafe fn setBlendingMode_(self, mode: NSVisualEffectBlendingMode) {
         msg_send![self, setBlendingMode: mode]
-    }
-}
-
-#[allow(deprecated)]
-pub fn apply_blur_with_material(window: id, material: NSVisualEffectMaterial) {
-    unsafe {
-        if NSAppKitVersionNumber < NSAppKitVersionNumber10_10 {
-            // panic!("Sorry, 'NSVisualEffectView' is only available on macOS 10.10 or newer");
-            return;
-        }
-
-        if !msg_send![class!(NSThread), isMainThread] {
-            panic!("Views can only be created on the main thread on macOS");
-        }
-
-        let mut m = material;
-        if material as u32 > 9 && NSAppKitVersionNumber < NSAppKitVersionNumber10_14 {
-            m = NSVisualEffectMaterial::AppearanceBased;
-        } else if material as u32 > 4 && NSAppKitVersionNumber < NSAppKitVersionNumber10_11 {
-            m = NSVisualEffectMaterial::AppearanceBased;
-        }
-
-        let ns_view: id = window.contentView();
-        let bounds = NSView::bounds(ns_view);
-
-        let blurred_view =
-            NSVisualEffectView::initWithFrame_(NSVisualEffectView::alloc(nil), bounds);
-        blurred_view.autorelease();
-
-        blurred_view.setMaterial_(m);
-        blurred_view.setBlendingMode_(NSVisualEffectBlendingMode::BehindWindow);
-        blurred_view.setState_(NSVisualEffectState::FollowsWindowActiveState);
-        NSVisualEffectView::setAutoresizingMask_(
-            blurred_view,
-            NSViewWidthSizable | NSViewHeightSizable,
-        );
-
-        let _: () = msg_send![ns_view, addSubview: blurred_view positioned: NSWindowOrderingMode::NSWindowBelow relativeTo: 0];
     }
 }

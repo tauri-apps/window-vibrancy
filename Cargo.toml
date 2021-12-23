@@ -32,3 +32,4 @@ tao = { git = "https://github.com/tauri-apps/tao", branch = "next" }
 [target."cfg(target_os = \"macos\")".dependencies]
 cocoa = "0.24"
 objc = "0.2"
+log = "0.4"
