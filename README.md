@@ -31,7 +31,7 @@
 > Please read the methods documentation, it has valuable info
 - `apply_blur()` - **`Windows Only`**
 - `apply_acrylic()` - **`Windows Only`**: works only on Windows 10 v1809 and above, it also has bad performance when resizing/dragging the window
-- `apply_vibrancy()` - **`macOS Only`**, thanks to @youngsing 
+- `apply_vibrancy()` - **`macOS Only`**, thanks to [@youngsing](https://github.com/youngsing)
 
 ## TODOS:
 - [ ] `apply_mica()` for Windows 11
