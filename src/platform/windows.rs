@@ -15,10 +15,13 @@ use windows::Win32::{
 
 pub fn apply_acrylic(hwnd: HWND) {
     if let Some(v) = get_windows_ver() {
-        if v.2 >= 17763 {
-            unsafe {
-                set_window_composition_attribute(hwnd, AccentState::EnableAcrylicBlurBehind);
-            }
+        if v.2 < 17763 {
+            debug!("\"apply_acrylic\" is only available on Windows 10 v1809 or newer");
+            return;
+        }
+
+        unsafe {
+            set_window_composition_attribute(hwnd, AccentState::EnableAcrylicBlurBehind);
         }
     }
 }
@@ -35,11 +38,11 @@ pub fn apply_blur(hwnd: HWND) {
             unsafe {
                 let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
             }
-            return;
+        } else {
+            unsafe {
+                set_window_composition_attribute(hwnd, AccentState::EnableBlurBehind);
+            }
         }
-    }
-    unsafe {
-        set_window_composition_attribute(hwnd, AccentState::EnableBlurBehind);
     }
 }
 

@@ -1,5 +1,5 @@
-//! The use of NSVisualEffectView comes from https://github.com/joboet/winit/tree/macos_blurred_background
-//! just rewrite it to make it more like cocoa::appkit style .
+// The use of NSVisualEffectView comes from https://github.com/joboet/winit/tree/macos_blurred_background
+// with a bit of rewrite by @youngsing to make it more like cocoa::appkit style.
 
 #![cfg(target_os = "macos")]
 
@@ -15,13 +15,11 @@ use cocoa::{
 use log::debug;
 use objc::{class, msg_send, sel, sel_impl};
 
-pub use NSVisualEffectMaterial as MacVibrancy;
-
 #[allow(deprecated)]
 pub fn apply_vibrancy(window: id, appearance: NSVisualEffectMaterial) {
     unsafe {
         if NSAppKitVersionNumber < NSAppKitVersionNumber10_10 {
-            debug!("Sorry, 'NSVisualEffectView' is only available on macOS 10.10 or newer");
+            debug!("\"NSVisualEffectView\" is only available on macOS 10.10 or newer");
             return;
         }
 
@@ -62,7 +60,7 @@ pub const NSAppKitVersionNumber10_14: f64 = 1671.0;
 #[allow(dead_code)]
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum NSVisualEffectBlendingMode {
+enum NSVisualEffectBlendingMode {
     BehindWindow = 0,
     WithinWindow = 1,
 }
@@ -71,14 +69,13 @@ pub enum NSVisualEffectBlendingMode {
 #[allow(dead_code)]
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum NSVisualEffectState {
+enum NSVisualEffectState {
     FollowsWindowActiveState = 0,
     Active = 1,
     Inactive = 2,
 }
 
 // https://developer.apple.com/documentation/appkit/nsvisualeffectview/material
-#[allow(dead_code)]
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum NSVisualEffectMaterial {
