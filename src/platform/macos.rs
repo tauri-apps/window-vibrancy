@@ -54,7 +54,7 @@ pub fn apply_vibrancy(window: id, appearance: NSVisualEffectMaterial) {
 }
 
 #[allow(non_upper_case_globals)]
-pub const NSAppKitVersionNumber10_14: f64 = 1671.0;
+const NSAppKitVersionNumber10_14: f64 = 1671.0;
 
 // https://developer.apple.com/documentation/appkit/nsvisualeffectview/blendingmode
 #[allow(dead_code)]
@@ -114,7 +114,7 @@ pub enum NSVisualEffectMaterial {
 // macos 10.10+
 // https://developer.apple.com/documentation/appkit/nsvisualeffectview
 #[allow(non_snake_case)]
-pub trait NSVisualEffectView: Sized {
+trait NSVisualEffectView: Sized {
     unsafe fn alloc(_: Self) -> id {
         msg_send![class!(NSVisualEffectView), alloc]
     }
