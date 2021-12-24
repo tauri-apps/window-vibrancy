@@ -9,32 +9,45 @@
 ## Usage:
 
 1. Enable transparency on your window
-    - Tauri: Edit you window in `tauri.conf.json > tauri > windows` and add `"transparent": true`
-    or use `tauri::WindowBuilder::transparent`
-    - Tao: use `tao::window::WindowBuilder::with_transparent`
-2. Import the vibrancy trait
-    ```rs
-    use tauri_plugin_vibrancy::Vibrancy;
-    ```
-3. Use the `Vibrancy` trait methods on your window
+    - Tauri: Edit your window in `tauri.conf.json > tauri > windows` and add `"transparent": true`
+      or use `tauri::WindowBuilder::transparent`
+    - Tao: Use `tao::window::WindowBuilder::with_transparent`
+2. Use the `Vibrancy` trait methods on your window type
     - Tauri:
         ```rs
         let window = app.get_window("main").unwrap();
+
+        use tauri_plugin_vibrancy::Vibrancy;
+        #[cfg(target_os = "windows")]
         window.apply_blur();
+        #[cfg(target_os = "macos")]
+        {
+            use tauri_plugin_vibrancy::MacOSVibrancy;
+            window.apply_vibrancy(MacOSVibrancy::AppearanceBased);
+        }
         ```
     - Tao:
         ```rs
         let window = WindowBuilder::new().with_transparent(true).build().unwrap();
+
+        use tauri_plugin_vibrancy::Vibrancy;
+        #[cfg(target_os = "windows")]
         window.apply_blur();
+        #[cfg(target_os = "macos")]
+        {
+            use tauri_plugin_vibrancy::MacOSVibrancy;
+            window.apply_vibrancy(MacOSVibrancy::AppearanceBased);
+        }
         ```
+
 ## Methods:
 > Please read the methods documentation, it has valuable info
 - `apply_blur()` - **`Windows Only`**
 - `apply_acrylic()` - **`Windows Only`**: works only on Windows 10 v1809 and above, it also has bad performance when resizing/dragging the window
+- `apply_vibrancy()` - **`macOS Only`**, thanks to [@youngsing](https://github.com/youngsing)
 
 ## TODOS:
 - [ ] `apply_mica()` for Windows 11
-- [ ] `apply_vibrancy()` for macOS, I'd like some help because I am not a macOS developer.
 
 ## License
 [MIT](./LICENSE) License © 2021 [Amr Bashir](https://github.com/amrbashir)
