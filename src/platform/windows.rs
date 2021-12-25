@@ -1,6 +1,5 @@
 #![cfg(target_os = "windows")]
 
-use log::debug;
 use std::ffi::c_void;
 use windows::Win32::{
     Foundation::{BOOL, FARPROC, HWND},
@@ -17,7 +16,7 @@ use windows::Win32::{
 pub fn apply_acrylic(hwnd: HWND) {
     if let Some(v) = get_windows_ver() {
         if v.2 < 17763 {
-            debug!("\"apply_acrylic\" is only available on Windows 10 v1809 or newer");
+            eprintln!("\"apply_acrylic\" is only available on Windows 10 v1809 or newer");
             return;
         }
 

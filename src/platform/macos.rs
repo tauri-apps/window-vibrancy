@@ -12,14 +12,13 @@ use cocoa::{
     base::{id, nil, BOOL},
     foundation::{NSAutoreleasePool, NSPoint, NSRect, NSSize},
 };
-use log::debug;
 use objc::{class, msg_send, sel, sel_impl};
 
 #[allow(deprecated)]
 pub fn apply_vibrancy(window: id, appearance: NSVisualEffectMaterial) {
     unsafe {
         if NSAppKitVersionNumber < NSAppKitVersionNumber10_10 {
-            debug!("\"NSVisualEffectView\" is only available on macOS 10.10 or newer");
+            eprintln!("\"NSVisualEffectView\" is only available on macOS 10.10 or newer");
             return;
         }
 

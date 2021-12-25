@@ -16,7 +16,6 @@ categories = [ "gui" ]
 [dependencies]
 tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next" }
 tao = { git = "https://github.com/tauri-apps/tao", branch = "next" }
-log = "0.4"
 
 [target."cfg(target_os = \"windows\")".dependencies.windows]
   version = "0.28.0"
