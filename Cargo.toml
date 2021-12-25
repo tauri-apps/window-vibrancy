@@ -12,10 +12,14 @@ documentation = "https://docs.rs/tauri-plugin-vibrancy"
 keywords = [ "vibrancy", "acrylic", "blur", "tauri", "gui", "plugin", "tauri-plugin" ]
 categories = [ "gui" ]
 
-
 [dependencies]
-tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next" }
-tao = { git = "https://github.com/tauri-apps/tao", branch = "next" }
+tao = { git = "https://github.com/tauri-apps/tao", branch = "next", default-features = false, features = [], optional = true }
+tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next", default-features = false, features = [], optional = true }
+
+[features]
+default = ["tauri-impl"]
+tao-impl = ["tao"]
+tauri-impl = ["tauri"]
 
 [target."cfg(target_os = \"windows\")".dependencies.windows]
   version = "0.28.0"

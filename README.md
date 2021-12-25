@@ -1,6 +1,6 @@
 # tauri-plugin-vibrancy
 
-Make your Tao/Tauri windows vibrant.
+Make your Tauri/TAO windows vibrant.
 
 ## Platform Note
 
@@ -12,16 +12,21 @@ Linux blur effect is controlled by the compositor installed on the user system a
 Add it as a dependncy in `Cargo.toml` of your Tao/Tauri project
 ```toml
 [target."cfg(any(target_os = \"windows\", target_os = \"macos\"))".dependencies]
-tauri-plugin-vibrancy = { git = "https://github.com/amrbashir/tauri-plugin-vibrancy" }
+tauri-plugin-vibrancy = { git = "https://github.com/amrbashir/tauri-plugin-vibrancy", features = ["tauri-impl"] }
 ```
-You also need to use Tao/Tauri from github using the `next` branch (Only until the next release of Tauri).
+You also need to use Tauri/TAO from github using the `next` branch (Only until the next release of Tauri).
+
+## Crate Features:
+
+- `tauri-impl`: for Tauri projects.
+- `tao-impl`: for TAO projects.
 
 ## Usage
 
 1. Enable transparency on your window
     - Tauri: Edit your window in `tauri.conf.json > tauri > windows` and add `"transparent": true`
       or use `tauri::WindowBuilder::transparent`
-    - Tao: Use `tao::window::WindowBuilder::with_transparent`
+    - TAO: Use `tao::window::WindowBuilder::with_transparent`
 2. Use the `Vibrancy` trait methods on your window type
     - Tauri:
         ```rs

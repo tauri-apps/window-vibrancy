@@ -1,8 +1,8 @@
-//! Make your Tao/Tauri windows vibrant.
+//! Make your Tauri/TAO windows vibrant.
 //!
 //! # Platform Note:
 //!
-//! Only Windows and macOS are supported, 
+//! Only Windows and macOS are supported,
 //! Linux blur effect is controlled by the compositor installed on the user system and they can enable it for your app if they want.
 //!
 //! # Usage:
@@ -10,7 +10,7 @@
 //! 1. Enable transparency on your window
 //!     - **Tauri:** Edit your window in `tauri.conf.json > tauri > windows` and add `"transparent": true`
 //!       or use [`tauri::WindowBuilder::transparent`]
-//!     - **Tao:** Use [`tao::window::WindowBuilder::with_transparent`]
+//!     - **TAO:** Use [`tao::window::WindowBuilder::with_transparent`]
 //! 2. Use the [`Vibrancy`] trait methods on your window type
 //!     - Tauri:
 //!         ```no_run
@@ -41,8 +41,10 @@
 
 mod platform;
 
-use tao::window::Window as TaoWindow;
+#[cfg(feature = "tauri-impl")]
 use tauri::Window as TauriWindow;
+#[cfg(feature = "tao-impl")]
+use tao::window::Window as TaoWindow;
 
 #[cfg(target_os = "macos")]
 use crate::platform::macos;
@@ -52,9 +54,9 @@ pub use crate::platform::macos::NSVisualEffectMaterial as MacOSVibrancy;
 use crate::platform::windows;
 #[cfg(target_os = "windows")]
 use ::windows::Win32::Foundation::HWND;
-#[cfg(target_os = "macos")]
+#[cfg(all(target_os = "macos", feature = "tao-impl"))]
 use tao::platform::macos::WindowExtMacOS;
-#[cfg(target_os = "windows")]
+#[cfg(all(target_os = "windows", feature = "tao-impl"))]
 use tao::platform::windows::WindowExtWindows;
 
 pub trait Vibrancy {
@@ -78,6 +80,7 @@ pub trait Vibrancy {
     fn apply_vibrancy(&self, vibrancy: MacOSVibrancy);
 }
 
+#[cfg(feature = "tauri-impl")]
 impl Vibrancy for TauriWindow {
     #[cfg(target_os = "windows")]
     fn apply_acrylic(&self) {
@@ -95,6 +98,7 @@ impl Vibrancy for TauriWindow {
     }
 }
 
+#[cfg(feature = "tao-impl")]
 impl Vibrancy for TaoWindow {
     #[cfg(target_os = "windows")]
     fn apply_acrylic(&self) {
