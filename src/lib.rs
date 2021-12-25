@@ -1,9 +1,9 @@
 //! Make your Tao/Tauri windows vibrant.
 //!
-//! # Note:
+//! # Platform Note:
 //!
-//! This plugin is an experiment to gather enough feedback that will help me
-//! decide how and whether this will be included in Tao/Tauri directly or kept as a plugin.
+//! Only Windows and macOS are supported, 
+//! Linux blur effect is controlled by the compositor installed on the user system and they can enable it for your app if they want.
 //!
 //! # Usage:
 //!

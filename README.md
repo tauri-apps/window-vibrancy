@@ -1,12 +1,22 @@
 # tauri-plugin-vibrancy
- Make your Tao/Tauri windows vibrant.
 
-## Note:
+Make your Tao/Tauri windows vibrant.
 
- This plugin is an experiment to gather enough feedback that will help me
- decide how and whether this will be included in Tao/Tauri directly or kept as a plugin.
+## Platform Note
 
-## Usage:
+Only Windows and macOS are supported, 
+Linux blur effect is controlled by the compositor installed on the user system and they can enable it for your app if they want.
+
+## Installation
+
+Add it as a dependncy in `Cargo.toml` of your Tao/Tauri project
+```toml
+[target."cfg(any(target_os = \"windows\", target_os = \"macos\"))".dependencies]
+tauri-plugin-vibrancy = { git = "https://github.com/amrbashir/tauri-plugin-vibrancy" }
+```
+You also need to use Tao/Tauri from github using the `next` branch (Only until the next release of Tauri).
+
+## Usage
 
 1. Enable transparency on your window
     - Tauri: Edit your window in `tauri.conf.json > tauri > windows` and add `"transparent": true`
@@ -40,14 +50,17 @@
         }
         ```
 
-## Methods:
+## Methods
+
 > Please read the methods documentation, it has valuable info
 - `apply_blur()` - **`Windows Only`**
-- `apply_acrylic()` - **`Windows Only`**: works only on Windows 10 v1809 and above, it also has bad performance when resizing/dragging the window
-- `apply_vibrancy()` - **`macOS Only`**, thanks to [@youngsing](https://github.com/youngsing)
+- `apply_acrylic()` - **`Windows Only`** works only on Windows 10 v1809 and above, it also has bad performance when resizing/dragging the window
+- `apply_vibrancy()` - **`macOS Only`** thanks to [@youngsing](https://github.com/youngsing)
 
-## TODOS:
+## TODOS
+
 - [ ] `apply_mica()` for Windows 11
 
 ## License
+
 [MIT](./LICENSE) License © 2021 [Amr Bashir](https://github.com/amrbashir)
