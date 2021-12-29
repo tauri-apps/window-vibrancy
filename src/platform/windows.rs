@@ -51,10 +51,10 @@ fn get_function_impl(library: &str, function: &str) -> Option<FARPROC> {
     assert_eq!(function.chars().last(), Some('\0'));
 
     let module = unsafe { LoadLibraryA(library) };
-    if module.0 == 0 {
+    if module == 0 {
         return None;
     }
-    unsafe { GetProcAddress(module, function) }
+    Some(unsafe { GetProcAddress(module, function) })
 }
 
 macro_rules! get_function {

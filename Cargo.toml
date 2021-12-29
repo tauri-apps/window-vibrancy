@@ -22,7 +22,7 @@ tao-impl = ["tao"]
 tauri-impl = ["tauri"]
 
 [target."cfg(target_os = \"windows\")".dependencies.windows]
-  version = "0.28.0"
+  version = "0.29.0"
   features = [
   "alloc",
   "Win32_Foundation",
