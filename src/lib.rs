@@ -1,6 +1,6 @@
 //! Make your Tauri/TAO windows vibrant.
 //!
-//! # Platform Note:
+//! # Platforms Notes:
 //!
 //! Only Windows and macOS are supported,
 //! Linux blur effect is controlled by the compositor installed on the user system and they can enable it for your app if they want.
@@ -36,12 +36,9 @@
 //!         }
 //!         ```
 
-mod platform;
+#![allow(unused)]
 
-#[cfg(feature = "tao-impl")]
-use tao::window::Window as TaoWindow;
-#[cfg(feature = "tauri-impl")]
-use tauri::{Runtime, Window as TauriWindow};
+mod platform;
 
 #[cfg(target_os = "macos")]
 use crate::platform::macos;
@@ -49,10 +46,16 @@ use crate::platform::macos;
 pub use crate::platform::macos::NSVisualEffectMaterial as MacOSVibrancy;
 #[cfg(target_os = "windows")]
 use crate::platform::windows;
+
+#[cfg(feature = "tauri-impl")]
+use tauri::{Runtime, Window as TauriWindow};
+
 #[cfg(all(target_os = "macos", feature = "tao-impl"))]
 use tao::platform::macos::WindowExtMacOS;
 #[cfg(all(target_os = "windows", feature = "tao-impl"))]
 use tao::platform::windows::WindowExtWindows;
+#[cfg(feature = "tao-impl")]
+use tao::window::Window as TaoWindow;
 
 pub trait Vibrancy {
   /// Applies Acrylic effect to you tao/tauri window. This has no effect on Windows versions below Windows 10 v1809

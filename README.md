@@ -2,7 +2,7 @@
 
 Make your Tauri/TAO windows vibrant.
 
-## Platform Note
+## Platforms Notes
 
 Only Windows and macOS are supported,
 Linux blur effect is controlled by the compositor installed on the user system and they can enable it for your app if they want.
@@ -12,7 +12,7 @@ Linux blur effect is controlled by the compositor installed on the user system a
 Add it as a dependncy in `Cargo.toml` of your Tao/Tauri project
 ```toml
 [target."cfg(any(target_os = \"windows\", target_os = \"macos\"))".dependencies]
-tauri-plugin-vibrancy = { git = "https://github.com/amrbashir/tauri-plugin-vibrancy", features = ["tauri-impl"] }
+tauri-plugin-vibrancy = { git = "https://github.com/tauri-apps/tauri-plugin-vibrancy", features = ["tauri-impl"] }
 ```
 You also need to use Tauri/TAO from github using the `next` branch (Only until the next release of Tauri).
 
@@ -66,6 +66,3 @@ You also need to use Tauri/TAO from github using the `next` branch (Only until t
 
 - [ ] `apply_mica()` for Windows 11
 
-## License
-
-[MIT](./LICENSE) License © 2021 [Amr Bashir](https://github.com/amrbashir)

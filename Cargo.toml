@@ -1,6 +1,6 @@
 [package]
 name = "tauri-plugin-vibrancy"
-description = "Add vibancy/blur/acrylic effects to your tauri window."
+description = "Make your Tauri/TAO windows vibrant."
 authors = [ "Tauri Programme within The Commons Conservancy" ]
 version = "0.1.0"
 edition = "2021"
@@ -17,7 +17,6 @@ tao = { git = "https://github.com/tauri-apps/tao", branch = "next", default-feat
 tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next", default-features = false, features = [], optional = true }
 
 [features]
-default = ["tauri-impl"]
 tao-impl = ["tao"]
 tauri-impl = ["tauri"]
 
