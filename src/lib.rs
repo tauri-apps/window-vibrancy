@@ -1,9 +1,10 @@
 //! Make your Tauri/TAO windows vibrant.
 //!
-//! # Platforms Notes:
+//! # Platform support:
 //!
-//! Only Windows and macOS are supported,
-//! Linux blur effect is controlled by the compositor installed on the user system and they can enable it for your app if they want.
+//! - **Windows:** Yes!
+//! - **macOS:** Yes!
+//! - **Linux:** No, blur effect is controlled by the compositor installed on the user system and they can enable it for your app if they want.
 //!
 //! # Usage:
 //!
