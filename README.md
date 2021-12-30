@@ -4,7 +4,7 @@ Make your Tauri/TAO windows vibrant.
 
 ## Platform Note
 
-Only Windows and macOS are supported, 
+Only Windows and macOS are supported,
 Linux blur effect is controlled by the compositor installed on the user system and they can enable it for your app if they want.
 
 ## Installation
@@ -43,7 +43,7 @@ You also need to use Tauri/TAO from github using the `next` branch (Only until t
         ```
     - Tao:
         ```rs
-        let window = WindowBuilder::new().with_transparent(true).build().unwrap();
+        let window = WindowBuilder::new().with_transparent(true).build(&event_loop).unwrap();
 
         use tauri_plugin_vibrancy::Vibrancy;
         #[cfg(target_os = "windows")]

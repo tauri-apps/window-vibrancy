@@ -13,10 +13,8 @@
 //!     - **TAO:** Use [`tao::window::WindowBuilder::with_transparent`]
 //! 2. Use the [`Vibrancy`] trait methods on your window type
 //!     - Tauri:
-//!         ```no_run
+//!         ```ignore
 //!         let window = app.get_window("main").unwrap();
-//!
-//!         use tauri_plugin_vibrancy::Vibrancy;
 //!         #[cfg(target_os = "windows")]
 //!         window.apply_blur();
 //!         #[cfg(target_os = "macos")]
@@ -26,9 +24,8 @@
 //!         }
 //!         ```
 //!     - Tao:
-//!         ```no_run
-//!         let window = WindowBuilder::new().with_transparent(true).build().unwrap();
-//!
+//!         ```ignore
+//!         let window = WindowBuilder::new().with_transparent(true).build(&event_loop).unwrap();
 //!         use tauri_plugin_vibrancy::Vibrancy;
 //!         #[cfg(target_os = "windows")]
 //!         window.apply_blur();
@@ -44,7 +41,7 @@ mod platform;
 #[cfg(feature = "tao-impl")]
 use tao::window::Window as TaoWindow;
 #[cfg(feature = "tauri-impl")]
-use tauri::Window as TauriWindow;
+use tauri::{Runtime, Window as TauriWindow};
 
 #[cfg(target_os = "macos")]
 use crate::platform::macos;
@@ -58,58 +55,61 @@ use tao::platform::macos::WindowExtMacOS;
 use tao::platform::windows::WindowExtWindows;
 
 pub trait Vibrancy {
-    /// Applies Acrylic effect to you tao/tauri window. This has no effect on Windows versions below Windows 10 v1809
-    ///
-    /// ## WARNING:
-    ///
-    /// This method has poor performance on Windows 10 v1903 and above,
-    /// the window will lag when resizing or dragging.
-    /// It is an issue in the undocumented api used for this method
-    /// and microsoft needs to fix it (they probably won't).
-    #[cfg(target_os = "windows")]
-    fn apply_acrylic(&self);
+  /// Applies Acrylic effect to you tao/tauri window. This has no effect on Windows versions below Windows 10 v1809
+  ///
+  /// ## WARNING:
+  ///
+  /// This method has poor performance on Windows 10 v1903 and above,
+  /// the window will lag when resizing or dragging.
+  /// It is an issue in the undocumented api used for this method
+  /// and microsoft needs to fix it (they probably won't).
+  #[cfg(target_os = "windows")]
+  fn apply_acrylic(&self);
 
-    /// Applies blur effect to tao/tauri window.
-    #[cfg(target_os = "windows")]
-    fn apply_blur(&self);
+  /// Applies blur effect to tao/tauri window.
+  #[cfg(target_os = "windows")]
+  fn apply_blur(&self);
 
-    /// Applies macos vibrancy effect to tao/tauri window. This has no effect on macOS versions below 10.10
-    #[cfg(target_os = "macos")]
-    fn apply_vibrancy(&self, vibrancy: MacOSVibrancy);
+  /// Applies macos vibrancy effect to tao/tauri window. This has no effect on macOS versions below 10.10
+  #[cfg(target_os = "macos")]
+  fn apply_vibrancy(&self, vibrancy: MacOSVibrancy);
 }
 
 #[cfg(feature = "tauri-impl")]
-impl Vibrancy for TauriWindow {
-    #[cfg(target_os = "windows")]
-    fn apply_acrylic(&self) {
-        windows::apply_acrylic(self.hwnd().unwrap() as _);
-    }
+impl<R> Vibrancy for TauriWindow<R>
+where
+  R: Runtime,
+{
+  #[cfg(target_os = "windows")]
+  fn apply_acrylic(&self) {
+    windows::apply_acrylic(self.hwnd().unwrap() as _);
+  }
 
-    #[cfg(target_os = "windows")]
-    fn apply_blur(&self) {
-        windows::apply_blur(self.hwnd().unwrap() as _);
-    }
+  #[cfg(target_os = "windows")]
+  fn apply_blur(&self) {
+    windows::apply_blur(self.hwnd().unwrap() as _);
+  }
 
-    #[cfg(target_os = "macos")]
-    fn apply_vibrancy(&self, vibrancy: MacOSVibrancy) {
-        macos::apply_vibrancy(self.ns_window().unwrap() as _, vibrancy);
-    }
+  #[cfg(target_os = "macos")]
+  fn apply_vibrancy(&self, vibrancy: MacOSVibrancy) {
+    macos::apply_vibrancy(self.ns_window().unwrap() as _, vibrancy);
+  }
 }
 
 #[cfg(feature = "tao-impl")]
 impl Vibrancy for TaoWindow {
-    #[cfg(target_os = "windows")]
-    fn apply_acrylic(&self) {
-        windows::apply_acrylic(self.hwnd() as _);
-    }
+  #[cfg(target_os = "windows")]
+  fn apply_acrylic(&self) {
+    windows::apply_acrylic(self.hwnd() as _);
+  }
 
-    #[cfg(target_os = "windows")]
-    fn apply_blur(&self) {
-        windows::apply_blur(self.hwnd() as _);
-    }
+  #[cfg(target_os = "windows")]
+  fn apply_blur(&self) {
+    windows::apply_blur(self.hwnd() as _);
+  }
 
-    #[cfg(target_os = "macos")]
-    fn apply_vibrancy(&self, vibrancy: MacOSVibrancy) {
-        macos::apply_vibrancy(self.ns_window() as _, vibrancy);
-    }
+  #[cfg(target_os = "macos")]
+  fn apply_vibrancy(&self, vibrancy: MacOSVibrancy) {
+    macos::apply_vibrancy(self.ns_window() as _, vibrancy);
+  }
 }

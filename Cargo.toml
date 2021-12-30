@@ -1,13 +1,13 @@
 [package]
 name = "tauri-plugin-vibrancy"
 description = "Add vibancy/blur/acrylic effects to your tauri window."
-authors = [ "Amr Bashir <amr.bashir2015@gmail.com>" ]
+authors = [ "Tauri Programme within The Commons Conservancy" ]
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.56"
-license = "MIT"
+license = "Apache-2.0 OR MIT"
 readme = "README.md"
-repository = "https://github.com/amrbashir/tauri-plugin-vibrancy"
+repository = "https://github.com/tauri-apps/tauri-plugin-vibrancy"
 documentation = "https://docs.rs/tauri-plugin-vibrancy"
 keywords = [ "vibrancy", "acrylic", "blur", "tauri", "gui", "plugin", "tauri-plugin" ]
 categories = [ "gui" ]
@@ -36,3 +36,7 @@ tauri-impl = ["tauri"]
 [target."cfg(target_os = \"macos\")".dependencies]
 cocoa = "0.24"
 objc = "0.2"
+
+[[example]]
+name = "tao"
+required-features = ["tao-impl"]
