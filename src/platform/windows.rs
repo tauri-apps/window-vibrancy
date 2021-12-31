@@ -4,7 +4,7 @@ use std::ffi::c_void;
 use windows::Win32::{
   Foundation::{BOOL, FARPROC, HWND},
   Graphics::{
-    Dwm::{DwmEnableBlurBehindWindow, DWM_BB_ENABLE, DWM_BLURBEHIND},
+    Dwm::{DwmEnableBlurBehindWindow, DwmSetWindowAttribute, DWM_BB_ENABLE, DWM_BLURBEHIND},
     Gdi::HRGN,
   },
   System::{
@@ -43,6 +43,17 @@ pub fn apply_blur(hwnd: HWND) {
         set_window_composition_attribute(hwnd, AccentState::EnableBlurBehind);
       }
     }
+  }
+}
+
+pub fn apply_mica(hwnd: HWND, dark: bool) {
+  unsafe {
+    let mica = DWMWINDOWATTRIBUTE::DWMWA_MICA_EFFECT;
+    let mica_size = std::mem::size_of_val(&mica);
+    let dark = DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE;
+    let dark_size = std::mem::size_of_val(&dark);
+    DwmSetWindowAttribute(hwnd, dark as _, 1 as _, dark_size as _);
+    DwmSetWindowAttribute(hwnd, mica as _, 1 as _, mica_size as _);
   }
 }
 
@@ -149,4 +160,10 @@ unsafe fn set_window_composition_attribute(hwnd: HWND, accent_state: AccentState
 
     set_window_composition_attribute(hwnd, &mut data as *mut _ as _);
   }
+}
+
+#[allow(non_camel_case_types)]
+enum DWMWINDOWATTRIBUTE {
+  DWMWA_USE_IMMERSIVE_DARK_MODE = 20,
+  DWMWA_MICA_EFFECT = 1029,
 }

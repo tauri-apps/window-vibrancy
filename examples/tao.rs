@@ -1,5 +1,3 @@
-#![allow(clippy)]
-
 fn main() {
   use tao::{
     event::{Event, WindowEvent},
@@ -16,7 +14,7 @@ fn main() {
     .build(&event_loop)
     .unwrap();
 
-  window.apply_blur();
+  window.apply_mica_dark();
 
   window.set_title("A fantastic window!");
 

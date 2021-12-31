@@ -74,6 +74,14 @@ pub trait Vibrancy {
   #[cfg(target_os = "windows")]
   fn apply_blur(&self);
 
+  /// Applies light mica effect to tao/tauri window.
+  #[cfg(target_os = "windows")]
+  fn apply_mica_light(&self);
+
+  /// Applies dark mica effect to tao/tauri window.
+  #[cfg(target_os = "windows")]
+  fn apply_mica_dark(&self);
+
   /// Applies macos vibrancy effect to tao/tauri window. This has no effect on macOS versions below 10.10
   #[cfg(target_os = "macos")]
   fn apply_vibrancy(&self, vibrancy: MacOSVibrancy);
@@ -94,6 +102,16 @@ where
     windows::apply_blur(self.hwnd().unwrap() as _);
   }
 
+  #[cfg(target_os = "windows")]
+  fn apply_mica_light(&self) {
+    windows::apply_mica(self.hwnd().unwrap() as _, false);
+  }
+
+  #[cfg(target_os = "windows")]
+  fn apply_mica_dark(&self) {
+    windows::apply_mica(self.hwnd().unwrap() as _, true);
+  }
+
   #[cfg(target_os = "macos")]
   fn apply_vibrancy(&self, vibrancy: MacOSVibrancy) {
     macos::apply_vibrancy(self.ns_window().unwrap() as _, vibrancy);
@@ -110,6 +128,16 @@ impl Vibrancy for TaoWindow {
   #[cfg(target_os = "windows")]
   fn apply_blur(&self) {
     windows::apply_blur(self.hwnd() as _);
+  }
+
+  #[cfg(target_os = "windows")]
+  fn apply_mica_light(&self) {
+    windows::apply_mica(self.hwnd() as _, false);
+  }
+
+  #[cfg(target_os = "windows")]
+  fn apply_mica_dark(&self) {
+    windows::apply_mica(self.hwnd() as _, true);
   }
 
   #[cfg(target_os = "macos")]
