@@ -1,5 +1,3 @@
-#![allow(clippy)]
-
 fn main() {
   use tao::{
     event::{Event, WindowEvent},
