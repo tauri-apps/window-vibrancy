@@ -46,13 +46,18 @@ pub fn apply_blur(hwnd: HWND) {
   }
 }
 
-pub fn apply_mica(hwnd: HWND, dark: bool) {
+pub fn apply_mica(hwnd: HWND, dark_mica: bool) {
   unsafe {
     let mica = DWMWINDOWATTRIBUTE::DWMWA_MICA_EFFECT;
     let mica_size = std::mem::size_of_val(&mica);
     let dark = DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE;
     let dark_size = std::mem::size_of_val(&dark);
-    DwmSetWindowAttribute(hwnd, dark as _, 1 as _, dark_size as _);
+    DwmSetWindowAttribute(
+      hwnd,
+      dark as _,
+      if dark_mica { 1 } else { 0 } as _,
+      dark_size as _,
+    );
     DwmSetWindowAttribute(hwnd, mica as _, 1 as _, mica_size as _);
   }
 }
