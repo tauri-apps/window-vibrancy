@@ -16,9 +16,6 @@ categories = [ "gui" ]
 tao = { git = "https://github.com/tauri-apps/tao", branch = "next", default-features = false, features = [], optional = true }
 tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next", default-features = false, features = [], optional = true }
 
-[features]
-tao-impl = ["tao"]
-tauri-impl = ["tauri"]
 
 [target."cfg(target_os = \"windows\")".dependencies.windows]
   version = "0.29.0"
@@ -34,6 +31,15 @@ tauri-impl = ["tauri"]
 [target."cfg(target_os = \"macos\")".dependencies]
 cocoa = "0.24"
 objc = "0.2"
+
+[package.metadata.docs.rs]
+features = ["tauri-impl", "tao-impl"]
+default-target = "x86_64-pc-windows-msvc"
+targets = ["x86_64-apple-darwin", "x86_64-pc-windows-msvc"]
+
+[features]
+tao-impl = ["tao"]
+tauri-impl = ["tauri"]
 
 [[example]]
 name = "tao"
