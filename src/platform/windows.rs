@@ -14,51 +14,39 @@ use windows::Win32::{
 };
 
 pub fn apply_acrylic(hwnd: HWND) {
-  if let Some(v) = get_windows_ver() {
-    if v.2 < 17763 {
+  if is_win11() {
+    // TODO:
+  } else {
+    if is_supported_win10() {
+      unsafe {
+        set_window_composition_attribute(hwnd, AccentState::EnableAcrylicBlurBehind);
+      }
+    } else {
       eprintln!("\"apply_acrylic\" is only available on Windows 10 v1809 or newer");
-      return;
-    }
-
-    unsafe {
-      set_window_composition_attribute(hwnd, AccentState::EnableAcrylicBlurBehind);
     }
   }
 }
 pub fn apply_blur(hwnd: HWND) {
-  if let Some(v) = get_windows_ver() {
-    // windows 7 is 6.1
-    if v.0 == 6 && v.1 == 1 {
-      let bb = DWM_BLURBEHIND {
-        dwFlags: DWM_BB_ENABLE,
-        fEnable: true.into(),
-        hRgnBlur: HRGN::default(),
-        ..Default::default()
-      };
-      unsafe {
-        let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
-      }
-    } else {
-      unsafe {
-        set_window_composition_attribute(hwnd, AccentState::EnableBlurBehind);
-      }
+  if is_win7() {
+    let bb = DWM_BLURBEHIND {
+      dwFlags: DWM_BB_ENABLE,
+      fEnable: true.into(),
+      hRgnBlur: HRGN::default(),
+      ..Default::default()
+    };
+    unsafe {
+      let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
+    }
+  } else {
+    unsafe {
+      set_window_composition_attribute(hwnd, AccentState::EnableBlurBehind);
     }
   }
 }
 
 pub fn apply_mica(hwnd: HWND, dark_mica: bool) {
   unsafe {
-    let mica = DWMWINDOWATTRIBUTE::DWMWA_MICA_EFFECT;
-    let mica_size = std::mem::size_of_val(&mica);
-    let dark = DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE;
-    let dark_size = std::mem::size_of_val(&dark);
-    DwmSetWindowAttribute(
-      hwnd,
-      dark as _,
-      if dark_mica { 1 } else { 0 } as _,
-      dark_size as _,
-    );
-    DwmSetWindowAttribute(hwnd, mica as _, 1 as _, mica_size as _);
+    DwmSetWindowAttribute(hwnd, 1029 as _, 1 as _, std::mem::size_of::<u32>() as _);
   }
 }
 
@@ -170,5 +158,39 @@ unsafe fn set_window_composition_attribute(hwnd: HWND, accent_state: AccentState
 #[allow(non_camel_case_types)]
 enum DWMWINDOWATTRIBUTE {
   DWMWA_USE_IMMERSIVE_DARK_MODE = 20,
-  DWMWA_MICA_EFFECT = 1029,
+  DWMWA_SYSTEMBACKDROP_TYPE = 38,
+}
+
+#[allow(non_camel_case_types)]
+enum DWM_SYSTEMBACKDROP_TYPE {
+  DWMSBT_MAINWINDOW = 2,      // Mica
+  DWMSBT_TRANSIENTWINDOW = 3, // Acrylic
+  DWMSBT_TABBEDWINDOW = 4,    // Tabbed
+}
+
+fn is_win7() -> bool {
+  if let Some(v) = get_windows_ver() {
+    // windows 7 is 6.1
+    if v.0 == 6 && v.1 == 1 {
+      return true;
+    }
+  }
+  false
+}
+
+fn is_supported_win10() -> bool {
+  if let Some(v) = get_windows_ver() {
+    if v.2 >= 17763 {
+      return true;
+    }
+  }
+  false
+}
+fn is_win11() -> bool {
+  if let Some(v) = get_windows_ver() {
+    if v.2 >= 22000 {
+      return true;
+    }
+  }
+  false
 }
