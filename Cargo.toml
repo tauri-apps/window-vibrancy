@@ -13,9 +13,8 @@ keywords = [ "vibrancy", "acrylic", "blur", "tauri", "gui", "plugin", "tauri-plu
 categories = [ "gui" ]
 
 [dependencies]
-tao = { git = "https://github.com/tauri-apps/tao", branch = "next", default-features = false, features = [], optional = true }
-tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next", default-features = false, features = [], optional = true }
-
+tao = { version = "0.6", default-features = false, features = [], optional = true }
+tauri = { version = "1.0.0-rc.0", default-features = false, features = [], optional = true }
 
 [target."cfg(target_os = \"windows\")".dependencies.windows]
   version = "0.32.0"
