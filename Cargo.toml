@@ -14,7 +14,7 @@ categories = [ "gui" ]
 
 [dependencies]
 tao = { version = "0.6", default-features = false, features = [], optional = true }
-tauri = { version = "1.0.0-rc.0", default-features = false, features = [], optional = true }
+tauri = { version = "1.0.0-rc.1", default-features = false, features = [], optional = true }
 
 [target."cfg(target_os = \"windows\")".dependencies.windows]
   version = "0.32.0"
