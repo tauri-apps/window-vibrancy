@@ -14,7 +14,7 @@ categories = [ "gui" ]
 
 [dependencies]
 tao = { version = "0.6", default-features = false, features = [], optional = true }
-tauri = { version = "1.0.0-rc.1", default-features = false, features = [], optional = true }
+tauri = "1.0.0-rc.1"
 
 [target."cfg(target_os = \"windows\")".dependencies.windows]
   version = "0.32.0"
@@ -38,7 +38,7 @@ targets = ["x86_64-apple-darwin", "x86_64-pc-windows-msvc"]
 
 [features]
 tao-impl = ["tao"]
-tauri-impl = ["tauri"]
+tauri-impl = []
 
 [[example]]
 name = "tao"
