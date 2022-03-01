@@ -14,8 +14,15 @@ use windows::Win32::{
 };
 
 pub fn apply_acrylic(hwnd: HWND) {
-  if is_win11() {
-    // TODO:
+  if is_win11_dwmsbt() {
+    unsafe {
+      DwmSetWindowAttribute(
+        hwnd,
+        DWMWINDOWATTRIBUTE::DWMWA_SYSTEMBACKDROP_TYPE as i32,
+        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TRANSIENTWINDOW as i32) as *const _ as _,
+        4
+      );
+    }
   } else {
     if is_supported_win10() {
       unsafe {
@@ -45,8 +52,37 @@ pub fn apply_blur(hwnd: HWND) {
 }
 
 pub fn apply_mica(hwnd: HWND, dark_mica: bool) {
-  unsafe {
-    DwmSetWindowAttribute(hwnd, 1029 as _, 1 as _, std::mem::size_of::<u32>() as _);
+  if is_win11() {
+    unsafe {
+      DwmSetWindowAttribute(
+        hwnd,
+        DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE as i32,
+        &dark_mica as *const _ as _,
+        4
+      );
+    }
+    if is_win11_dwmsbt() {
+      unsafe {
+        DwmSetWindowAttribute(
+          hwnd,
+          DWMWINDOWATTRIBUTE::DWMWA_SYSTEMBACKDROP_TYPE as i32,
+          &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_MAINWINDOW as i32) as *const _ as _,
+          4
+        );
+      }
+    } else {
+      unsafe {
+        DwmSetWindowAttribute(
+          hwnd,
+          /* DWMWA_MICA_EFFECT */
+          1029 as _,
+          1 as _,
+          std::mem::size_of::<u32>() as _
+        );
+      }
+    }
+  } else {
+    eprintln!("\"apply_mica\" is only available on Windows 11");
   }
 }
 
@@ -189,6 +225,14 @@ fn is_supported_win10() -> bool {
 fn is_win11() -> bool {
   if let Some(v) = get_windows_ver() {
     if v.2 >= 22000 {
+      return true;
+    }
+  }
+  false
+}
+fn is_win11_dwmsbt() -> bool {
+  if let Some(v) = get_windows_ver() {
+    if v.2 >= 22523 {
       return true;
     }
   }
