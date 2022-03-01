@@ -177,7 +177,7 @@ unsafe fn set_window_composition_attribute(hwnd: HWND, accent_state: AccentState
     let mut policy = ACCENT_POLICY {
       AccentState: accent_state.into(),
       AccentFlags: 2,
-      GradientColor: 16777216,
+      GradientColor: 0x1F | 0x1F << 8 | 0x1F << 16 | 0 << 24,
       AnimationId: 0,
     };
 
@@ -205,30 +205,17 @@ enum DWM_SYSTEMBACKDROP_TYPE {
 }
 
 fn is_win7() -> bool {
-  if let Some(v) = get_windows_ver() {
-    // windows 7 is 6.1
-    if v.0 == 6 && v.1 == 1 {
-      return true;
-    }
-  }
-  false
+  let v = get_windows_ver().unwrap_or_default();
+  (v.0 == 6 && v.1 == 1)
 }
 
 fn is_supported_win10() -> bool {
-  if let Some(v) = get_windows_ver() {
-    if v.2 >= 17763 {
-      return true;
-    }
-  }
-  false
+  let v = get_windows_ver().unwrap_or_default();
+  (v.2 >= 17763 && v.2 < 22000)
 }
 fn is_win11() -> bool {
-  if let Some(v) = get_windows_ver() {
-    if v.2 >= 22000 {
-      return true;
-    }
-  }
-  false
+  let v = get_windows_ver().unwrap_or_default();
+  v.2 >= 22000
 }
 fn is_win11_dwmsbt() -> bool {
   if let Some(v) = get_windows_ver() {

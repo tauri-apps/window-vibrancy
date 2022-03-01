@@ -9,20 +9,28 @@ license = "Apache-2.0 OR MIT"
 readme = "README.md"
 repository = "https://github.com/tauri-apps/tauri-plugin-vibrancy"
 documentation = "https://docs.rs/tauri-plugin-vibrancy"
-keywords = [ "vibrancy", "acrylic", "blur", "tauri", "gui", "plugin", "tauri-plugin" ]
+keywords = [
+  "vibrancy",
+  "acrylic",
+  "blur",
+  "tauri",
+  "gui",
+  "plugin",
+  "tauri-plugin"
+]
 categories = [ "gui" ]
 
 [dependencies]
-tao = { git = "https://github.com/tauri-apps/tao", branch = "next", default-features = false, features = [], optional = true }
-tauri = { git = "https://github.com/tauri-apps/tauri", branch = "next", default-features = false, features = [], optional = true }
+tao = { version = "0.6", default-features = false, features = [], optional = true }
+tauri = { version = "1.0.0-rc.3", default-features = false, features = [], optional = true }
 
 [features]
-tao-impl = ["tao"]
-tauri-impl = ["tauri"]
+tao-impl = [ "tao" ]
+tauri-impl = [ "tauri" ]
 
 [target."cfg(target_os = \"windows\")".dependencies.windows]
-  version = "0.29.0"
-  features = [
+version = "0.29.0"
+features = [
   "alloc",
   "Win32_Foundation",
   "Win32_System_LibraryLoader",
@@ -38,4 +46,4 @@ objc = "0.2"
 
 [[example]]
 name = "tao"
-required-features = ["tao-impl"]
+required-features = [ "tao-impl" ]
