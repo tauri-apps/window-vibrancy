@@ -34,7 +34,7 @@ tauri-plugin-vibrancy = { git = "https://github.com/tauri-apps/tauri-plugin-vibr
 
         use tauri_plugin_vibrancy::Vibrancy;
         #[cfg(target_os = "windows")]
-        window.apply_blur();
+        window.apply_blur(Some(0x80121212u32));
         #[cfg(target_os = "macos")]
         {
             use tauri_plugin_vibrancy::MacOSVibrancy;
@@ -47,7 +47,7 @@ tauri-plugin-vibrancy = { git = "https://github.com/tauri-apps/tauri-plugin-vibr
 
         use tauri_plugin_vibrancy::Vibrancy;
         #[cfg(target_os = "windows")]
-        window.apply_blur();
+        window.apply_blur(Some(0x80121212u32));
         #[cfg(target_os = "macos")]
         {
             use tauri_plugin_vibrancy::MacOSVibrancy;
@@ -58,11 +58,7 @@ tauri-plugin-vibrancy = { git = "https://github.com/tauri-apps/tauri-plugin-vibr
 ## Available methods
 
 > Please read the methods documentation in [src/lib.rs](src/lib.rs)
-- `apply_blur()` - **`Windows`**
-- `apply_acrylic()` - **`Windows`** works on Windows 10 v1809 and above and has bad performance when resizing/dragging the window
+- `apply_blur()` - **`Windows`** and has bad performance when resizing/dragging the window
+- `apply_acrylic()` - **`Windows`** works on Windows 10 v1809 and above
+- `apply_mica()` - **`Windows`** works on Windows 11
 - `apply_vibrancy()` - **`macOS`** thanks to [@youngsing](https://github.com/youngsing)
-
-## TODOS
-
-- [ ] `apply_mica()` for Windows 11
-

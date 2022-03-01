@@ -59,7 +59,12 @@ use tao::platform::windows::WindowExtWindows;
 use tao::window::Window as TaoWindow;
 
 pub trait Vibrancy {
-  /// Applies Acrylic effect to you tao/tauri window. This has no effect on Windows versions below Windows 10 v1809
+  /// Applies Acrylic effect to you tao/tauri window with an optional tint in ABGR format. This has no effect on
+  /// Windows versions below Windows 10 v1809
+  #[cfg(target_os = "windows")]
+  fn apply_acrylic(&self, tint: Option<u32>);
+
+  /// Applies blur effect to tao/tauri window with an optional tint in ABGR format. (tint only supported on Windows 8+).
   ///
   /// ## WARNING:
   ///
@@ -68,11 +73,11 @@ pub trait Vibrancy {
   /// It is an issue in the undocumented api used for this method
   /// and microsoft needs to fix it (they probably won't).
   #[cfg(target_os = "windows")]
-  fn apply_acrylic(&self);
+  fn apply_blur(&self, tint: Option<u32>);
 
-  /// Applies blur effect to tao/tauri window.
+  /// Applies Mica effect to tao/tauri window. The mica effect is not tintable and requires Windows 11.
   #[cfg(target_os = "windows")]
-  fn apply_blur(&self);
+  fn apply_mica(&self);
 
   /// Applies macos vibrancy effect to tao/tauri window. This has no effect on macOS versions below 10.10
   #[cfg(target_os = "macos")]
@@ -85,13 +90,18 @@ where
   R: Runtime,
 {
   #[cfg(target_os = "windows")]
-  fn apply_acrylic(&self) {
-    windows::apply_acrylic(windows::HWND(self.hwnd().unwrap() as _));
+  fn apply_acrylic(&self, tint: Option<u32>) {
+    windows::apply_acrylic(windows::HWND(self.hwnd().unwrap() as _), tint);
   }
 
   #[cfg(target_os = "windows")]
-  fn apply_blur(&self) {
-    windows::apply_blur(windows::HWND(self.hwnd().unwrap() as _));
+  fn apply_blur(&self, tint: Option<u32>) {
+    windows::apply_blur(windows::HWND(self.hwnd().unwrap() as _), tint);
+  }
+
+  #[cfg(target_os = "windows")]
+  fn apply_mica(&self) {
+    windows::apply_mica(windows::HWND(self.hwnd().unwrap() as _));
   }
 
   #[cfg(target_os = "macos")]
@@ -103,13 +113,18 @@ where
 #[cfg(feature = "tao-impl")]
 impl Vibrancy for TaoWindow {
   #[cfg(target_os = "windows")]
-  fn apply_acrylic(&self) {
-    windows::apply_acrylic(windows::HWND(self.hwnd() as _));
+  fn apply_acrylic(&self, tint: Option<u32>) {
+    windows::apply_acrylic(windows::HWND(self.hwnd() as _), tint);
   }
 
   #[cfg(target_os = "windows")]
-  fn apply_blur(&self) {
-    windows::apply_blur(windows::HWND(self.hwnd() as _));
+  fn apply_blur(&self, tint: Option<u32>) {
+    windows::apply_blur(windows::HWND(self.hwnd() as _), tint);
+  }
+
+  #[cfg(target_os = "windows")]
+  fn apply_mica(&self) {
+    windows::apply_mica(windows::HWND(self.hwnd() as _));
   }
 
   #[cfg(target_os = "macos")]
