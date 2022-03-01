@@ -15,7 +15,6 @@ Add it as a dependncy in `Cargo.toml` of your Tao/Tauri project
 [dependencies]
 tauri-plugin-vibrancy = { git = "https://github.com/tauri-apps/tauri-plugin-vibrancy", features = ["tauri-impl"] } # or "tao-impl" for TAO projects.
 ```
-> You also need to use Tauri/TAO from github using the `next` branch (Only until the next release of Tauri).
 
 ## Cargo Features:
 

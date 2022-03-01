@@ -31,7 +31,6 @@ tauri-impl = [ "tauri" ]
 [target."cfg(target_os = \"windows\")".dependencies.windows]
 version = "0.32.0"
 features = [
-  "alloc",
   "Win32_Foundation",
   "Win32_System_LibraryLoader",
   "Win32_System_SystemInformation",
@@ -43,6 +42,11 @@ features = [
 [target."cfg(target_os = \"macos\")".dependencies]
 cocoa = "0.24"
 objc = "0.2"
+
+[package.metadata.docs.rs]
+features = [ "tauri-impl", "tao-impl" ]
+default-target = "x86_64-pc-windows-msvc"
+targets = [ "x86_64-apple-darwin", "x86_64-pc-windows-msvc" ]
 
 [[example]]
 name = "tao"

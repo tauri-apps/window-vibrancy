@@ -3,8 +3,8 @@
 #![allow(non_camel_case_types)]
 
 use std::ffi::c_void;
-use windows::Win32::{
-  Foundation::{BOOL, FARPROC, HWND},
+pub use windows::Win32::{
+  Foundation::{BOOL, FARPROC, HWND, PSTR},
   Graphics::{
     Dwm::{
       DwmEnableBlurBehindWindow, DwmSetWindowAttribute, DWMWA_USE_IMMERSIVE_DARK_MODE,
@@ -87,11 +87,11 @@ fn get_function_impl(library: &str, function: &str) -> Option<FARPROC> {
   assert_eq!(library.chars().last(), Some('\0'));
   assert_eq!(function.chars().last(), Some('\0'));
 
-  let module = unsafe { LoadLibraryA(library) };
-  if module.is_invalid() {
+  let module = unsafe { LoadLibraryA(PSTR(library.as_ptr() as _)) };
+  if module.0 == 0 {
     return None;
   }
-  Some(unsafe { GetProcAddress(module, function) })
+  Some(unsafe { GetProcAddress(module, PSTR(function.as_ptr() as _)) })
 }
 
 macro_rules! get_function {

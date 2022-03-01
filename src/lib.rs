@@ -115,12 +115,12 @@ where
 impl Vibrancy for TaoWindow {
   #[cfg(target_os = "windows")]
   fn apply_acrylic(&self) {
-    windows::apply_acrylic(HWND(self.hwnd() as _));
+    windows::apply_acrylic(windows::HWND(self.hwnd() as _));
   }
 
   #[cfg(target_os = "windows")]
   fn apply_blur(&self) {
-    windows::apply_blur(HWND(self.hwnd() as _));
+    windows::apply_blur(windows::HWND(self.hwnd() as _));
   }
 
   #[cfg(target_os = "windows")]
