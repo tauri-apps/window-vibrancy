@@ -59,11 +59,11 @@ use tao::platform::windows::WindowExtWindows;
 use tao::window::Window as TaoWindow;
 
 pub trait Vibrancy {
-  /// Applies Acrylic effect to you tao/tauri window. This has no effect on Windows versions below Windows 10 v1809
+  /// Applies Acrylic effect to you tao/tauri window.
   ///
   /// ## WARNING:
   ///
-  /// This method has poor performance on Windows 10 v1903 and above,
+  /// This method has poor performance on Windows 10 v1903+ and Windows 11 build 22000,
   /// the window will lag when resizing or dragging.
   /// It is an issue in the undocumented api used for this method
   /// and microsoft needs to fix it (they probably won't).
@@ -74,13 +74,9 @@ pub trait Vibrancy {
   #[cfg(target_os = "windows")]
   fn apply_blur(&self);
 
-  /// Applies light mica effect to tao/tauri window.
+  /// Applies mica effect to tao/tauri window.
   #[cfg(target_os = "windows")]
-  fn apply_mica_light(&self);
-
-  /// Applies dark mica effect to tao/tauri window.
-  #[cfg(target_os = "windows")]
-  fn apply_mica_dark(&self);
+  fn apply_mica(&self, dark: bool);
 
   /// Applies macos vibrancy effect to tao/tauri window. This has no effect on macOS versions below 10.10
   #[cfg(target_os = "macos")]
@@ -103,13 +99,8 @@ where
   }
 
   #[cfg(target_os = "windows")]
-  fn apply_mica_light(&self) {
-    windows::apply_mica(self.hwnd().unwrap() as _, false);
-  }
-
-  #[cfg(target_os = "windows")]
-  fn apply_mica_dark(&self) {
-    windows::apply_mica(self.hwnd().unwrap() as _, true);
+  fn apply_mica(&self, dark: bool) {
+    windows::apply_mica(self.hwnd().unwrap() as _, dark);
   }
 
   #[cfg(target_os = "macos")]
@@ -131,13 +122,8 @@ impl Vibrancy for TaoWindow {
   }
 
   #[cfg(target_os = "windows")]
-  fn apply_mica_light(&self) {
-    windows::apply_mica(self.hwnd() as _, false);
-  }
-
-  #[cfg(target_os = "windows")]
-  fn apply_mica_dark(&self) {
-    windows::apply_mica(self.hwnd() as _, true);
+  fn apply_mica(&self, dark: bool) {
+    windows::apply_mica(self.hwnd() as _, dark);
   }
 
   #[cfg(target_os = "macos")]

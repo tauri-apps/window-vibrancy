@@ -59,11 +59,8 @@ tauri-plugin-vibrancy = { git = "https://github.com/tauri-apps/tauri-plugin-vibr
 ## Available methods
 
 > Please read the methods documentation in [src/lib.rs](src/lib.rs)
-- `apply_blur()` - **`Windows`**
-- `apply_acrylic()` - **`Windows`** works on Windows 10 v1809 and above and has bad performance when resizing/dragging the window
+- `apply_blur()` - **`Windows 7/10/11`**
+- `apply_acrylic()` - **`Windows 10/11`** has bad performance when resizing/dragging the window on Windows 10 v1903+ and Windows 11 build 22000
+- `apply_mica()` - **Windows 11** thanks to [@sudo-carson](https://github.com/sudo-carson)
 - `apply_vibrancy()` - **`macOS`** thanks to [@youngsing](https://github.com/youngsing)
-
-## TODOS
-
-- [ ] `apply_mica()` for Windows 11
 

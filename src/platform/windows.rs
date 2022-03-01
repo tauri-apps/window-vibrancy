@@ -20,17 +20,15 @@ pub fn apply_acrylic(hwnd: HWND) {
         hwnd,
         DWMWINDOWATTRIBUTE::DWMWA_SYSTEMBACKDROP_TYPE as i32,
         &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TRANSIENTWINDOW as i32) as *const _ as _,
-        4
+        4,
       );
     }
-  } else {
-    if is_supported_win10() {
-      unsafe {
-        set_window_composition_attribute(hwnd, AccentState::EnableAcrylicBlurBehind);
-      }
-    } else {
-      eprintln!("\"apply_acrylic\" is only available on Windows 10 v1809 or newer");
+  } else if is_supported_win10() || is_win11() {
+    unsafe {
+      set_window_composition_attribute(hwnd, AccentState::EnableAcrylicBlurBehind);
     }
+  } else {
+    eprintln!("\"apply_acrylic\" is only available on Windows 10 v1809 or newer");
   }
 }
 pub fn apply_blur(hwnd: HWND) {
@@ -58,7 +56,7 @@ pub fn apply_mica(hwnd: HWND, dark_mica: bool) {
         hwnd,
         DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE as i32,
         &dark_mica as *const _ as _,
-        4
+        4,
       );
     }
     if is_win11_dwmsbt() {
@@ -67,7 +65,7 @@ pub fn apply_mica(hwnd: HWND, dark_mica: bool) {
           hwnd,
           DWMWINDOWATTRIBUTE::DWMWA_SYSTEMBACKDROP_TYPE as i32,
           &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_MAINWINDOW as i32) as *const _ as _,
-          4
+          4,
         );
       }
     } else {
@@ -77,7 +75,7 @@ pub fn apply_mica(hwnd: HWND, dark_mica: bool) {
           /* DWMWA_MICA_EFFECT */
           1029 as _,
           1 as _,
-          std::mem::size_of::<u32>() as _
+          std::mem::size_of::<u32>() as _,
         );
       }
     }
@@ -218,10 +216,6 @@ fn is_win11() -> bool {
   v.2 >= 22000
 }
 fn is_win11_dwmsbt() -> bool {
-  if let Some(v) = get_windows_ver() {
-    if v.2 >= 22523 {
-      return true;
-    }
-  }
-  false
+  let v = get_windows_ver().unwrap_or_default();
+  v.2 >= 22523
 }
