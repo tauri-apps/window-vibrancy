@@ -47,6 +47,8 @@ use crate::platform::macos;
 pub use crate::platform::macos::NSVisualEffectMaterial as MacOSVibrancy;
 #[cfg(target_os = "windows")]
 use crate::platform::windows;
+#[cfg(target_os = "windows")]
+use ::windows::Win32::Foundation::HWND;
 
 #[cfg(feature = "tauri-impl")]
 use tauri::{Runtime, Window as TauriWindow};
@@ -59,11 +61,11 @@ use tao::platform::windows::WindowExtWindows;
 use tao::window::Window as TaoWindow;
 
 pub trait Vibrancy {
-  /// Applies Acrylic effect to you tao/tauri window. This has no effect on Windows versions below Windows 10 v1809
+  /// Applies Acrylic effect to you tao/tauri window.
   ///
   /// ## WARNING:
   ///
-  /// This method has poor performance on Windows 10 v1903 and above,
+  /// This method has poor performance on Windows 10 v1903+ and Windows 11 build 22000,
   /// the window will lag when resizing or dragging.
   /// It is an issue in the undocumented api used for this method
   /// and microsoft needs to fix it (they probably won't).
@@ -73,6 +75,10 @@ pub trait Vibrancy {
   /// Applies blur effect to tao/tauri window.
   #[cfg(target_os = "windows")]
   fn apply_blur(&self);
+
+  /// Applies mica effect to tao/tauri window.
+  #[cfg(target_os = "windows")]
+  fn apply_mica(&self, dark: bool);
 
   /// Applies macos vibrancy effect to tao/tauri window. This has no effect on macOS versions below 10.10
   #[cfg(target_os = "macos")]
@@ -86,12 +92,17 @@ where
 {
   #[cfg(target_os = "windows")]
   fn apply_acrylic(&self) {
-    windows::apply_acrylic(windows::HWND(self.hwnd().unwrap() as _));
+    windows::apply_acrylic(HWND(self.hwnd().unwrap() as _));
   }
 
   #[cfg(target_os = "windows")]
   fn apply_blur(&self) {
-    windows::apply_blur(windows::HWND(self.hwnd().unwrap() as _));
+    windows::apply_blur(HWND(self.hwnd().unwrap() as _));
+  }
+
+  #[cfg(target_os = "windows")]
+  fn apply_mica(&self, dark: bool) {
+    windows::apply_mica(HWND(self.hwnd().unwrap() as _), dark);
   }
 
   #[cfg(target_os = "macos")]
@@ -110,6 +121,11 @@ impl Vibrancy for TaoWindow {
   #[cfg(target_os = "windows")]
   fn apply_blur(&self) {
     windows::apply_blur(windows::HWND(self.hwnd() as _));
+  }
+
+  #[cfg(target_os = "windows")]
+  fn apply_mica(&self, dark: bool) {
+    windows::apply_mica(HWND(self.hwnd() as _), dark);
   }
 
   #[cfg(target_os = "macos")]

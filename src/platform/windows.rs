@@ -1,10 +1,15 @@
 #![cfg(target_os = "windows")]
+#![allow(non_snake_case)]
+#![allow(non_camel_case_types)]
 
 use std::ffi::c_void;
 pub use windows::Win32::{
   Foundation::{BOOL, FARPROC, HWND, PSTR},
   Graphics::{
-    Dwm::{DwmEnableBlurBehindWindow, DWM_BB_ENABLE, DWM_BLURBEHIND},
+    Dwm::{
+      DwmEnableBlurBehindWindow, DwmSetWindowAttribute, DWMWA_USE_IMMERSIVE_DARK_MODE,
+      DWMWINDOWATTRIBUTE, DWM_BB_ENABLE, DWM_BLURBEHIND,
+    },
     Gdi::HRGN,
   },
   System::{
@@ -14,35 +19,67 @@ pub use windows::Win32::{
 };
 
 pub fn apply_acrylic(hwnd: HWND) {
-  if let Some(v) = get_windows_ver() {
-    if v.2 < 17763 {
-      eprintln!("\"apply_acrylic\" is only available on Windows 10 v1809 or newer");
-      return;
+  if is_win11_dwmsbt() {
+    unsafe {
+      DwmSetWindowAttribute(
+        hwnd,
+        DWMWA_USE_IMMERSIVE_DARK_MODE,
+        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TRANSIENTWINDOW) as *const _ as _,
+        4,
+      );
     }
-
+  } else if is_supported_win10() || is_win11() {
     unsafe {
       set_window_composition_attribute(hwnd, AccentState::EnableAcrylicBlurBehind);
     }
+  } else {
+    eprintln!("\"apply_acrylic\" is only available on Windows 10 v1809 or newer");
   }
 }
 pub fn apply_blur(hwnd: HWND) {
-  if let Some(v) = get_windows_ver() {
-    // windows 7 is 6.1
-    if v.0 == 6 && v.1 == 1 {
-      let bb = DWM_BLURBEHIND {
-        dwFlags: DWM_BB_ENABLE,
-        fEnable: true.into(),
-        hRgnBlur: HRGN::default(),
-        ..Default::default()
-      };
+  if is_win7() {
+    let bb = DWM_BLURBEHIND {
+      dwFlags: DWM_BB_ENABLE,
+      fEnable: true.into(),
+      hRgnBlur: HRGN::default(),
+      ..Default::default()
+    };
+    unsafe {
+      let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
+    }
+  } else {
+    unsafe {
+      set_window_composition_attribute(hwnd, AccentState::EnableBlurBehind);
+    }
+  }
+}
+
+pub fn apply_mica(hwnd: HWND, dark_mica: bool) {
+  if is_win11() {
+    unsafe {
+      DwmSetWindowAttribute(
+        hwnd,
+        DWMWA_USE_IMMERSIVE_DARK_MODE,
+        &dark_mica as *const _ as _,
+        4,
+      );
+    }
+    if is_win11_dwmsbt() {
       unsafe {
-        let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
+        DwmSetWindowAttribute(
+          hwnd,
+          DWMWA_SYSTEMBACKDROP_TYPE,
+          &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_MAINWINDOW as i32) as *const _ as _,
+          4,
+        );
       }
     } else {
       unsafe {
-        set_window_composition_attribute(hwnd, AccentState::EnableBlurBehind);
+        DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &1 as *const _ as _, 4);
       }
     }
+  } else {
+    eprintln!("\"apply_mica\" is only available on Windows 11");
   }
 }
 
@@ -95,11 +132,8 @@ fn get_windows_ver() -> Option<(u32, u32, u32)> {
 type SetWindowCompositionAttribute =
   unsafe extern "system" fn(HWND, *mut WINDOWCOMPOSITIONATTRIBDATA) -> BOOL;
 
-#[allow(non_snake_case)]
 type WINDOWCOMPOSITIONATTRIB = u32;
 
-#[allow(non_camel_case_types)]
-#[allow(non_snake_case)]
 #[repr(C)]
 struct ACCENT_POLICY {
   AccentState: u32,
@@ -108,7 +142,6 @@ struct ACCENT_POLICY {
   AnimationId: u32,
 }
 
-#[allow(non_snake_case)]
 #[repr(C)]
 struct WINDOWCOMPOSITIONATTRIBDATA {
   Attrib: WINDOWCOMPOSITIONATTRIB,
@@ -117,17 +150,8 @@ struct WINDOWCOMPOSITIONATTRIBDATA {
 }
 
 pub enum AccentState {
-  EnableBlurBehind,
-  EnableAcrylicBlurBehind,
-}
-
-impl From<AccentState> for u32 {
-  fn from(state: AccentState) -> Self {
-    match state {
-      AccentState::EnableBlurBehind => 3,
-      AccentState::EnableAcrylicBlurBehind => 4,
-    }
-  }
+  EnableBlurBehind = 3,
+  EnableAcrylicBlurBehind = 4,
 }
 
 unsafe fn set_window_composition_attribute(hwnd: HWND, accent_state: AccentState) {
@@ -135,9 +159,9 @@ unsafe fn set_window_composition_attribute(hwnd: HWND, accent_state: AccentState
     get_function!("user32.dll", SetWindowCompositionAttribute)
   {
     let mut policy = ACCENT_POLICY {
-      AccentState: accent_state.into(),
+      AccentState: accent_state as _,
       AccentFlags: 2,
-      GradientColor: 16777216,
+      GradientColor: 0x1F | 0x1F << 8 | 0x1F << 16 | 0 << 24,
       AnimationId: 0,
     };
 
@@ -149,4 +173,31 @@ unsafe fn set_window_composition_attribute(hwnd: HWND, accent_state: AccentState
 
     set_window_composition_attribute(hwnd, &mut data as *mut _ as _);
   }
+}
+
+const DWMWA_MICA_EFFECT: DWMWINDOWATTRIBUTE = DWMWINDOWATTRIBUTE(1029i32);
+const DWMWA_SYSTEMBACKDROP_TYPE: DWMWINDOWATTRIBUTE = DWMWINDOWATTRIBUTE(38i32);
+
+enum DWM_SYSTEMBACKDROP_TYPE {
+  DWMSBT_MAINWINDOW = 2,      // Mica
+  DWMSBT_TRANSIENTWINDOW = 3, // Acrylic
+  DWMSBT_TABBEDWINDOW = 4,    // Tabbed
+}
+
+fn is_win7() -> bool {
+  let v = get_windows_ver().unwrap_or_default();
+  (v.0 == 6 && v.1 == 1)
+}
+
+fn is_supported_win10() -> bool {
+  let v = get_windows_ver().unwrap_or_default();
+  (v.2 >= 17763 && v.2 < 22000)
+}
+fn is_win11() -> bool {
+  let v = get_windows_ver().unwrap_or_default();
+  v.2 >= 22000
+}
+fn is_win11_dwmsbt() -> bool {
+  let v = get_windows_ver().unwrap_or_default();
+  v.2 >= 22523
 }

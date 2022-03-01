@@ -11,7 +11,7 @@ fn main() {
     .setup(|app| {
       let window = app.get_window("main").unwrap();
       #[cfg(target_os = "windows")]
-      window.apply_blur();
+      window.apply_mica_dark();
       #[cfg(target_os = "macos")]
       {
         use tauri_plugin_vibrancy::MacOSVibrancy;
