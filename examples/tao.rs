@@ -14,7 +14,7 @@ fn main() {
     .build(&event_loop)
     .unwrap();
 
-  window.apply_mica_dark();
+  window.apply_mica(true);
 
   window.set_title("A fantastic window!");
 

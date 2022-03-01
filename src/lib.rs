@@ -47,6 +47,8 @@ use crate::platform::macos;
 pub use crate::platform::macos::NSVisualEffectMaterial as MacOSVibrancy;
 #[cfg(target_os = "windows")]
 use crate::platform::windows;
+#[cfg(target_os = "windows")]
+use ::windows::Win32::Foundation::HWND;
 
 #[cfg(feature = "tauri-impl")]
 use tauri::{Runtime, Window as TauriWindow};
@@ -90,17 +92,17 @@ where
 {
   #[cfg(target_os = "windows")]
   fn apply_acrylic(&self) {
-    windows::apply_acrylic(self.hwnd().unwrap() as _);
+    windows::apply_acrylic(HWND(self.hwnd().unwrap() as _));
   }
 
   #[cfg(target_os = "windows")]
   fn apply_blur(&self) {
-    windows::apply_blur(self.hwnd().unwrap() as _);
+    windows::apply_blur(HWND(self.hwnd().unwrap() as _));
   }
 
   #[cfg(target_os = "windows")]
   fn apply_mica(&self, dark: bool) {
-    windows::apply_mica(self.hwnd().unwrap() as _, dark);
+    windows::apply_mica(HWND(self.hwnd().unwrap() as _), dark);
   }
 
   #[cfg(target_os = "macos")]
@@ -113,17 +115,17 @@ where
 impl Vibrancy for TaoWindow {
   #[cfg(target_os = "windows")]
   fn apply_acrylic(&self) {
-    windows::apply_acrylic(self.hwnd() as _);
+    windows::apply_acrylic(HWND(self.hwnd() as _));
   }
 
   #[cfg(target_os = "windows")]
   fn apply_blur(&self) {
-    windows::apply_blur(self.hwnd() as _);
+    windows::apply_blur(HWND(self.hwnd() as _));
   }
 
   #[cfg(target_os = "windows")]
   fn apply_mica(&self, dark: bool) {
-    windows::apply_mica(self.hwnd() as _, dark);
+    windows::apply_mica(HWND(self.hwnd() as _), dark);
   }
 
   #[cfg(target_os = "macos")]

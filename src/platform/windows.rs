@@ -1,10 +1,15 @@
 #![cfg(target_os = "windows")]
+#![allow(non_snake_case)]
+#![allow(non_camel_case_types)]
 
 use std::ffi::c_void;
 use windows::Win32::{
   Foundation::{BOOL, FARPROC, HWND},
   Graphics::{
-    Dwm::{DwmEnableBlurBehindWindow, DwmSetWindowAttribute, DWM_BB_ENABLE, DWM_BLURBEHIND},
+    Dwm::{
+      DwmEnableBlurBehindWindow, DwmSetWindowAttribute, DWMWA_USE_IMMERSIVE_DARK_MODE,
+      DWMWINDOWATTRIBUTE, DWM_BB_ENABLE, DWM_BLURBEHIND,
+    },
     Gdi::HRGN,
   },
   System::{
@@ -18,8 +23,8 @@ pub fn apply_acrylic(hwnd: HWND) {
     unsafe {
       DwmSetWindowAttribute(
         hwnd,
-        DWMWINDOWATTRIBUTE::DWMWA_SYSTEMBACKDROP_TYPE as i32,
-        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TRANSIENTWINDOW as i32) as *const _ as _,
+        DWMWA_USE_IMMERSIVE_DARK_MODE,
+        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TRANSIENTWINDOW) as *const _ as _,
         4,
       );
     }
@@ -54,7 +59,7 @@ pub fn apply_mica(hwnd: HWND, dark_mica: bool) {
     unsafe {
       DwmSetWindowAttribute(
         hwnd,
-        DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE as i32,
+        DWMWA_USE_IMMERSIVE_DARK_MODE,
         &dark_mica as *const _ as _,
         4,
       );
@@ -63,20 +68,14 @@ pub fn apply_mica(hwnd: HWND, dark_mica: bool) {
       unsafe {
         DwmSetWindowAttribute(
           hwnd,
-          DWMWINDOWATTRIBUTE::DWMWA_SYSTEMBACKDROP_TYPE as i32,
+          DWMWA_SYSTEMBACKDROP_TYPE,
           &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_MAINWINDOW as i32) as *const _ as _,
           4,
         );
       }
     } else {
       unsafe {
-        DwmSetWindowAttribute(
-          hwnd,
-          /* DWMWA_MICA_EFFECT */
-          1029 as _,
-          1 as _,
-          std::mem::size_of::<u32>() as _,
-        );
+        DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &1 as *const _ as _, 4);
       }
     }
   } else {
@@ -89,7 +88,7 @@ fn get_function_impl(library: &str, function: &str) -> Option<FARPROC> {
   assert_eq!(function.chars().last(), Some('\0'));
 
   let module = unsafe { LoadLibraryA(library) };
-  if module == 0 {
+  if module.is_invalid() {
     return None;
   }
   Some(unsafe { GetProcAddress(module, function) })
@@ -133,11 +132,8 @@ fn get_windows_ver() -> Option<(u32, u32, u32)> {
 type SetWindowCompositionAttribute =
   unsafe extern "system" fn(HWND, *mut WINDOWCOMPOSITIONATTRIBDATA) -> BOOL;
 
-#[allow(non_snake_case)]
 type WINDOWCOMPOSITIONATTRIB = u32;
 
-#[allow(non_camel_case_types)]
-#[allow(non_snake_case)]
 #[repr(C)]
 struct ACCENT_POLICY {
   AccentState: u32,
@@ -146,7 +142,6 @@ struct ACCENT_POLICY {
   AnimationId: u32,
 }
 
-#[allow(non_snake_case)]
 #[repr(C)]
 struct WINDOWCOMPOSITIONATTRIBDATA {
   Attrib: WINDOWCOMPOSITIONATTRIB,
@@ -155,17 +150,8 @@ struct WINDOWCOMPOSITIONATTRIBDATA {
 }
 
 pub enum AccentState {
-  EnableBlurBehind,
-  EnableAcrylicBlurBehind,
-}
-
-impl From<AccentState> for u32 {
-  fn from(state: AccentState) -> Self {
-    match state {
-      AccentState::EnableBlurBehind => 3,
-      AccentState::EnableAcrylicBlurBehind => 4,
-    }
-  }
+  EnableBlurBehind = 3,
+  EnableAcrylicBlurBehind = 4,
 }
 
 unsafe fn set_window_composition_attribute(hwnd: HWND, accent_state: AccentState) {
@@ -173,7 +159,7 @@ unsafe fn set_window_composition_attribute(hwnd: HWND, accent_state: AccentState
     get_function!("user32.dll", SetWindowCompositionAttribute)
   {
     let mut policy = ACCENT_POLICY {
-      AccentState: accent_state.into(),
+      AccentState: accent_state as _,
       AccentFlags: 2,
       GradientColor: 0x1F | 0x1F << 8 | 0x1F << 16 | 0 << 24,
       AnimationId: 0,
@@ -189,13 +175,9 @@ unsafe fn set_window_composition_attribute(hwnd: HWND, accent_state: AccentState
   }
 }
 
-#[allow(non_camel_case_types)]
-enum DWMWINDOWATTRIBUTE {
-  DWMWA_USE_IMMERSIVE_DARK_MODE = 20,
-  DWMWA_SYSTEMBACKDROP_TYPE = 38,
-}
+const DWMWA_MICA_EFFECT: DWMWINDOWATTRIBUTE = DWMWINDOWATTRIBUTE(1029i32);
+const DWMWA_SYSTEMBACKDROP_TYPE: DWMWINDOWATTRIBUTE = DWMWINDOWATTRIBUTE(38i32);
 
-#[allow(non_camel_case_types)]
 enum DWM_SYSTEMBACKDROP_TYPE {
   DWMSBT_MAINWINDOW = 2,      // Mica
   DWMSBT_TRANSIENTWINDOW = 3, // Acrylic
