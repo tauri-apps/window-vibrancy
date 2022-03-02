@@ -1,0 +1,16 @@
+{
+  "gitSiteUrl": "https://github.com/tauri-apps/window-vibrancy/",
+  "pkgManagers": {
+    "rust": {
+      "version": true,
+      "publish": true,
+      "getPublishedVersion": "cargo search ${ pkg.pkg } --limit 1 | sed -nE 's/^[^\"]*\"//; s/\".*//1p' -"
+    }
+  },
+  "packages": {
+    "window-vibrancy": {
+      "path": ".",
+      "manager": "rust"
+    }
+  }
+}

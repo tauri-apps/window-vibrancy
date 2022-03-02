@@ -3,19 +3,10 @@
 #![allow(non_camel_case_types)]
 
 use std::ffi::c_void;
-pub use windows::Win32::{
-  Foundation::{BOOL, FARPROC, HWND, PSTR},
-  Graphics::{
-    Dwm::{
-      DwmEnableBlurBehindWindow, DwmSetWindowAttribute, DWMWA_USE_IMMERSIVE_DARK_MODE,
-      DWMWINDOWATTRIBUTE, DWM_BB_ENABLE, DWM_BLURBEHIND,
-    },
-    Gdi::HRGN,
-  },
-  System::{
-    LibraryLoader::{GetProcAddress, LoadLibraryA},
-    SystemInformation::OSVERSIONINFOW,
-  },
+pub use windows_sys::Win32::{
+  Foundation::*,
+  Graphics::{Dwm::*, Gdi::*},
+  System::{LibraryLoader::*, SystemInformation::*},
 };
 
 pub fn apply_acrylic(hwnd: HWND) {
@@ -42,7 +33,7 @@ pub fn apply_blur(hwnd: HWND) {
       dwFlags: DWM_BB_ENABLE,
       fEnable: true.into(),
       hRgnBlur: HRGN::default(),
-      ..Default::default()
+      fTransitionOnMaximized: 0,
     };
     unsafe {
       let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
@@ -54,29 +45,19 @@ pub fn apply_blur(hwnd: HWND) {
   }
 }
 
-pub fn apply_mica(hwnd: HWND, dark_mica: bool) {
-  if is_win11() {
+pub fn apply_mica(hwnd: HWND) {
+  if is_win11_dwmsbt() {
     unsafe {
       DwmSetWindowAttribute(
         hwnd,
-        DWMWA_USE_IMMERSIVE_DARK_MODE,
-        &dark_mica as *const _ as _,
+        DWMWA_SYSTEMBACKDROP_TYPE,
+        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_MAINWINDOW as i32) as *const _ as _,
         4,
       );
     }
-    if is_win11_dwmsbt() {
-      unsafe {
-        DwmSetWindowAttribute(
-          hwnd,
-          DWMWA_SYSTEMBACKDROP_TYPE,
-          &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_MAINWINDOW as i32) as *const _ as _,
-          4,
-        );
-      }
-    } else {
-      unsafe {
-        DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &1 as *const _ as _, 4);
-      }
+  } else if is_win11() {
+    unsafe {
+      DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &1 as *const _ as _, 4);
     }
   } else {
     eprintln!("\"apply_mica\" is only available on Windows 11");
@@ -87,17 +68,18 @@ fn get_function_impl(library: &str, function: &str) -> Option<FARPROC> {
   assert_eq!(library.chars().last(), Some('\0'));
   assert_eq!(function.chars().last(), Some('\0'));
 
-  let module = unsafe { LoadLibraryA(PSTR(library.as_ptr() as _)) };
-  if module.0 == 0 {
+  let module = unsafe { LoadLibraryA(library.as_ptr()) };
+  if module == 0 {
     return None;
   }
-  Some(unsafe { GetProcAddress(module, PSTR(function.as_ptr() as _)) })
+  Some(unsafe { GetProcAddress(module, function.as_ptr()) })
 }
 
 macro_rules! get_function {
   ($lib:expr, $func:ident) => {
-    get_function_impl(concat!($lib, '\0'), concat!(stringify!($func), '\0'))
-      .map(|f| unsafe { std::mem::transmute::<windows::Win32::Foundation::FARPROC, $func>(f) })
+    get_function_impl(concat!($lib, '\0'), concat!(stringify!($func), '\0')).map(|f| unsafe {
+      std::mem::transmute::<::windows_sys::Win32::Foundation::FARPROC, $func>(f)
+    })
   };
 }
 
@@ -175,9 +157,10 @@ unsafe fn set_window_composition_attribute(hwnd: HWND, accent_state: AccentState
   }
 }
 
-const DWMWA_MICA_EFFECT: DWMWINDOWATTRIBUTE = DWMWINDOWATTRIBUTE(1029i32);
-const DWMWA_SYSTEMBACKDROP_TYPE: DWMWINDOWATTRIBUTE = DWMWINDOWATTRIBUTE(38i32);
+const DWMWA_MICA_EFFECT: DWMWINDOWATTRIBUTE = 1029i32;
+const DWMWA_SYSTEMBACKDROP_TYPE: DWMWINDOWATTRIBUTE = 38i32;
 
+#[allow(unused)]
 enum DWM_SYSTEMBACKDROP_TYPE {
   DWMSBT_MAINWINDOW = 2,      // Mica
   DWMSBT_TRANSIENTWINDOW = 3, // Acrylic
@@ -186,12 +169,12 @@ enum DWM_SYSTEMBACKDROP_TYPE {
 
 fn is_win7() -> bool {
   let v = get_windows_ver().unwrap_or_default();
-  (v.0 == 6 && v.1 == 1)
+  v.0 == 6 && v.1 == 1
 }
 
 fn is_supported_win10() -> bool {
   let v = get_windows_ver().unwrap_or_default();
-  (v.2 >= 17763 && v.2 < 22000)
+  v.2 >= 17763 && v.2 < 22000
 }
 fn is_win11() -> bool {
   let v = get_windows_ver().unwrap_or_default();

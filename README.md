@@ -1,6 +1,6 @@
-# tauri-plugin-vibrancy
+# window-vibrancy
 
-Make your Tauri/TAO windows vibrant.
+Make your windows vibrant.
 
 ## Platform support
 
@@ -10,50 +10,11 @@ Make your Tauri/TAO windows vibrant.
 
 ## Installation
 
-Add it as a dependncy in `Cargo.toml` of your Tao/Tauri project
+Add it as a dependncy in `Cargo.toml`
 ```toml
 [dependencies]
-tauri-plugin-vibrancy = { git = "https://github.com/tauri-apps/tauri-plugin-vibrancy", features = ["tauri-impl"] } # or "tao-impl" for TAO projects.
+window-vibrancy = { git = "https://github.com/tauri-apps/window-vibrancy" }
 ```
-
-## Cargo Features:
-
-- `tauri-impl`: for Tauri projects.
-- `tao-impl`: for TAO projects.
-
-## Usage
-
-1. Enable transparency on your window:
-    - Tauri: Edit your window in `tauri.conf.json > tauri > windows` and add `"transparent": true`
-      or use `tauri::WindowBuilder::transparent`.
-    - TAO: Use `tao::window::WindowBuilder::with_transparent`.
-2. Use the `Vibrancy` trait methods on your window type:
-    - Tauri:
-        ```rs
-        let window = app.get_window("main").unwrap();
-
-        use tauri_plugin_vibrancy::Vibrancy;
-        #[cfg(target_os = "windows")]
-        window.apply_blur();
-        #[cfg(target_os = "macos")]
-        {
-            use tauri_plugin_vibrancy::MacOSVibrancy;
-            window.apply_vibrancy(MacOSVibrancy::AppearanceBased);
-        }
-        ```
-    - Tao:
-        ```rs
-        let window = WindowBuilder::new().with_transparent(true).build(&event_loop).unwrap();
-
-        use tauri_plugin_vibrancy::Vibrancy;
-        #[cfg(target_os = "windows")]
-        window.apply_blur();
-        #[cfg(target_os = "macos")]
-        {
-            use tauri_plugin_vibrancy::MacOSVibrancy;
-            window.apply_vibrancy(MacOSVibrancy::AppearanceBased);
-        }
-        ```
 
 ## Available methods
 
@@ -63,3 +24,36 @@ tauri-plugin-vibrancy = { git = "https://github.com/tauri-apps/tauri-plugin-vibr
 - `apply_mica()` - **`Windows 11`** thanks to [@sudo-carson](https://github.com/sudo-carson)
 - `apply_vibrancy()` - **`macOS`** thanks to [@youngsing](https://github.com/youngsing)
 
+## Examples
+
+- with `winit`:
+    ```rs
+    use winit::{event_loop::EventLoop, window::WindowBuilder};
+    use window_vibrancy::{apply_vibrancy, apply_blur, NSVisualEffectMaterial};
+
+    let event_loop = EventLoop::new();
+
+    let window = WindowBuilder::new()
+    .with_decorations(false)
+    .build(&event_loop)
+    .unwrap();
+
+    #[cfg(target_os = "macos")]
+    apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased).unwrap();
+
+    #[cfg(target_os = "windows")]
+    apply_blur(&window).unwrap();
+    ```
+
+- with `tauri`:
+    ```rs
+    use window_vibrancy::{apply_vibrancy, apply_blur, NSVisualEffectMaterial};
+
+    let window = app.get_window("main").unwrap();
+
+    #[cfg(target_os = "macos")]
+    apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased).unwrap();
+
+    #[cfg(target_os = "windows")]
+    apply_blur(&window).unwrap();
+    ```

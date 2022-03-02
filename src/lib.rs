@@ -1,4 +1,4 @@
-//! Make your Tauri/TAO windows vibrant.
+//! Make your windows vibrant.
 //!
 //! # Platform support:
 //!
@@ -6,130 +6,108 @@
 //! - **macOS:** Yes!
 //! - **Linux:** No, blur effect is controlled by the compositor installed on the user system and they can enable it for your app if they want.
 //!
-//! # Usage:
+//! # Example with [`winit`](https://docs.rs/winit)
 //!
-//! 1. Enable transparency on your window
-//!     - **Tauri:** Edit your window in `tauri.conf.json > tauri > windows` and add `"transparent": true`
-//!       or use [`tauri::WindowBuilder::transparent`]
-//!     - **TAO:** Use [`tao::window::WindowBuilder::with_transparent`]
-//! 2. Use the [`Vibrancy`] trait methods on your window type
-//!     - Tauri:
-//!         ```ignore
-//!         let window = app.get_window("main").unwrap();
-//!         #[cfg(target_os = "windows")]
-//!         window.apply_blur();
-//!         #[cfg(target_os = "macos")]
-//!         {
-//!             use tauri_plugin_vibrancy::MacOSVibrancy;
-//!             window.apply_vibrancy(MacOSVibrancy::AppearanceBased);
-//!         }
-//!         ```
-//!     - Tao:
-//!         ```ignore
-//!         let window = WindowBuilder::new().with_transparent(true).build(&event_loop).unwrap();
-//!         use tauri_plugin_vibrancy::Vibrancy;
-//!         #[cfg(target_os = "windows")]
-//!         window.apply_blur();
-//!         #[cfg(target_os = "macos")]
-//!         {
-//!             use tauri_plugin_vibrancy::MacOSVibrancy;
-//!             window.apply_vibrancy(MacOSVibrancy::AppearanceBased);
-//!         }
-//!         ```
+//! ```no_run,ignore
+//! # use winit::{event_loop::EventLoop, window::WindowBuilder};
+//! # use window_vibrancy::{apply_vibrancy, apply_blur, NSVisualEffectMaterial};
+//! let event_loop = EventLoop::new();
+//!
+//! let window = WindowBuilder::new()
+//!  .with_decorations(false)
+//!  .build(&event_loop)
+//!  .unwrap();
+//!
+//! #[cfg(target_os = "windows")]
+//! apply_blur(&window).unwrap();
+//!
+//! #[cfg(target_os = "macos")]
+//! apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased).unwrap();
+//! ```
 
-#![allow(unused)]
+mod macos;
+mod windows;
 
-mod platform;
+pub use macos::NSVisualEffectMaterial;
 
-#[cfg(target_os = "macos")]
-use crate::platform::macos;
-#[cfg(target_os = "macos")]
-pub use crate::platform::macos::NSVisualEffectMaterial as MacOSVibrancy;
-#[cfg(target_os = "windows")]
-use crate::platform::windows;
-#[cfg(target_os = "windows")]
-use ::windows::Win32::Foundation::HWND;
-
-#[cfg(feature = "tauri-impl")]
-use tauri::{Runtime, Window as TauriWindow};
-
-#[cfg(all(target_os = "macos", feature = "tao-impl"))]
-use tao::platform::macos::WindowExtMacOS;
-#[cfg(all(target_os = "windows", feature = "tao-impl"))]
-use tao::platform::windows::WindowExtWindows;
-#[cfg(feature = "tao-impl")]
-use tao::window::Window as TaoWindow;
-
-pub trait Vibrancy {
-  /// Applies Acrylic effect to you tao/tauri window.
-  ///
-  /// ## WARNING:
-  ///
-  /// This method has poor performance on Windows 10 v1903+ and Windows 11 build 22000,
-  /// the window will lag when resizing or dragging.
-  /// It is an issue in the undocumented api used for this method
-  /// and microsoft needs to fix it (they probably won't).
-  #[cfg(target_os = "windows")]
-  fn apply_acrylic(&self);
-
-  /// Applies blur effect to tao/tauri window.
-  #[cfg(target_os = "windows")]
-  fn apply_blur(&self);
-
-  /// Applies mica effect to tao/tauri window.
-  #[cfg(target_os = "windows")]
-  fn apply_mica(&self, dark: bool);
-
-  /// Applies macos vibrancy effect to tao/tauri window. This has no effect on macOS versions below 10.10
-  #[cfg(target_os = "macos")]
-  fn apply_vibrancy(&self, vibrancy: MacOSVibrancy);
-}
-
-#[cfg(feature = "tauri-impl")]
-impl<R> Vibrancy for TauriWindow<R>
-where
-  R: Runtime,
-{
-  #[cfg(target_os = "windows")]
-  fn apply_acrylic(&self) {
-    windows::apply_acrylic(HWND(self.hwnd().unwrap() as _));
-  }
-
-  #[cfg(target_os = "windows")]
-  fn apply_blur(&self) {
-    windows::apply_blur(HWND(self.hwnd().unwrap() as _));
-  }
-
-  #[cfg(target_os = "windows")]
-  fn apply_mica(&self, dark: bool) {
-    windows::apply_mica(HWND(self.hwnd().unwrap() as _), dark);
-  }
-
-  #[cfg(target_os = "macos")]
-  fn apply_vibrancy(&self, vibrancy: MacOSVibrancy) {
-    macos::apply_vibrancy(self.ns_window().unwrap() as _, vibrancy);
+/// Applies Acrylic effect to you window.
+///
+/// ## WARNING:
+///
+/// This method has poor performance on Windows 10 v1903+ and Windows 11 build 22000,
+/// the window will lag when resizing or dragging.
+/// It is an issue in the undocumented api used for this method
+/// and microsoft needs to fix it (they probably won't).
+pub fn apply_acrylic(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
+  match window.raw_window_handle() {
+    #[cfg(target_os = "windows")]
+    raw_window_handle::RawWindowHandle::Win32(handle) => {
+      windows::apply_acrylic(handle.hwnd as _);
+      Ok(())
+    }
+    _ => Err(Error::UnsupportedPlatform(
+      "apply_acrylic()".into(),
+      "Windows".into(),
+    )),
   }
 }
 
-#[cfg(feature = "tao-impl")]
-impl Vibrancy for TaoWindow {
-  #[cfg(target_os = "windows")]
-  fn apply_acrylic(&self) {
-    windows::apply_acrylic(windows::HWND(self.hwnd() as _));
+/// Applies blur effect to window.
+pub fn apply_blur(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
+  match window.raw_window_handle() {
+    #[cfg(target_os = "windows")]
+    raw_window_handle::RawWindowHandle::Win32(handle) => {
+      windows::apply_blur(handle.hwnd as _);
+      Ok(())
+    }
+    _ => Err(Error::UnsupportedPlatform(
+      "apply_blur()".into(),
+      "Windows".into(),
+    )),
   }
+}
 
-  #[cfg(target_os = "windows")]
-  fn apply_blur(&self) {
-    windows::apply_blur(windows::HWND(self.hwnd() as _));
+/// Applies mica effect to window.
+pub fn apply_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
+  match window.raw_window_handle() {
+    #[cfg(target_os = "windows")]
+    raw_window_handle::RawWindowHandle::Win32(handle) => {
+      windows::apply_mica(handle.hwnd as _);
+      Ok(())
+    }
+    _ => Err(Error::UnsupportedPlatform(
+      "apply_mica()".into(),
+      "Windows".into(),
+    )),
   }
+}
 
-  #[cfg(target_os = "windows")]
-  fn apply_mica(&self, dark: bool) {
-    windows::apply_mica(HWND(self.hwnd() as _), dark);
+/// Applies macos vibrancy effect to window. This has no effect on macOS versions below 10.10
+pub fn apply_vibrancy(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
+  match window.raw_window_handle() {
+    #[cfg(target_os = "macos")]
+    raw_window_handle::RawWindowHandle::Win32(handle) => {
+      macos::apply_vibrancy(handle.hwnd as _);
+      Ok(())
+    }
+    _ => Err(Error::UnsupportedPlatform(
+      "apply_vibrancy()".into(),
+      "macOS".into(),
+    )),
   }
+}
 
-  #[cfg(target_os = "macos")]
-  fn apply_vibrancy(&self, vibrancy: MacOSVibrancy) {
-    macos::apply_vibrancy(self.ns_window() as _, vibrancy);
+#[derive(Debug)]
+pub enum Error {
+  UnsupportedPlatform(String, String),
+}
+
+impl std::fmt::Display for Error {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    match self {
+      Error::UnsupportedPlatform(func, supported_platform) => {
+        write!(f, "{} is only supported on {} ", func, supported_platform)
+      }
+    }
   }
 }

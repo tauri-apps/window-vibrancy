@@ -1,10 +1,10 @@
 fn main() {
-  use tao::{
+  use window_vibrancy::*;
+  use winit::{
     event::{Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
     window::WindowBuilder,
   };
-  use window_vibrancy::*;
 
   let event_loop = EventLoop::new();
 
