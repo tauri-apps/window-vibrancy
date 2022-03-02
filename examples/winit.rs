@@ -14,7 +14,11 @@ fn main() {
     .build(&event_loop)
     .unwrap();
 
-  apply_blur(&window);
+  #[cfg(target_os = "windows")]
+  let _ = apply_blur(&window);
+
+  #[cfg(target_os = "macos")]
+  let _ = apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased);
 
   window.set_title("A fantastic window!");
 
