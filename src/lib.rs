@@ -83,11 +83,14 @@ pub fn apply_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
 }
 
 /// Applies macos vibrancy effect to window. This has no effect on macOS versions below 10.10
-pub fn apply_vibrancy(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
+pub fn apply_vibrancy(
+  window: impl raw_window_handle::HasRawWindowHandle,
+  effect: NSVisualEffectMaterial,
+) -> Result<(), Error> {
   match window.raw_window_handle() {
     #[cfg(target_os = "macos")]
     raw_window_handle::RawWindowHandle::Win32(handle) => {
-      macos::apply_vibrancy(handle.hwnd as _);
+      macos::apply_vibrancy(handle.hwnd as _, effect);
       Ok(())
     }
     _ => Err(Error::UnsupportedPlatform(
