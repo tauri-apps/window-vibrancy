@@ -113,6 +113,7 @@ pub fn clear_acrylic(window: impl raw_window_handle::HasRawWindowHandle) -> Resu
   }
 }
 
+/// Clears mica effect applied to window
 pub fn clear_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
   match window.raw_window_handle() {
     #[cfg(target_os = "windows")]
