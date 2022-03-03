@@ -82,6 +82,7 @@ pub fn apply_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
   }
 }
 
+/// Clears mica effect applied to window
 pub fn clear_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
   match window.raw_window_handle() {
     #[cfg(target_os = "windows")]
@@ -96,7 +97,7 @@ pub fn clear_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
   }
 }
 
-/// Clears all Windows effects applied to window.
+/// Clears all Windows 10 effects applied to window.
 pub fn clear_effects(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
   match window.raw_window_handle() {
     #[cfg(target_os = "windows")]
