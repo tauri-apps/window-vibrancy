@@ -64,6 +64,25 @@ pub fn apply_mica(hwnd: HWND) {
   }
 }
 
+pub fn clear_mica(hwnd: HWND) {
+  if is_win11_dwmsbt() {
+    unsafe {
+      DwmSetWindowAttribute(
+        hwnd,
+        DWMWA_SYSTEMBACKDROP_TYPE,
+        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE as i32) as *const _ as _,
+        4,
+      );
+    }
+  } else if is_win11() {
+    unsafe {
+      DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &1 as *const _ as _, 4);
+    }
+  } else {
+    eprintln!("\"clear_mica\" is only available on Windows 11");
+  }
+}
+
 pub fn clear_effects(hwnd: HWND) {
   if is_win7() {
     let bb = DWM_BLURBEHIND {
@@ -181,6 +200,7 @@ const DWMWA_SYSTEMBACKDROP_TYPE: DWMWINDOWATTRIBUTE = 38i32;
 
 #[allow(unused)]
 enum DWM_SYSTEMBACKDROP_TYPE {
+  DWMSBT_DISABLE = 1,         // None
   DWMSBT_MAINWINDOW = 2,      // Mica
   DWMSBT_TRANSIENTWINDOW = 3, // Acrylic
   DWMSBT_TABBEDWINDOW = 4,    // Tabbed

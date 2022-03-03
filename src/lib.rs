@@ -82,6 +82,20 @@ pub fn apply_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
   }
 }
 
+pub fn clear_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
+  match window.raw_window_handle() {
+    #[cfg(target_os = "windows")]
+    raw_window_handle::RawWindowHandle::Win32(handle) => {
+      windows::clear_mica(handle.hwnd as _);
+      Ok(())
+    }
+    _ => Err(Error::UnsupportedPlatform(
+      "clear_mica()".into(),
+      "Windows".into(),
+    )),
+  }
+}
+
 /// Clears all Windows effects applied to window.
 pub fn clear_effects(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
   match window.raw_window_handle() {
