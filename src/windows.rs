@@ -64,26 +64,8 @@ pub fn apply_mica(hwnd: HWND) {
   }
 }
 
-pub fn clear_mica(hwnd: HWND) {
-  if is_win11_dwmsbt() {
-    unsafe {
-      DwmSetWindowAttribute(
-        hwnd,
-        DWMWA_SYSTEMBACKDROP_TYPE,
-        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE as i32) as *const _ as _,
-        4,
-      );
-    }
-  } else if is_win11() {
-    unsafe {
-      DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &1 as *const _ as _, 4);
-    }
-  } else {
-    eprintln!("\"clear_mica\" is only available on Windows 11");
-  }
-}
 
-pub fn clear_effects(hwnd: HWND) {
+pub fn clear_blur(hwnd: HWND) {
   if is_win7() {
     let bb = DWM_BLURBEHIND {
       dwFlags: DWM_BB_ENABLE,
@@ -96,8 +78,45 @@ pub fn clear_effects(hwnd: HWND) {
     }
   } else {
     unsafe {
-      set_window_composition_attribute(hwnd, AccentState::Nothing);
+      set_window_composition_attribute(hwnd, AccentState::Disabled);
     }
+  }
+}
+
+pub fn clear_acrylic(hwnd: HWND) {
+  if is_win7() {
+    let bb = DWM_BLURBEHIND {
+      dwFlags: DWM_BB_ENABLE,
+      fEnable: false.into(),
+      hRgnBlur: HRGN::default(),
+      fTransitionOnMaximized: 0,
+    };
+    unsafe {
+      let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
+    }
+  } else {
+    unsafe {
+      set_window_composition_attribute(hwnd, AccentState::Disabled);
+    }
+  }
+}
+
+pub fn clear_mica(hwnd: HWND) {
+  if is_win11_dwmsbt() {
+    unsafe {
+      DwmSetWindowAttribute(
+        hwnd,
+        DWMWA_SYSTEMBACKDROP_TYPE,
+        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE as i32) as *const _ as _,
+        4,
+      );
+    }
+  } else if is_win11() {
+    unsafe {
+      DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &0 as *const _ as _, 4);
+    }
+  } else {
+    eprintln!("\"clear_mica\" is only available on Windows 11");
   }
 }
 
@@ -169,7 +188,7 @@ struct WINDOWCOMPOSITIONATTRIBDATA {
 }
 
 pub enum AccentState {
-  Nothing = 0,
+  Disabled = 0,
   EnableBlurBehind = 3,
   EnableAcrylicBlurBehind = 4,
 }

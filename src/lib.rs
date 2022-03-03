@@ -82,7 +82,37 @@ pub fn apply_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
   }
 }
 
-/// Clears mica effect applied to window
+
+/// Clears blur effect applied to window
+pub fn clear_blur(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
+  match window.raw_window_handle() {
+    #[cfg(target_os = "windows")]
+    raw_window_handle::RawWindowHandle::Win32(handle) => {
+      windows::clear_blur(handle.hwnd as _);
+      Ok(())
+    }
+    _ => Err(Error::UnsupportedPlatform(
+      "clear_blur()".into(),
+      "Windows".into(),
+    )),
+  }
+}
+
+/// Clears acrylic effect applied to window
+pub fn clear_acrylic(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
+  match window.raw_window_handle() {
+    #[cfg(target_os = "windows")]
+    raw_window_handle::RawWindowHandle::Win32(handle) => {
+      windows::clear_acrylic(handle.hwnd as _);
+      Ok(())
+    }
+    _ => Err(Error::UnsupportedPlatform(
+      "clear_acrylic()".into(),
+      "Windows".into(),
+    )),
+  }
+}
+
 pub fn clear_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
   match window.raw_window_handle() {
     #[cfg(target_os = "windows")]
@@ -97,20 +127,6 @@ pub fn clear_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
   }
 }
 
-/// Clears all Windows 10 effects applied to window.
-pub fn clear_effects(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
-  match window.raw_window_handle() {
-    #[cfg(target_os = "windows")]
-    raw_window_handle::RawWindowHandle::Win32(handle) => {
-      windows::clear_effects(handle.hwnd as _);
-      Ok(())
-    }
-    _ => Err(Error::UnsupportedPlatform(
-      "clear_effects()".into(),
-      "Windows".into(),
-    )),
-  }
-}
 
 /// Applies macos vibrancy effect to window. This has no effect on macOS versions below 10.10
 pub fn apply_vibrancy(
