@@ -82,6 +82,21 @@ pub fn apply_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
   }
 }
 
+/// Clears all Windows effects applied to window.
+pub fn clear_effects(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
+  match window.raw_window_handle() {
+    #[cfg(target_os = "windows")]
+    raw_window_handle::RawWindowHandle::Win32(handle) => {
+      windows::clear_effects(handle.hwnd as _);
+      Ok(())
+    }
+    _ => Err(Error::UnsupportedPlatform(
+      "clear_effects()".into(),
+      "Windows".into(),
+    )),
+  }
+}
+
 /// Applies macos vibrancy effect to window. This has no effect on macOS versions below 10.10
 pub fn apply_vibrancy(
   window: impl raw_window_handle::HasRawWindowHandle,

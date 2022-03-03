@@ -64,6 +64,24 @@ pub fn apply_mica(hwnd: HWND) {
   }
 }
 
+pub fn clear_effects(hwnd: HWND) {
+  if is_win7() {
+    let bb = DWM_BLURBEHIND {
+      dwFlags: DWM_BB_ENABLE,
+      fEnable: false.into(),
+      hRgnBlur: HRGN::default(),
+      fTransitionOnMaximized: 0,
+    };
+    unsafe {
+      let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
+    }
+  } else {
+    unsafe {
+      set_window_composition_attribute(hwnd, AccentState::Nothing);
+    }
+  }
+}
+
 fn get_function_impl(library: &str, function: &str) -> Option<FARPROC> {
   assert_eq!(library.chars().last(), Some('\0'));
   assert_eq!(function.chars().last(), Some('\0'));
@@ -132,6 +150,7 @@ struct WINDOWCOMPOSITIONATTRIBDATA {
 }
 
 pub enum AccentState {
+  Nothing = 0,
   EnableBlurBehind = 3,
   EnableAcrylicBlurBehind = 4,
 }
