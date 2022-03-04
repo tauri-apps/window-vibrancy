@@ -64,6 +64,62 @@ pub fn apply_mica(hwnd: HWND) {
   }
 }
 
+pub fn clear_blur(hwnd: HWND) {
+  if is_win7() {
+    let bb = DWM_BLURBEHIND {
+      dwFlags: DWM_BB_ENABLE,
+      fEnable: false.into(),
+      hRgnBlur: HRGN::default(),
+      fTransitionOnMaximized: 0,
+    };
+    unsafe {
+      let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
+    }
+  } else {
+    unsafe {
+      set_window_composition_attribute(hwnd, AccentState::Disabled);
+    }
+  }
+}
+
+pub fn clear_acrylic(hwnd: HWND) {
+  if is_win11_dwmsbt() {
+    unsafe {
+      DwmSetWindowAttribute(
+        hwnd,
+        DWMWA_USE_IMMERSIVE_DARK_MODE,
+        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE) as *const _ as _,
+        4,
+      );
+    }
+  } else if is_supported_win10() || is_win11() {
+    unsafe {
+      set_window_composition_attribute(hwnd, AccentState::Disabled);
+    }
+  } else {
+    eprintln!("\"clear_acrylic\" is only available on Windows 10 v1809 or newer");
+  }
+}
+
+pub fn clear_mica(hwnd: HWND) {
+  if is_win11_dwmsbt() {
+    unsafe {
+      DwmSetWindowAttribute(
+        hwnd,
+        DWMWA_SYSTEMBACKDROP_TYPE,
+        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE as i32) as *const _ as _,
+        4,
+      );
+    }
+  } else if is_win11() {
+    unsafe {
+      DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &0 as *const _ as _, 4);
+    }
+  } else {
+    eprintln!("\"clear_mica\" is only available on Windows 11");
+  }
+}
+
 fn get_function_impl(library: &str, function: &str) -> Option<FARPROC> {
   assert_eq!(library.chars().last(), Some('\0'));
   assert_eq!(function.chars().last(), Some('\0'));
@@ -132,6 +188,7 @@ struct WINDOWCOMPOSITIONATTRIBDATA {
 }
 
 pub enum AccentState {
+  Disabled = 0,
   EnableBlurBehind = 3,
   EnableAcrylicBlurBehind = 4,
 }
@@ -162,6 +219,7 @@ const DWMWA_SYSTEMBACKDROP_TYPE: DWMWINDOWATTRIBUTE = 38i32;
 
 #[allow(unused)]
 enum DWM_SYSTEMBACKDROP_TYPE {
+  DWMSBT_DISABLE = 1,         // None
   DWMSBT_MAINWINDOW = 2,      // Mica
   DWMSBT_TRANSIENTWINDOW = 3, // Acrylic
   DWMSBT_TABBEDWINDOW = 4,    // Tabbed
