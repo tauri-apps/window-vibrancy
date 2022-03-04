@@ -19,10 +19,10 @@ window-vibrancy = { git = "https://github.com/tauri-apps/window-vibrancy" }
 ## Available methods
 
 > Please read the methods documentation in [src/lib.rs](src/lib.rs)
-- `apply_blur()` - **`Windows 7/10/11`**
-- `apply_acrylic()` - **`Windows 10/11`** has bad performance when resizing/dragging the window on Windows 10 v1903+ and Windows 11 build 22000
-- `apply_mica()` - **`Windows 11`** thanks to [@sudo-carson](https://github.com/sudo-carson)
-- `apply_vibrancy()` - **`macOS`** thanks to [@youngsing](https://github.com/youngsing)
+- `apply_blur()` & `clear_blur()`- **`Windows 7/10/11`**
+- `apply_acrylic()` & `clear_acrylic()` - **`Windows 10/11`** has bad performance when resizing/dragging the window on Windows 10 v1903+ and Windows 11 build 22000
+- `apply_mica()` & `clear_mica()` - **`Windows 11`**
+- `apply_vibrancy()` - **`macOS 10.10+`**
 
 ## Examples
 
