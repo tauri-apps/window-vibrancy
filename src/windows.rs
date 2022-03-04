@@ -192,11 +192,6 @@ fn get_windows_ver() -> Option<(u32, u32, u32)> {
   }
 }
 
-type SetWindowCompositionAttributeFnType =
-  unsafe extern "system" fn(HWND, *mut WINDOWCOMPOSITIONATTRIBDATA) -> BOOL;
-
-type WINDOWCOMPOSITIONATTRIB = u32;
-
 #[repr(C)]
 struct ACCENT_POLICY {
   AccentState: u32,
@@ -204,6 +199,8 @@ struct ACCENT_POLICY {
   GradientColor: u32,
   AnimationId: u32,
 }
+
+type WINDOWCOMPOSITIONATTRIB = u32;
 
 #[repr(C)]
 struct WINDOWCOMPOSITIONATTRIBDATA {
@@ -219,8 +216,11 @@ pub enum ACCENT_STATE {
 }
 
 unsafe fn SetWindowCompositionAttribute(hwnd: HWND, accent_state: ACCENT_STATE) {
+  type SetWindowCompositionAttribute =
+    unsafe extern "system" fn(HWND, *mut WINDOWCOMPOSITIONATTRIBDATA) -> BOOL;
+
   if let Some(set_window_composition_attribute) =
-    get_function!("user32.dll", SetWindowCompositionAttributeFnType)
+    get_function!("user32.dll", SetWindowCompositionAttribute)
   {
     let mut policy = ACCENT_POLICY {
       AccentState: accent_state as _,

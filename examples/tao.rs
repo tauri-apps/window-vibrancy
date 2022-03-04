@@ -15,7 +15,7 @@ fn main() {
     .unwrap();
 
   #[cfg(target_os = "windows")]
-  let _ = apply_mica(&window);
+  let _ = apply_blur(&window);
 
   #[cfg(target_os = "macos")]
   let _ = apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased);
