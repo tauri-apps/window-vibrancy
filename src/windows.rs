@@ -64,7 +64,6 @@ pub fn apply_mica(hwnd: HWND) {
   }
 }
 
-
 pub fn clear_blur(hwnd: HWND) {
   if is_win7() {
     let bb = DWM_BLURBEHIND {

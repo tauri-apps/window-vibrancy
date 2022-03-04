@@ -82,7 +82,6 @@ pub fn apply_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
   }
 }
 
-
 /// Clears blur effect applied to window
 pub fn clear_blur(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
   match window.raw_window_handle() {
@@ -127,7 +126,6 @@ pub fn clear_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
     )),
   }
 }
-
 
 /// Applies macos vibrancy effect to window. This has no effect on macOS versions below 10.10
 pub fn apply_vibrancy(
