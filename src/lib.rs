@@ -8,7 +8,7 @@
 //!
 //! # Example with [`winit`](https://docs.rs/winit)
 //!
-//! ```no_run,ignore
+//! ```no_run
 //! # use winit::{event_loop::EventLoop, window::WindowBuilder};
 //! # use window_vibrancy::{apply_vibrancy, apply_blur, NSVisualEffectMaterial};
 //! let event_loop = EventLoop::new();
@@ -19,7 +19,7 @@
 //!  .unwrap();
 //!
 //! #[cfg(target_os = "windows")]
-//! apply_blur(&window).unwrap();
+//! apply_blur(&window, Some((18, 18, 18, 125))).unwrap();
 //!
 //! #[cfg(target_os = "macos")]
 //! apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased).unwrap();
@@ -30,11 +30,21 @@ mod windows;
 
 pub use macos::NSVisualEffectMaterial;
 
+/// a tuple of RGBA colors. Each value has minimum of 0 and maximum of 255.
+pub type Color = (u8, u8, u8, u8);
+
 /// Applies blur effect to window. Works only on Windows 7, Windows 10 v1809 or newer and Windows 11.
-pub fn apply_blur(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
+///
+/// - *`color`* is ignored on Windows 7 and has no effect.
+pub fn apply_blur(
+  window: impl raw_window_handle::HasRawWindowHandle,
+  #[allow(unused)] color: Option<Color>,
+) -> Result<(), Error> {
   match window.raw_window_handle() {
     #[cfg(target_os = "windows")]
-    raw_window_handle::RawWindowHandle::Win32(handle) => windows::apply_blur(handle.hwnd as _),
+    raw_window_handle::RawWindowHandle::Win32(handle) => {
+      windows::apply_blur(handle.hwnd as _, color)
+    }
     _ => Err(Error::UnsupportedPlatform(
       "\"apply_blur()\" is only supported on Windows.",
     )),
@@ -54,16 +64,23 @@ pub fn clear_blur(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
 
 /// Applies Acrylic effect to you window. Works only on Windows 10 v1809 or newer and Windows 11
 ///
+/// - *`color`* is ignored on Windows 11 build 22523 and newer and has no effect.
+///
 /// ## WARNING:
 ///
 /// This method has poor performance on Windows 10 v1903+ and Windows 11 build 22000,
 /// the window will lag when resizing or dragging.
 /// It is an issue in the undocumented api used for this method
 /// and microsoft needs to fix it (they probably won't).
-pub fn apply_acrylic(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
+pub fn apply_acrylic(
+  window: impl raw_window_handle::HasRawWindowHandle,
+  #[allow(unused)] color: Option<Color>,
+) -> Result<(), Error> {
   match window.raw_window_handle() {
     #[cfg(target_os = "windows")]
-    raw_window_handle::RawWindowHandle::Win32(handle) => windows::apply_acrylic(handle.hwnd as _),
+    raw_window_handle::RawWindowHandle::Win32(handle) => {
+      windows::apply_acrylic(handle.hwnd as _, color)
+    }
     _ => Err(Error::UnsupportedPlatform(
       "\"apply_acrylic()\" is only supported on Windows.",
     )),

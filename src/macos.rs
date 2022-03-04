@@ -1,7 +1,7 @@
 // The use of NSVisualEffectView comes from https://github.com/joboet/winit/tree/macos_blurred_background
 // with a bit of rewrite by @youngsing to make it more like cocoa::appkit style.
 
-/// https://developer.apple.com/documentation/appkit/nsvisualeffectview/material
+/// <https://developer.apple.com/documentation/appkit/nsvisualeffectview/material>
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum NSVisualEffectMaterial {

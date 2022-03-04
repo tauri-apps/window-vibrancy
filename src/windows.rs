@@ -9,9 +9,9 @@ pub use windows_sys::Win32::{
   System::{LibraryLoader::*, SystemInformation::*},
 };
 
-use crate::Error;
+use crate::{Color, Error};
 
-pub fn apply_blur(hwnd: HWND) -> Result<(), Error> {
+pub fn apply_blur(hwnd: HWND, color: Option<Color>) -> Result<(), Error> {
   if is_win7() {
     let bb = DWM_BLURBEHIND {
       dwFlags: DWM_BB_ENABLE,
@@ -24,7 +24,7 @@ pub fn apply_blur(hwnd: HWND) -> Result<(), Error> {
     }
   } else if is_win10_swca() || is_win11() {
     unsafe {
-      SetWindowCompositionAttribute(hwnd, ACCENT_STATE::ACCENT_ENABLE_BLURBEHIND);
+      SetWindowCompositionAttribute(hwnd, ACCENT_STATE::ACCENT_ENABLE_BLURBEHIND, color);
     }
   } else {
     return Err(Error::UnsupportedPlatformVersion(
@@ -47,7 +47,7 @@ pub fn clear_blur(hwnd: HWND) -> Result<(), Error> {
     }
   } else if is_win10_swca() || is_win11() {
     unsafe {
-      SetWindowCompositionAttribute(hwnd, ACCENT_STATE::ACCENT_DISABLED);
+      SetWindowCompositionAttribute(hwnd, ACCENT_STATE::ACCENT_DISABLED, None);
     }
   } else {
     return Err(Error::UnsupportedPlatformVersion(
@@ -57,7 +57,7 @@ pub fn clear_blur(hwnd: HWND) -> Result<(), Error> {
   Ok(())
 }
 
-pub fn apply_acrylic(hwnd: HWND) -> Result<(), Error> {
+pub fn apply_acrylic(hwnd: HWND, color: Option<Color>) -> Result<(), Error> {
   if is_win11_dwmsbt() {
     unsafe {
       DwmSetWindowAttribute(
@@ -69,7 +69,7 @@ pub fn apply_acrylic(hwnd: HWND) -> Result<(), Error> {
     }
   } else if is_win10_swca() || is_win11() {
     unsafe {
-      SetWindowCompositionAttribute(hwnd, ACCENT_STATE::ACCENT_ENABLE_ACRYLICBLURBEHIND);
+      SetWindowCompositionAttribute(hwnd, ACCENT_STATE::ACCENT_ENABLE_ACRYLICBLURBEHIND, color);
     }
   } else {
     return Err(Error::UnsupportedPlatformVersion(
@@ -91,7 +91,7 @@ pub fn clear_acrylic(hwnd: HWND) -> Result<(), Error> {
     }
   } else if is_win10_swca() || is_win11() {
     unsafe {
-      SetWindowCompositionAttribute(hwnd, ACCENT_STATE::ACCENT_DISABLED);
+      SetWindowCompositionAttribute(hwnd, ACCENT_STATE::ACCENT_DISABLED, None);
     }
   } else {
     return Err(Error::UnsupportedPlatformVersion(
@@ -215,17 +215,25 @@ pub enum ACCENT_STATE {
   ACCENT_ENABLE_ACRYLICBLURBEHIND = 4,
 }
 
-unsafe fn SetWindowCompositionAttribute(hwnd: HWND, accent_state: ACCENT_STATE) {
+unsafe fn SetWindowCompositionAttribute(
+  hwnd: HWND,
+  accent_state: ACCENT_STATE,
+  color: Option<Color>,
+) {
   type SetWindowCompositionAttribute =
     unsafe extern "system" fn(HWND, *mut WINDOWCOMPOSITIONATTRIBDATA) -> BOOL;
 
   if let Some(set_window_composition_attribute) =
     get_function!("user32.dll", SetWindowCompositionAttribute)
   {
+    let color = color.unwrap_or_default();
     let mut policy = ACCENT_POLICY {
       AccentState: accent_state as _,
       AccentFlags: 2,
-      GradientColor: 0x1F | 0x1F << 8 | 0x1F << 16 | 0 << 24,
+      GradientColor: (color.0 as u32)
+        | (color.1 as u32) << 8
+        | (color.2 as u32) << 16
+        | (color.3 as u32) << 24,
       AnimationId: 0,
     };
 
