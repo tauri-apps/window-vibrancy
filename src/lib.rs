@@ -111,7 +111,7 @@ pub fn apply_vibrancy(
   match window.raw_window_handle() {
     #[cfg(target_os = "macos")]
     raw_window_handle::RawWindowHandle::AppKit(handle) => {
-      macos::apply_vibrancy(handle.hwnd as _, effect)
+      macos::apply_vibrancy(handle.ns_window as _, effect)
     }
     _ => Err(Error::UnsupportedPlatform(
       "\"apply_vibrancy()\" is only supported on macOS.",
