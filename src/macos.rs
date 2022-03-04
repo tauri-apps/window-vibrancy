@@ -55,16 +55,22 @@ mod internal {
   };
   use objc::{class, msg_send, sel, sel_impl};
 
+  use crate::Error;
+
   #[allow(deprecated)]
-  pub fn apply_vibrancy(window: id, appearance: NSVisualEffectMaterial) {
+  pub fn apply_vibrancy(window: id, appearance: NSVisualEffectMaterial) -> Result<(), Error> {
     unsafe {
       if NSAppKitVersionNumber < NSAppKitVersionNumber10_10 {
         eprintln!("\"NSVisualEffectView\" is only available on macOS 10.10 or newer");
-        return;
+        return Err(Error::UnsupportedPlatformVersion(
+          "\"apply_vibrancy()\" is only available on macOS 10.0 or newer.",
+        ));
       }
 
       if !msg_send![class!(NSThread), isMainThread] {
-        panic!("Views can only be created on the main thread on macOS");
+        return Err(Error::NotMainThread(
+          "\"apply_vibrancy()\" can only be used on the main thread.",
+        ));
       }
 
       let mut m = appearance;
@@ -90,6 +96,7 @@ mod internal {
 
       let _: () = msg_send![ns_view, addSubview: blurred_view positioned: NSWindowOrderingMode::NSWindowBelow relativeTo: 0];
     }
+    Ok(())
   }
 
   #[allow(non_upper_case_globals)]

@@ -9,25 +9,9 @@ pub use windows_sys::Win32::{
   System::{LibraryLoader::*, SystemInformation::*},
 };
 
-pub fn apply_acrylic(hwnd: HWND) {
-  if is_win11_dwmsbt() {
-    unsafe {
-      DwmSetWindowAttribute(
-        hwnd,
-        DWMWA_USE_IMMERSIVE_DARK_MODE,
-        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TRANSIENTWINDOW) as *const _ as _,
-        4,
-      );
-    }
-  } else if is_supported_win10() || is_win11() {
-    unsafe {
-      set_window_composition_attribute(hwnd, AccentState::EnableAcrylicBlurBehind);
-    }
-  } else {
-    eprintln!("\"apply_acrylic\" is only available on Windows 10 v1809 or newer");
-  }
-}
-pub fn apply_blur(hwnd: HWND) {
+use crate::Error;
+
+pub fn apply_blur(hwnd: HWND) -> Result<(), Error> {
   if is_win7() {
     let bb = DWM_BLURBEHIND {
       dwFlags: DWM_BB_ENABLE,
@@ -38,14 +22,86 @@ pub fn apply_blur(hwnd: HWND) {
     unsafe {
       let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
     }
-  } else {
+  } else if is_win10_swca() || is_win11() {
     unsafe {
-      set_window_composition_attribute(hwnd, AccentState::EnableBlurBehind);
+      SetWindowCompositionAttribute(hwnd, ACCENT_STATE::ACCENT_ENABLE_BLURBEHIND);
     }
+  } else {
+    return Err(Error::UnsupportedPlatformVersion(
+      "\"apply_blur()\" is only available on Windows 7, Windows 10 v1809 or newer and Windows 11.",
+    ));
   }
+  Ok(())
 }
 
-pub fn apply_mica(hwnd: HWND) {
+pub fn clear_blur(hwnd: HWND) -> Result<(), Error> {
+  if is_win7() {
+    let bb = DWM_BLURBEHIND {
+      dwFlags: DWM_BB_ENABLE,
+      fEnable: false.into(),
+      hRgnBlur: HRGN::default(),
+      fTransitionOnMaximized: 0,
+    };
+    unsafe {
+      let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
+    }
+  } else if is_win10_swca() || is_win11() {
+    unsafe {
+      SetWindowCompositionAttribute(hwnd, ACCENT_STATE::ACCENT_DISABLED);
+    }
+  } else {
+    return Err(Error::UnsupportedPlatformVersion(
+      "\"clear_blur()\" is only available on Windows 7, Windows 10 v1809 or newer and Windows 11.",
+    ));
+  }
+  Ok(())
+}
+
+pub fn apply_acrylic(hwnd: HWND) -> Result<(), Error> {
+  if is_win11_dwmsbt() {
+    unsafe {
+      DwmSetWindowAttribute(
+        hwnd,
+        DWMWA_USE_IMMERSIVE_DARK_MODE,
+        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TRANSIENTWINDOW) as *const _ as _,
+        4,
+      );
+    }
+  } else if is_win10_swca() || is_win11() {
+    unsafe {
+      SetWindowCompositionAttribute(hwnd, ACCENT_STATE::ACCENT_ENABLE_ACRYLICBLURBEHIND);
+    }
+  } else {
+    return Err(Error::UnsupportedPlatformVersion(
+      "\"apply_acrylic()\" is only available on Windows 10 v1809 or newer and Windows 11.",
+    ));
+  }
+  Ok(())
+}
+
+pub fn clear_acrylic(hwnd: HWND) -> Result<(), Error> {
+  if is_win11_dwmsbt() {
+    unsafe {
+      DwmSetWindowAttribute(
+        hwnd,
+        DWMWA_USE_IMMERSIVE_DARK_MODE,
+        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE) as *const _ as _,
+        4,
+      );
+    }
+  } else if is_win10_swca() || is_win11() {
+    unsafe {
+      SetWindowCompositionAttribute(hwnd, ACCENT_STATE::ACCENT_DISABLED);
+    }
+  } else {
+    return Err(Error::UnsupportedPlatformVersion(
+      "\"clear_acrylic()\" is only available on Windows 10 v1809 or newer and Windows 11.",
+    ));
+  }
+  Ok(())
+}
+
+pub fn apply_mica(hwnd: HWND) -> Result<(), Error> {
   if is_win11_dwmsbt() {
     unsafe {
       DwmSetWindowAttribute(
@@ -60,48 +116,14 @@ pub fn apply_mica(hwnd: HWND) {
       DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &1 as *const _ as _, 4);
     }
   } else {
-    eprintln!("\"apply_mica\" is only available on Windows 11");
+    return Err(Error::UnsupportedPlatformVersion(
+      "\"apply_mica()\" is only available on Windows 11.",
+    ));
   }
+  Ok(())
 }
 
-pub fn clear_blur(hwnd: HWND) {
-  if is_win7() {
-    let bb = DWM_BLURBEHIND {
-      dwFlags: DWM_BB_ENABLE,
-      fEnable: false.into(),
-      hRgnBlur: HRGN::default(),
-      fTransitionOnMaximized: 0,
-    };
-    unsafe {
-      let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
-    }
-  } else {
-    unsafe {
-      set_window_composition_attribute(hwnd, AccentState::Disabled);
-    }
-  }
-}
-
-pub fn clear_acrylic(hwnd: HWND) {
-  if is_win11_dwmsbt() {
-    unsafe {
-      DwmSetWindowAttribute(
-        hwnd,
-        DWMWA_USE_IMMERSIVE_DARK_MODE,
-        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE) as *const _ as _,
-        4,
-      );
-    }
-  } else if is_supported_win10() || is_win11() {
-    unsafe {
-      set_window_composition_attribute(hwnd, AccentState::Disabled);
-    }
-  } else {
-    eprintln!("\"clear_acrylic\" is only available on Windows 10 v1809 or newer");
-  }
-}
-
-pub fn clear_mica(hwnd: HWND) {
+pub fn clear_mica(hwnd: HWND) -> Result<(), Error> {
   if is_win11_dwmsbt() {
     unsafe {
       DwmSetWindowAttribute(
@@ -116,8 +138,11 @@ pub fn clear_mica(hwnd: HWND) {
       DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &0 as *const _ as _, 4);
     }
   } else {
-    eprintln!("\"clear_mica\" is only available on Windows 11");
+    return Err(Error::UnsupportedPlatformVersion(
+      "\"clear_mica()\" is only available on Windows 11.",
+    ));
   }
+  Ok(())
 }
 
 fn get_function_impl(library: &str, function: &str) -> Option<FARPROC> {
@@ -167,7 +192,7 @@ fn get_windows_ver() -> Option<(u32, u32, u32)> {
   }
 }
 
-type SetWindowCompositionAttribute =
+type SetWindowCompositionAttributeFnType =
   unsafe extern "system" fn(HWND, *mut WINDOWCOMPOSITIONATTRIBDATA) -> BOOL;
 
 type WINDOWCOMPOSITIONATTRIB = u32;
@@ -187,15 +212,15 @@ struct WINDOWCOMPOSITIONATTRIBDATA {
   cbData: usize,
 }
 
-pub enum AccentState {
-  Disabled = 0,
-  EnableBlurBehind = 3,
-  EnableAcrylicBlurBehind = 4,
+pub enum ACCENT_STATE {
+  ACCENT_DISABLED = 0,
+  ACCENT_ENABLE_BLURBEHIND = 3,
+  ACCENT_ENABLE_ACRYLICBLURBEHIND = 4,
 }
 
-unsafe fn set_window_composition_attribute(hwnd: HWND, accent_state: AccentState) {
+unsafe fn SetWindowCompositionAttribute(hwnd: HWND, accent_state: ACCENT_STATE) {
   if let Some(set_window_composition_attribute) =
-    get_function!("user32.dll", SetWindowCompositionAttribute)
+    get_function!("user32.dll", SetWindowCompositionAttributeFnType)
   {
     let mut policy = ACCENT_POLICY {
       AccentState: accent_state as _,
@@ -230,15 +255,20 @@ fn is_win7() -> bool {
   v.0 == 6 && v.1 == 1
 }
 
-fn is_supported_win10() -> bool {
+fn is_win10_swca() -> bool {
   let v = get_windows_ver().unwrap_or_default();
   v.2 >= 17763 && v.2 < 22000
 }
+
 fn is_win11() -> bool {
-  let v = get_windows_ver().unwrap_or_default();
-  v.2 >= 22000
+  is_at_least_build(22000)
 }
+
 fn is_win11_dwmsbt() -> bool {
+  is_at_least_build(22523)
+}
+
+fn is_at_least_build(build: u32) -> bool {
   let v = get_windows_ver().unwrap_or_default();
-  v.2 >= 22523
+  v.2 >= build
 }
