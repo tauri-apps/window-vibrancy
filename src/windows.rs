@@ -84,20 +84,21 @@ pub fn clear_blur(hwnd: HWND) {
 }
 
 pub fn clear_acrylic(hwnd: HWND) {
-  if is_win7() {
-    let bb = DWM_BLURBEHIND {
-      dwFlags: DWM_BB_ENABLE,
-      fEnable: false.into(),
-      hRgnBlur: HRGN::default(),
-      fTransitionOnMaximized: 0,
-    };
+  if is_win11_dwmsbt() {
     unsafe {
-      let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
+      DwmSetWindowAttribute(
+        hwnd,
+        DWMWA_USE_IMMERSIVE_DARK_MODE,
+        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE) as *const _ as _,
+        4,
+      );
     }
-  } else {
+  } else if is_supported_win10() || is_win11() {
     unsafe {
       set_window_composition_attribute(hwnd, AccentState::Disabled);
     }
+  } else {
+    eprintln!("\"clear_acrylic\" is only available on Windows 10 v1809 or newer");
   }
 }
 
