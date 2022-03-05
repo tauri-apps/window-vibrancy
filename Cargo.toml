@@ -9,18 +9,7 @@ license = "Apache-2.0 OR MIT"
 readme = "README.md"
 repository = "https://github.com/tauri-apps/tauri-plugin-vibrancy"
 documentation = "https://docs.rs/tauri-plugin-vibrancy"
-keywords = [
-  "vibrancy",
-  "acrylic",
-  "mica",
-  "blur",
-  "windowing",
-  "winit",
-  "tauri",
-  "gui",
-  "plugin",
-  "tauri-plugin"
-]
+keywords = [ "vibrancy", "acrylic", "mica", "blur", "windowing" ]
 categories = [ "gui" ]
 
 [package.metadata.docs.rs]
