@@ -15,11 +15,6 @@
           "pipe": true
         },
         {
-          "command": "echo \"# Cargo Publish\"",
-          "dryRunCommand": true,
-          "pipe": true
-        },
-        {
           "command": "echo \"\\`\\`\\`\"",
           "dryRunCommand": true,
           "pipe": true
