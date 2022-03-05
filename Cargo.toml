@@ -2,7 +2,7 @@
 name = "window-vibrancy"
 description = "Make your windows vibrant."
 authors = [ "Tauri Programme within The Commons Conservancy" ]
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 rust-version = "1.56"
 license = "Apache-2.0 OR MIT"
@@ -22,6 +22,11 @@ keywords = [
   "tauri-plugin"
 ]
 categories = [ "gui" ]
+
+[package.metadata.docs.rs]
+features = [ "tauri-impl", "tao-impl" ]
+default-target = "x86_64-pc-windows-msvc"
+targets = [ "x86_64-apple-darwin", "x86_64-pc-windows-msvc" ]
 
 [dependencies]
 raw-window-handle = "0.4"
@@ -44,8 +49,3 @@ features = [
 [target."cfg(target_os = \"macos\")".dependencies]
 cocoa = "0.24"
 objc = "0.2"
-
-[package.metadata.docs.rs]
-features = [ "tauri-impl", "tao-impl" ]
-default-target = "x86_64-pc-windows-msvc"
-targets = [ "x86_64-apple-darwin", "x86_64-pc-windows-msvc" ]
