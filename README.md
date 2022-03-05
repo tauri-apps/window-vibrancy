@@ -1,5 +1,8 @@
 # window-vibrancy
 
+[![](https://img.shields.io/crates/v/window-vibrancy)](https://crates.io/crates/window-vibrancy) [![](https://img.shields.io/docsrs/window-vibrancy)](https://docs.rs/window-vibrancy/) ![](https://img.shields.io/crates/l/window-vibrancy)
+[![Chat Server](https://img.shields.io/badge/chat-on%20discord-7289da.svg)](https://discord.gg/SpmNs4S)
+
 Make your windows vibrant.
 
 ## Platform support
@@ -7,14 +10,6 @@ Make your windows vibrant.
 - **`Windows:`** Yes!
 - **`macOS:`** Yes!
 - **`Linux:`** No, blur effect is controlled by the compositor installed on the user system and they can enable it for your app if they want.
-
-## Installation
-
-Add it as a dependncy in `Cargo.toml`
-```toml
-[dependencies]
-window-vibrancy = { git = "https://github.com/tauri-apps/window-vibrancy" }
-```
 
 ## Available methods
 
