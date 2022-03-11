@@ -33,7 +33,7 @@ Make your windows vibrant.
     .unwrap();
 
     #[cfg(target_os = "macos")]
-    apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased).unwrap();
+    apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased, 13.0).unwrap();
 
     #[cfg(target_os = "windows")]
     apply_blur(&window).unwrap();
@@ -46,7 +46,7 @@ Make your windows vibrant.
     let window = app.get_window("main").unwrap();
 
     #[cfg(target_os = "macos")]
-    apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased).unwrap();
+    apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased, 13.0).unwrap();
 
     #[cfg(target_os = "windows")]
     apply_blur(&window).unwrap();
