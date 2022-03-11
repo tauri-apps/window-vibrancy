@@ -124,11 +124,12 @@ pub fn clear_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
 pub fn apply_vibrancy(
   window: impl raw_window_handle::HasRawWindowHandle,
   #[allow(unused)] effect: NSVisualEffectMaterial,
+  #[allow(unused)] radius: f64,
 ) -> Result<(), Error> {
   match window.raw_window_handle() {
     #[cfg(target_os = "macos")]
     raw_window_handle::RawWindowHandle::AppKit(handle) => {
-      macos::apply_vibrancy(handle.ns_window as _, effect)
+      macos::apply_vibrancy(handle.ns_window as _, effect, radius)
     }
     _ => Err(Error::UnsupportedPlatform(
       "\"apply_vibrancy()\" is only supported on macOS.",
