@@ -1,5 +1,10 @@
 # Changelog
 
+## \[0.1.1]
+
+- Update crate docs.
+  - [2764ca3](https://github.com/tauri-apps/window-vibrancy/commit/2764ca398661b7f4045b39883914f67e299a7fe4) chore: update crate docs on 2022-03-29
+
 ## \[0.1.0]
 
 - Initial Release.
