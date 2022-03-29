@@ -5,11 +5,9 @@
 
 Make your windows vibrant.
 
-## Platform support
+## Platform-specific
 
-- **`Windows:`** Yes!
-- **`macOS:`** Yes!
-- **`Linux:`** No, blur effect is controlled by the compositor installed on the user system and they can enable it for your app if they want.
+- **Linux**: Unsupported, Blur and any vibrancy effects are controlled by the compositor installed on the end-user system.
 
 ## Available methods
 
@@ -18,36 +16,14 @@ Make your windows vibrant.
 - `apply_mica()` & `clear_mica()` - **`Windows 11`**
 - `apply_vibrancy()` - **`macOS 10.10+`**
 
-## Examples
+## Example
 
-- with `winit`:
-    ```rs
-    use winit::{event_loop::EventLoop, window::WindowBuilder};
-    use window_vibrancy::{apply_vibrancy, apply_blur, NSVisualEffectMaterial};
+```rs
+use window_vibrancy::{apply_blur, apply_vibrancy, NSVisualEffectMaterial};
 
-    let event_loop = EventLoop::new();
+#[cfg(target_os = "macos")]
+apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased).expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
 
-    let window = WindowBuilder::new()
-    .with_decorations(false)
-    .build(&event_loop)
-    .unwrap();
-
-    #[cfg(target_os = "macos")]
-    apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased).unwrap();
-
-    #[cfg(target_os = "windows")]
-    apply_blur(&window).unwrap();
-    ```
-
-- with `tauri`:
-    ```rs
-    use window_vibrancy::{apply_vibrancy, apply_blur, NSVisualEffectMaterial};
-
-    let window = app.get_window("main").unwrap();
-
-    #[cfg(target_os = "macos")]
-    apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased).unwrap();
-
-    #[cfg(target_os = "windows")]
-    apply_blur(&window).unwrap();
-    ```
+#[cfg(target_os = "windows")]
+apply_blur(&window, Some((18, 18, 18, 125))).expect("Unsupported platform! 'apply_blur' is only supported on Windows");
+```

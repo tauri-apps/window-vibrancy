@@ -15,10 +15,12 @@ fn main() {
     .unwrap();
 
   #[cfg(target_os = "windows")]
-  let _ = apply_blur(&window, Some((18, 18, 18, 125)));
+  apply_blur(&window, Some((18, 18, 18, 125)))
+    .expect("Unsupported platform! 'apply_blur' is only supported on Windows");
 
   #[cfg(target_os = "macos")]
-  let _ = apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased);
+  let _ = apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased)
+    .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
 
   window.set_title("A fantastic window!");
 

@@ -1,28 +1,20 @@
 //! Make your windows vibrant.
 //!
-//! # Platform support:
+//! ## Platform-specific
 //!
-//! - **Windows:** Yes!
-//! - **macOS:** Yes!
-//! - **Linux:** No, blur effect is controlled by the compositor installed on the user system and they can enable it for your app if they want.
+//! - **Linux**: Unsupported, Blur and any vibrancy effects are controlled by the compositor installed on the end-user system.
 //!
-//! # Example with [`winit`](https://docs.rs/winit)
+//! # Example
 //!
 //! ```no_run
-//! # use winit::{event_loop::EventLoop, window::WindowBuilder};
-//! # use window_vibrancy::{apply_vibrancy, apply_blur, NSVisualEffectMaterial};
-//! let event_loop = EventLoop::new();
+//! use window_vibrancy::{apply_vibrancy, apply_blur, NSVisualEffectMaterial};
 //!
-//! let window = WindowBuilder::new()
-//!  .with_decorations(false)
-//!  .build(&event_loop)
-//!  .unwrap();
+//! # let window: &dyn raw_window_handle::HasRawWindowHandle = unsafe { std::mem::zeroed() };
+//! #[cfg(target_os = "macos")]
+//! apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased).expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
 //!
 //! #[cfg(target_os = "windows")]
-//! apply_blur(&window, Some((18, 18, 18, 125))).unwrap();
-//!
-//! #[cfg(target_os = "macos")]
-//! apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased).unwrap();
+//! apply_blur(&window, Some((18, 18, 18, 125))).expect("Unsupported platform! 'apply_blur' is only supported on Windows");
 //! ```
 
 mod macos;
@@ -35,7 +27,13 @@ pub type Color = (u8, u8, u8, u8);
 
 /// Applies blur effect to window. Works only on Windows 7, Windows 10 v1809 or newer and Windows 11.
 ///
+/// ## Argumesnts:
+///
 /// - *`color`* is ignored on Windows 7 and has no effect.
+///
+/// ## Platform-specific
+///
+/// - **Linux / macOS**: Unsupported.
 pub fn apply_blur(
   window: impl raw_window_handle::HasRawWindowHandle,
   #[allow(unused)] color: Option<Color>,
@@ -52,6 +50,10 @@ pub fn apply_blur(
 }
 
 /// Clears blur effect applied to window. Works only on Windows 7, Windows 10 v1809 or newer and Windows 11.
+///
+/// ## Platform-specific
+///
+/// - **Linux / macOS**: Unsupported.
 pub fn clear_blur(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
   match window.raw_window_handle() {
     #[cfg(target_os = "windows")]
@@ -72,6 +74,10 @@ pub fn clear_blur(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
 /// the window will lag when resizing or dragging.
 /// It is an issue in the undocumented api used for this method
 /// and microsoft needs to fix it (they probably won't).
+///
+/// ## Platform-specific
+///
+/// - **Linux / macOS**: Unsupported.
 pub fn apply_acrylic(
   window: impl raw_window_handle::HasRawWindowHandle,
   #[allow(unused)] color: Option<Color>,
@@ -88,6 +94,10 @@ pub fn apply_acrylic(
 }
 
 /// Clears acrylic effect applied to window. Works only on Windows 10 v1809 or newer and Windows 11.
+///
+/// ## Platform-specific
+///
+/// - **Linux / macOS**: Unsupported.
 pub fn clear_acrylic(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
   match window.raw_window_handle() {
     #[cfg(target_os = "windows")]
@@ -99,6 +109,10 @@ pub fn clear_acrylic(window: impl raw_window_handle::HasRawWindowHandle) -> Resu
 }
 
 /// Applies mica effect to window. Works only on Windows 11.
+///
+/// ## Platform-specific
+///
+/// - **Linux / macOS**: Unsupported.
 pub fn apply_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
   match window.raw_window_handle() {
     #[cfg(target_os = "windows")]
@@ -110,6 +124,10 @@ pub fn apply_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
 }
 
 /// Clears mica effect applied to window. Works only on Windows 11.
+///
+/// ## Platform-specific
+///
+/// - **Linux / macOS**: Unsupported.
 pub fn clear_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
   match window.raw_window_handle() {
     #[cfg(target_os = "windows")]
@@ -121,6 +139,10 @@ pub fn clear_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
 }
 
 /// Applies macos vibrancy effect to window. Works only on macOS 10.10 or newer.
+///
+/// ## Platform-specific
+///
+/// - **Linux / Windows**: Unsupported.
 pub fn apply_vibrancy(
   window: impl raw_window_handle::HasRawWindowHandle,
   #[allow(unused)] effect: NSVisualEffectMaterial,
