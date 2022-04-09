@@ -16,6 +16,15 @@ Make your windows vibrant.
 - `apply_mica()` & `clear_mica()` - **`Windows 11`**
 - `apply_vibrancy()` - **`macOS 10.10+`**
 
+## Install Guide
+
+in `Cargo.toml`  add the content
+
+```toml
+[dependencies]
+window-vibrancy = { git = "https://github.com/tauri-apps/window-vibrancy", branch = "dev" }
+```
+
 ## Example
 
 ```rs
