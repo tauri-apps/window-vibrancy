@@ -9,13 +9,6 @@ Make your windows vibrant.
 
 - **Linux**: Unsupported, Blur and any vibrancy effects are controlled by the compositor installed on the end-user system.
 
-## Available methods
-
-- `apply_blur()` & `clear_blur()`- **`Windows 7/10/11`**
-- `apply_acrylic()` & `clear_acrylic()` - **`Windows 10/11`** has bad performance when resizing/dragging the window on Windows 10 v1903+ and Windows 11 build 22000.
-- `apply_mica()` & `clear_mica()` - **`Windows 11`**
-- `apply_vibrancy()` - **`macOS 10.10+`**
-
 ## Example
 
 ```rs
@@ -27,3 +20,16 @@ apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased).expect("Unsuppo
 #[cfg(target_os = "windows")]
 apply_blur(&window, Some((18, 18, 18, 125))).expect("Unsupported platform! 'apply_blur' is only supported on Windows");
 ```
+
+## Available functions
+
+| Function                          | Supported platforms   | Notes |
+| ----------------------------------------------------------------- |
+| `apply_blur` & `clear_blur`       | Windows  7/10/11      |       |
+| ----------------------------------------------------------------- |
+| `apply_acrylic` & `clear_acrylic` | Windows 10/11         | has bad performance when resizing/dragging the window on Windows 10 v1903+ and Windows 11 build 22000. |
+| ----------------------------------------------------------------- |
+| `apply_mica` & `clear_mica`       | Windows 11            |       |
+| ----------------------------------------------------------------- |
+| `apply_vibrancy`                  | macOS 10.10 and newer |       |
+
