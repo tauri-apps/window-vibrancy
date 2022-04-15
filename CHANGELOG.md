@@ -1,5 +1,10 @@
 # Changelog
 
+## \[0.1.2]
+
+- Update examples and documentation about macOS `NSVisualEffectMaterial`.
+  - [e3e2cc7](https://github.com/tauri-apps/window-vibrancy/commit/e3e2cc7323a830305ef84001edfd7a7678d098d7) docs: update examples and macos NSVisualEffectMaterial on 2022-04-15
+
 ## \[0.1.1]
 
 - Update crate docs.
