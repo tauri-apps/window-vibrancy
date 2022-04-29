@@ -63,7 +63,7 @@ pub fn apply_acrylic(hwnd: HWND, color: Option<Color>) -> Result<(), Error> {
       DwmSetWindowAttribute(
         hwnd,
         DWMWA_USE_IMMERSIVE_DARK_MODE,
-        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TRANSIENTWINDOW) as *const _ as _,
+        &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TRANSIENTWINDOW as *const _ as _,
         4,
       );
     }
@@ -85,7 +85,7 @@ pub fn clear_acrylic(hwnd: HWND) -> Result<(), Error> {
       DwmSetWindowAttribute(
         hwnd,
         DWMWA_USE_IMMERSIVE_DARK_MODE,
-        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE) as *const _ as _,
+        &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE as *const _ as _,
         4,
       );
     }
@@ -107,7 +107,7 @@ pub fn apply_mica(hwnd: HWND) -> Result<(), Error> {
       DwmSetWindowAttribute(
         hwnd,
         DWMWA_SYSTEMBACKDROP_TYPE,
-        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_MAINWINDOW as i32) as *const _ as _,
+        &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_MAINWINDOW as *const _ as _,
         4,
       );
     }
@@ -129,7 +129,7 @@ pub fn clear_mica(hwnd: HWND) -> Result<(), Error> {
       DwmSetWindowAttribute(
         hwnd,
         DWMWA_SYSTEMBACKDROP_TYPE,
-        &(DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE as i32) as *const _ as _,
+        &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE as *const _ as _,
         4,
       );
     }
@@ -209,7 +209,9 @@ struct WINDOWCOMPOSITIONATTRIBDATA {
   cbData: usize,
 }
 
-pub enum ACCENT_STATE {
+#[derive(PartialEq)]
+#[repr(C)]
+enum ACCENT_STATE {
   ACCENT_DISABLED = 0,
   ACCENT_ENABLE_BLURBEHIND = 3,
   ACCENT_ENABLE_ACRYLICBLURBEHIND = 4,
@@ -226,10 +228,17 @@ unsafe fn SetWindowCompositionAttribute(
   if let Some(set_window_composition_attribute) =
     get_function!("user32.dll", SetWindowCompositionAttribute)
   {
-    let color = color.unwrap_or_default();
+    let mut color = color.unwrap_or_default();
+
+    let is_acrylic = accent_state == ACCENT_STATE::ACCENT_ENABLE_ACRYLICBLURBEHIND;
+    if is_acrylic && color.3 == 0 {
+      // SetWindowCompositionAttribute doesn't like acrylic to have 0 alpha
+      color.3 = 1;
+    }
+
     let mut policy = ACCENT_POLICY {
       AccentState: accent_state as _,
-      AccentFlags: 2,
+      AccentFlags: if is_acrylic { 0 } else { 2 },
       GradientColor: (color.0 as u32)
         | (color.1 as u32) << 8
         | (color.2 as u32) << 16
@@ -251,6 +260,7 @@ const DWMWA_MICA_EFFECT: DWMWINDOWATTRIBUTE = 1029i32;
 const DWMWA_SYSTEMBACKDROP_TYPE: DWMWINDOWATTRIBUTE = 38i32;
 
 #[allow(unused)]
+#[repr(C)]
 enum DWM_SYSTEMBACKDROP_TYPE {
   DWMSBT_DISABLE = 1,         // None
   DWMSBT_MAINWINDOW = 2,      // Mica

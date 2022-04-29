@@ -22,7 +22,7 @@ apply_blur(&window, Some((18, 18, 18, 125))).expect("Unsupported platform! 'appl
 ```
 
 ## Available functions
- 
+
 | Function                          | Supported platforms   | Notes |
 | :---                              | :---:                 | :---  |
 | `apply_blur`&`clear_blur`         | Windows  7/10/11      |       |
@@ -30,3 +30,12 @@ apply_blur(&window, Some((18, 18, 18, 125))).expect("Unsupported platform! 'appl
 | `apply_mica`&`clear_mica`         | Windows 11            |       |
 | `apply_vibrancy`                  | macOS 10.10 and newer |       |
 
+## Screenshots
+
+<p align="center">
+
+| apply_blur | apply_acrylic | apply_mica | apply_vibrancy |
+| :---:      | :---:         | :---:      | :---:          |
+| ![apply_blur screenshot](./screenshots/apply_blur.png) | ![apply_blur screenshot](./screenshots/apply_acrylic.png) | ![apply_mica screenshot](./screenshots/apply_mica.png) | ![apply_vibrancy screenshot](./screenshots/apply_blur.png) |
+
+</p>
