@@ -232,7 +232,7 @@ unsafe fn SetWindowCompositionAttribute(
 
     let is_acrylic = accent_state == ACCENT_STATE::ACCENT_ENABLE_ACRYLICBLURBEHIND;
     if is_acrylic && color.3 == 0 {
-      // SetWindowCompositionAttribute doesn't like acrylic to have 0 alpha
+      // acrylic doesn't like to have 0 alpha
       color.3 = 1;
     }
 
