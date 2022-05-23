@@ -1,5 +1,13 @@
 # Changelog
 
+## \[0.1.3]
+
+- Fix `apply_acrylic` effect on Windows 11.
+  - [7f4e28f](https://github.com/tauri-apps/window-vibrancy/commit/7f4e28fba82bfc70673cc48ca1aabec2356bdccd) fix(acrylic): pass correct `AccentFlags` to `swca` on 2022-04-29
+  - [92ef268](https://github.com/tauri-apps/window-vibrancy/commit/92ef268006686fcdc9b8a3dd09d2b71b5140bd7f) chore: add screenshots ([#37](https://github.com/tauri-apps/window-vibrancy/pull/37)) on 2022-05-23
+- Add screenshots
+  - [92ef268](https://github.com/tauri-apps/window-vibrancy/commit/92ef268006686fcdc9b8a3dd09d2b71b5140bd7f) chore: add screenshots ([#37](https://github.com/tauri-apps/window-vibrancy/pull/37)) on 2022-05-23
+
 ## \[0.1.2]
 
 - Update examples and documentation about macOS `NSVisualEffectMaterial`.
