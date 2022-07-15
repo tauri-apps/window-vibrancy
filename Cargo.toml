@@ -17,7 +17,7 @@ default-target = "x86_64-pc-windows-msvc"
 targets = [ "x86_64-apple-darwin", "x86_64-pc-windows-msvc" ]
 
 [dependencies]
-raw-window-handle = "0.4"
+raw-window-handle = "0.5"
 
 [dev-dependencies]
 tao = "0.12"
