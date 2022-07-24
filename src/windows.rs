@@ -158,16 +158,15 @@ fn get_function_impl(library: &str, function: &str) -> Option<FARPROC> {
 
 macro_rules! get_function {
   ($lib:expr, $func:ident) => {
-    get_function_impl(concat!($lib, '\0'), concat!(stringify!($func), '\0')).map(|f| unsafe {
-      std::mem::transmute::<::windows_sys::Win32::Foundation::FARPROC, $func>(f)
-    })
+    get_function_impl(concat!($lib, '\0'), concat!(stringify!($func), '\0'))
+      .map(|f| std::mem::transmute::<::windows_sys::Win32::Foundation::FARPROC, $func>(f))
   };
 }
 
 /// Returns a tuple of (major, minor, buildnumber)
 fn get_windows_ver() -> Option<(u32, u32, u32)> {
   type RtlGetVersion = unsafe extern "system" fn(*mut OSVERSIONINFOW) -> i32;
-  let handle = get_function!("ntdll.dll", RtlGetVersion);
+  let handle = unsafe { get_function!("ntdll.dll", RtlGetVersion) };
   if let Some(rtl_get_version) = handle {
     unsafe {
       let mut vi = OSVERSIONINFOW {
