@@ -1,20 +1,20 @@
 [package]
 name = "window-vibrancy"
 description = "Make your windows vibrant."
-authors = ["Tauri Programme within The Commons Conservancy"]
-version = "0.1.3"
+authors = [ "Tauri Programme within The Commons Conservancy" ]
+version = "0.2.0"
 edition = "2021"
 rust-version = "1.56"
 license = "Apache-2.0 OR MIT"
 readme = "README.md"
 repository = "https://github.com/tauri-apps/tauri-plugin-vibrancy"
 documentation = "https://docs.rs/tauri-plugin-vibrancy"
-keywords = ["vibrancy", "acrylic", "mica", "blur", "windowing"]
-categories = ["gui"]
+keywords = [ "vibrancy", "acrylic", "mica", "blur", "windowing" ]
+categories = [ "gui" ]
 
 [package.metadata.docs.rs]
 default-target = "x86_64-pc-windows-msvc"
-targets = ["x86_64-apple-darwin", "x86_64-pc-windows-msvc"]
+targets = [ "x86_64-apple-darwin", "x86_64-pc-windows-msvc" ]
 
 [dependencies]
 raw-window-handle = "0.5"
@@ -31,7 +31,7 @@ features = [
   "Win32_System_SystemInformation",
   "Win32_Graphics_Gdi",
   "Win32_Graphics_Dwm",
-  "Win32_UI_WindowsAndMessaging",
+  "Win32_UI_WindowsAndMessaging"
 ]
 
 [target."cfg(target_os = \"macos\")".dependencies]

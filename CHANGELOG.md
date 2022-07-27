@@ -1,5 +1,10 @@
 # Changelog
 
+## \[0.2.0]
+
+- Update `raw-window-handle` dependency to 0.5
+  - [aef927b](https://github.com/tauri-apps/window-vibrancy/commit/aef927b7378e834c2b14df13de785770c812c8a0) chore(deps): update raw-window-handle to 0.5 on 2022-07-25
+
 ## \[0.1.3]
 
 - Fix `apply_acrylic` effect on Windows 11.
