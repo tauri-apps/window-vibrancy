@@ -1,3 +1,7 @@
+// Copyright 2019-2022 Tauri Programme within The Commons Conservancy
+// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
+
 //! Make your windows vibrant.
 //!
 //! ## Platform-specific
@@ -35,18 +39,18 @@ pub type Color = (u8, u8, u8, u8);
 ///
 /// - **Linux / macOS**: Unsupported.
 pub fn apply_blur(
-  window: impl raw_window_handle::HasRawWindowHandle,
-  #[allow(unused)] color: Option<Color>,
+    window: impl raw_window_handle::HasRawWindowHandle,
+    #[allow(unused)] color: Option<Color>,
 ) -> Result<(), Error> {
-  match window.raw_window_handle() {
-    #[cfg(target_os = "windows")]
-    raw_window_handle::RawWindowHandle::Win32(handle) => {
-      windows::apply_blur(handle.hwnd as _, color)
+    match window.raw_window_handle() {
+        #[cfg(target_os = "windows")]
+        raw_window_handle::RawWindowHandle::Win32(handle) => {
+            windows::apply_blur(handle.hwnd as _, color)
+        }
+        _ => Err(Error::UnsupportedPlatform(
+            "\"apply_blur()\" is only supported on Windows.",
+        )),
     }
-    _ => Err(Error::UnsupportedPlatform(
-      "\"apply_blur()\" is only supported on Windows.",
-    )),
-  }
 }
 
 /// Clears blur effect applied to window. Works only on Windows 7, Windows 10 v1809 or newer and Windows 11.
@@ -55,13 +59,13 @@ pub fn apply_blur(
 ///
 /// - **Linux / macOS**: Unsupported.
 pub fn clear_blur(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
-  match window.raw_window_handle() {
-    #[cfg(target_os = "windows")]
-    raw_window_handle::RawWindowHandle::Win32(handle) => windows::clear_blur(handle.hwnd as _),
-    _ => Err(Error::UnsupportedPlatform(
-      "\"clear_blur()\" is only supported on Windows.",
-    )),
-  }
+    match window.raw_window_handle() {
+        #[cfg(target_os = "windows")]
+        raw_window_handle::RawWindowHandle::Win32(handle) => windows::clear_blur(handle.hwnd as _),
+        _ => Err(Error::UnsupportedPlatform(
+            "\"clear_blur()\" is only supported on Windows.",
+        )),
+    }
 }
 
 /// Applies Acrylic effect to you window. Works only on Windows 10 v1809 or newer and Windows 11
@@ -79,18 +83,18 @@ pub fn clear_blur(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
 ///
 /// - **Linux / macOS**: Unsupported.
 pub fn apply_acrylic(
-  window: impl raw_window_handle::HasRawWindowHandle,
-  #[allow(unused)] color: Option<Color>,
+    window: impl raw_window_handle::HasRawWindowHandle,
+    #[allow(unused)] color: Option<Color>,
 ) -> Result<(), Error> {
-  match window.raw_window_handle() {
-    #[cfg(target_os = "windows")]
-    raw_window_handle::RawWindowHandle::Win32(handle) => {
-      windows::apply_acrylic(handle.hwnd as _, color)
+    match window.raw_window_handle() {
+        #[cfg(target_os = "windows")]
+        raw_window_handle::RawWindowHandle::Win32(handle) => {
+            windows::apply_acrylic(handle.hwnd as _, color)
+        }
+        _ => Err(Error::UnsupportedPlatform(
+            "\"apply_acrylic()\" is only supported on Windows.",
+        )),
     }
-    _ => Err(Error::UnsupportedPlatform(
-      "\"apply_acrylic()\" is only supported on Windows.",
-    )),
-  }
 }
 
 /// Clears acrylic effect applied to window. Works only on Windows 10 v1809 or newer and Windows 11.
@@ -99,13 +103,15 @@ pub fn apply_acrylic(
 ///
 /// - **Linux / macOS**: Unsupported.
 pub fn clear_acrylic(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
-  match window.raw_window_handle() {
-    #[cfg(target_os = "windows")]
-    raw_window_handle::RawWindowHandle::Win32(handle) => windows::clear_acrylic(handle.hwnd as _),
-    _ => Err(Error::UnsupportedPlatform(
-      "\"clear_acrylic()\" is only supported on Windows.",
-    )),
-  }
+    match window.raw_window_handle() {
+        #[cfg(target_os = "windows")]
+        raw_window_handle::RawWindowHandle::Win32(handle) => {
+            windows::clear_acrylic(handle.hwnd as _)
+        }
+        _ => Err(Error::UnsupportedPlatform(
+            "\"clear_acrylic()\" is only supported on Windows.",
+        )),
+    }
 }
 
 /// Applies mica effect to window. Works only on Windows 11.
@@ -114,13 +120,13 @@ pub fn clear_acrylic(window: impl raw_window_handle::HasRawWindowHandle) -> Resu
 ///
 /// - **Linux / macOS**: Unsupported.
 pub fn apply_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
-  match window.raw_window_handle() {
-    #[cfg(target_os = "windows")]
-    raw_window_handle::RawWindowHandle::Win32(handle) => windows::apply_mica(handle.hwnd as _),
-    _ => Err(Error::UnsupportedPlatform(
-      "\"apply_mica()\" is only supported on Windows.",
-    )),
-  }
+    match window.raw_window_handle() {
+        #[cfg(target_os = "windows")]
+        raw_window_handle::RawWindowHandle::Win32(handle) => windows::apply_mica(handle.hwnd as _),
+        _ => Err(Error::UnsupportedPlatform(
+            "\"apply_mica()\" is only supported on Windows.",
+        )),
+    }
 }
 
 /// Clears mica effect applied to window. Works only on Windows 11.
@@ -129,13 +135,13 @@ pub fn apply_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
 ///
 /// - **Linux / macOS**: Unsupported.
 pub fn clear_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
-  match window.raw_window_handle() {
-    #[cfg(target_os = "windows")]
-    raw_window_handle::RawWindowHandle::Win32(handle) => windows::clear_mica(handle.hwnd as _),
-    _ => Err(Error::UnsupportedPlatform(
-      "\"clear_mica()\" is only supported on Windows.",
-    )),
-  }
+    match window.raw_window_handle() {
+        #[cfg(target_os = "windows")]
+        raw_window_handle::RawWindowHandle::Win32(handle) => windows::clear_mica(handle.hwnd as _),
+        _ => Err(Error::UnsupportedPlatform(
+            "\"clear_mica()\" is only supported on Windows.",
+        )),
+    }
 }
 
 /// Applies macos vibrancy effect to window. Works only on macOS 10.10 or newer.
@@ -144,35 +150,35 @@ pub fn clear_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
 ///
 /// - **Linux / Windows**: Unsupported.
 pub fn apply_vibrancy(
-  window: impl raw_window_handle::HasRawWindowHandle,
-  #[allow(unused)] effect: NSVisualEffectMaterial,
+    window: impl raw_window_handle::HasRawWindowHandle,
+    #[allow(unused)] effect: NSVisualEffectMaterial,
 ) -> Result<(), Error> {
-  match window.raw_window_handle() {
-    #[cfg(target_os = "macos")]
-    raw_window_handle::RawWindowHandle::AppKit(handle) => {
-      macos::apply_vibrancy(handle.ns_window as _, effect)
+    match window.raw_window_handle() {
+        #[cfg(target_os = "macos")]
+        raw_window_handle::RawWindowHandle::AppKit(handle) => {
+            macos::apply_vibrancy(handle.ns_window as _, effect)
+        }
+        _ => Err(Error::UnsupportedPlatform(
+            "\"apply_vibrancy()\" is only supported on macOS.",
+        )),
     }
-    _ => Err(Error::UnsupportedPlatform(
-      "\"apply_vibrancy()\" is only supported on macOS.",
-    )),
-  }
 }
 
 #[derive(Debug)]
 pub enum Error {
-  UnsupportedPlatform(&'static str),
-  UnsupportedPlatformVersion(&'static str),
-  NotMainThread(&'static str),
+    UnsupportedPlatform(&'static str),
+    UnsupportedPlatformVersion(&'static str),
+    NotMainThread(&'static str),
 }
 
 impl std::fmt::Display for Error {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    match self {
-      Error::UnsupportedPlatform(e)
-      | Error::UnsupportedPlatformVersion(e)
-      | Error::NotMainThread(e) => {
-        write!(f, "{}", e)
-      }
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Error::UnsupportedPlatform(e)
+            | Error::UnsupportedPlatformVersion(e)
+            | Error::NotMainThread(e) => {
+                write!(f, "{}", e)
+            }
+        }
     }
-  }
 }
