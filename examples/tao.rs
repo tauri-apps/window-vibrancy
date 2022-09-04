@@ -4,7 +4,7 @@
 
 fn main() {
     use tao::{
-        event::{Event, WindowEvent},
+        event::{Event, WindowEvent, ElementState, MouseButton},
         event_loop::{ControlFlow, EventLoop},
         window::WindowBuilder,
     };
@@ -36,6 +36,17 @@ fn main() {
                 event: WindowEvent::CloseRequested,
                 ..
             } => *control_flow = ControlFlow::Exit,
+            Event::WindowEvent {
+                event:
+                    WindowEvent::MouseInput {
+                        state: ElementState::Pressed,
+                        button: MouseButton::Left,
+                        ..
+                    },
+                ..
+            } => {
+                window.drag_window().unwrap();
+            }
             _ => (),
         }
     });
