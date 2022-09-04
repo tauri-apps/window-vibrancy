@@ -4,7 +4,7 @@
 
 fn main() {
     use tao::{
-        event::{Event, WindowEvent, ElementState, MouseButton},
+        event::{ElementState, Event, MouseButton, WindowEvent},
         event_loop::{ControlFlow, EventLoop},
         window::WindowBuilder,
     };

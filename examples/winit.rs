@@ -5,7 +5,7 @@
 fn main() {
     use window_vibrancy::*;
     use winit::{
-        event::{Event, MouseButton, WindowEvent, ElementState},
+        event::{ElementState, Event, MouseButton, WindowEvent},
         event_loop::{ControlFlow, EventLoop},
         window::WindowBuilder,
     };
