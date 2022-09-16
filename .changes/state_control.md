@@ -2,4 +2,4 @@
 "window-vibrancy": "minor"
 ---
 
-Expose vibrancy state control for macos, default is follow window active state.
+Add a 3rd argument to `apply_vibrancy()` to control the vibrancy state, follows window active state by default.
