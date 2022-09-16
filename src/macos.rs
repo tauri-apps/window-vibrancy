@@ -55,13 +55,16 @@ pub enum NSVisualEffectMaterial {
     UnderPageBackground = 22,
 }
 
-// https://developer.apple.com/documentation/appkit/nsvisualeffectview/state
+/// <https://developer.apple.com/documentation/appkit/nsvisualeffectview/state>
 #[allow(dead_code)]
 #[repr(u64)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum NSVisualEffectState {
+    /// Make window vibrancy state follow the window's active state
     FollowsWindowActiveState = 0,
+    /// Make window vibrancy state always active
     Active = 1,
+    /// Make window vibrancy state always inactive
     Inactive = 2,
 }
 
@@ -86,7 +89,7 @@ mod internal {
     use crate::Error;
 
     #[allow(deprecated)]
-    pub fn apply_vibrancy(window: id, appearance: NSVisualEffectMaterial, state: NSVisualEffectState) -> Result<(), Error> {
+    pub fn apply_vibrancy(window: id, appearance: NSVisualEffectMaterial, state: Option<NSVisualEffectState>) -> Result<(), Error> {
         unsafe {
             if NSAppKitVersionNumber < NSAppKitVersionNumber10_10 {
                 eprintln!("\"NSVisualEffectView\" is only available on macOS 10.10 or newer");
@@ -115,9 +118,14 @@ mod internal {
                 NSVisualEffectView::initWithFrame_(NSVisualEffectView::alloc(nil), bounds);
             blurred_view.autorelease();
 
+            let visual_state = match state {
+                Some(s) => s,
+                None => NSVisualEffectState::FollowsWindowActiveState,
+            };
+
             blurred_view.setMaterial_(m);
             blurred_view.setBlendingMode_(NSVisualEffectBlendingMode::BehindWindow);
-            blurred_view.setState_(state);
+            blurred_view.setState_(visual_state);
             NSVisualEffectView::setAutoresizingMask_(
                 blurred_view,
                 NSViewWidthSizable | NSViewHeightSizable,
