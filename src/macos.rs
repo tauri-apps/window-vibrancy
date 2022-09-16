@@ -89,7 +89,11 @@ mod internal {
     use crate::Error;
 
     #[allow(deprecated)]
-    pub fn apply_vibrancy(window: id, appearance: NSVisualEffectMaterial, state: Option<NSVisualEffectState>) -> Result<(), Error> {
+    pub fn apply_vibrancy(
+        window: id,
+        appearance: NSVisualEffectMaterial,
+        state: Option<NSVisualEffectState>,
+    ) -> Result<(), Error> {
         unsafe {
             if NSAppKitVersionNumber < NSAppKitVersionNumber10_10 {
                 eprintln!("\"NSVisualEffectView\" is only available on macOS 10.10 or newer");
@@ -118,14 +122,9 @@ mod internal {
                 NSVisualEffectView::initWithFrame_(NSVisualEffectView::alloc(nil), bounds);
             blurred_view.autorelease();
 
-            let visual_state = match state {
-                Some(s) => s,
-                None => NSVisualEffectState::FollowsWindowActiveState,
-            };
-
             blurred_view.setMaterial_(m);
             blurred_view.setBlendingMode_(NSVisualEffectBlendingMode::BehindWindow);
-            blurred_view.setState_(visual_state);
+            blurred_view.setState_(state.unwrap_or(NSVisualEffectState::FollowsWindowActiveState));
             NSVisualEffectView::setAutoresizingMask_(
                 blurred_view,
                 NSViewWidthSizable | NSViewHeightSizable,
@@ -147,8 +146,6 @@ mod internal {
         BehindWindow = 0,
         WithinWindow = 1,
     }
-
-
 
     // macos 10.10+
     // https://developer.apple.com/documentation/appkit/nsvisualeffectview
