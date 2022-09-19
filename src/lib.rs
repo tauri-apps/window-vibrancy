@@ -15,7 +15,7 @@
 //!
 //! # let window: &dyn raw_window_handle::HasRawWindowHandle = unsafe { std::mem::zeroed() };
 //! #[cfg(target_os = "macos")]
-//! apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased, None).expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
+//! apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased, None, None).expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
 //!
 //! #[cfg(target_os = "windows")]
 //! apply_blur(&window, Some((18, 18, 18, 125))).expect("Unsupported platform! 'apply_blur' is only supported on Windows");
