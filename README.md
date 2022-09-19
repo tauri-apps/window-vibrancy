@@ -5,49 +5,37 @@
 
 Make your windows vibrant.
 
-## Platform support
+## Platform-specific
 
-- **`Windows:`** Yes!
-- **`macOS:`** Yes!
-- **`Linux:`** No, blur effect is controlled by the compositor installed on the user system and they can enable it for your app if they want.
+- **Linux**: Unsupported, Blur and any vibrancy effects are controlled by the compositor installed on the end-user system.
 
-## Available methods
+## Example
 
-- `apply_blur()` & `clear_blur()`- **`Windows 7/10/11`**
-- `apply_acrylic()` & `clear_acrylic()` - **`Windows 10/11`** has bad performance when resizing/dragging the window on Windows 10 v1903+ and Windows 11 build 22000.
-- `apply_mica()` & `clear_mica()` - **`Windows 11`**
-- `apply_vibrancy()` - **`macOS 10.10+`**
+```rs
+use window_vibrancy::{apply_blur, apply_vibrancy, NSVisualEffectMaterial};
 
-## Examples
+#[cfg(target_os = "macos")]
+apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None).expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
 
-- with `winit`:
-    ```rs
-    use winit::{event_loop::EventLoop, window::WindowBuilder};
-    use window_vibrancy::{apply_vibrancy, apply_blur, NSVisualEffectMaterial};
+#[cfg(target_os = "windows")]
+apply_blur(&window, Some((18, 18, 18, 125))).expect("Unsupported platform! 'apply_blur' is only supported on Windows");
+```
 
-    let event_loop = EventLoop::new();
+## Available functions
 
-    let window = WindowBuilder::new()
-    .with_decorations(false)
-    .build(&event_loop)
-    .unwrap();
+| Function                          | Supported platforms   | Notes |
+| :---                              | :---:                 | :---  |
+| `apply_blur`&`clear_blur`         | Windows  7/10/11      |       |
+| `apply_acrylic`&`clear_acrylic`   | Windows 10/11         | has bad performance when resizing/dragging the window on Windows 10 v1903+ and Windows 11 build 22000. |
+| `apply_mica`&`clear_mica`         | Windows 11            |       |
+| `apply_vibrancy`                  | macOS 10.10 and newer |       |
 
-    #[cfg(target_os = "macos")]
-    apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased, 13.0).unwrap();
+## Screenshots
 
-    #[cfg(target_os = "windows")]
-    apply_blur(&window).unwrap();
-    ```
+<p align="center">
 
-- with `tauri`:
-    ```rs
-    use window_vibrancy::{apply_vibrancy, apply_blur, NSVisualEffectMaterial};
+| apply_blur | apply_acrylic | apply_mica | apply_vibrancy |
+| :---:      | :---:         | :---:      | :---:          |
+| ![apply_blur screenshot](./screenshots/apply_blur.png) | ![apply_blur screenshot](./screenshots/apply_acrylic.png) | ![apply_mica screenshot](./screenshots/apply_mica.png) | ![apply_vibrancy screenshot](./screenshots/apply_vibrancy.png) |
 
-    let window = app.get_window("main").unwrap();
-
-    #[cfg(target_os = "macos")]
-    apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased, 13.0).unwrap();
-
-    #[cfg(target_os = "windows")]
-    apply_blur(&window).unwrap();
-    ```
+</p>

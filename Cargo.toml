@@ -2,7 +2,7 @@
 name = "window-vibrancy"
 description = "Make your windows vibrant."
 authors = [ "Tauri Programme within The Commons Conservancy" ]
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 rust-version = "1.56"
 license = "Apache-2.0 OR MIT"
@@ -17,14 +17,14 @@ default-target = "x86_64-pc-windows-msvc"
 targets = [ "x86_64-apple-darwin", "x86_64-pc-windows-msvc" ]
 
 [dependencies]
-raw-window-handle = "0.4"
+raw-window-handle = "0.5"
 
 [dev-dependencies]
-tao = "0.6"
-winit = "0.26"
+tao = "0.14"
+winit = "0.27"
 
 [target."cfg(target_os = \"windows\")".dependencies.windows-sys]
-version = "0.33.0"
+version = "0.36.1"
 features = [
   "Win32_Foundation",
   "Win32_System_LibraryLoader",
