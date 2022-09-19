@@ -153,7 +153,7 @@ pub fn apply_vibrancy(
     window: impl raw_window_handle::HasRawWindowHandle,
     #[allow(unused)] effect: NSVisualEffectMaterial,
     #[allow(unused)] state: Option<NSVisualEffectState>,
-    #[allow(unused)] radius: Option<f64>
+    #[allow(unused)] radius: Option<f64>,
 ) -> Result<(), Error> {
     match window.raw_window_handle() {
         #[cfg(target_os = "macos")]
