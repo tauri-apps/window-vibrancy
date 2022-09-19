@@ -1,5 +1,12 @@
 # Changelog
 
+## \[0.3.0]
+
+- Add a 3rd argument to `apply_vibrancy()` to control the vibrancy state, follows window active state by default.
+  - [0a566c6](https://github.com/tauri-apps/window-vibrancy/commit/0a566c6cefca0371ce0e19cce8b9c7c7a7ae1f12) feat: (macos) add vibrancy state parameter ([#63](https://github.com/tauri-apps/window-vibrancy/pull/63)) on 2022-09-19
+- Add a 4th argument to `apply_vibrancy()` to control the corner radius of the effect view.
+  - [bffac24](https://github.com/tauri-apps/window-vibrancy/commit/bffac24a783dfd6c4d147d7bed6d5abc1d126acf) feat: add rounded corner support on MacOS  ([#26](https://github.com/tauri-apps/window-vibrancy/pull/26)) on 2022-09-19
+
 ## \[0.2.0]
 
 - Update `raw-window-handle` dependency to 0.5
