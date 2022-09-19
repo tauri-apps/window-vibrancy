@@ -124,7 +124,7 @@ mod internal {
             blurred_view.autorelease();
 
             blurred_view.setMaterial_(m);
-            blurred_view.setCornerRadius_(radius.unwrap_or(0));
+            blurred_view.setCornerRadius_(radius.unwrap_or(0.0));
             blurred_view.setBlendingMode_(NSVisualEffectBlendingMode::BehindWindow);
             blurred_view.setState_(state.unwrap_or(NSVisualEffectState::FollowsWindowActiveState));
             NSVisualEffectView::setAutoresizingMask_(
