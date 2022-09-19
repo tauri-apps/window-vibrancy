@@ -23,7 +23,7 @@ fn main() {
         .expect("Unsupported platform! 'apply_blur' is only supported on Windows");
 
     #[cfg(target_os = "macos")]
-    let _ = apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None)
+    let _ = apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None)
         .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
 
     window.set_title("A fantastic window!");
