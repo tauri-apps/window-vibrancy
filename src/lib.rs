@@ -15,7 +15,7 @@
 //!
 //! # let window: &dyn raw_window_handle::HasRawWindowHandle = unsafe { std::mem::zeroed() };
 //! #[cfg(target_os = "macos")]
-//! apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased, None).expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
+//! apply_vibrancy(&window, NSVisualEffectMaterial::AppearanceBased, None, None).expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
 //!
 //! #[cfg(target_os = "windows")]
 //! apply_blur(&window, Some((18, 18, 18, 125))).expect("Unsupported platform! 'apply_blur' is only supported on Windows");
@@ -153,11 +153,12 @@ pub fn apply_vibrancy(
     window: impl raw_window_handle::HasRawWindowHandle,
     #[allow(unused)] effect: NSVisualEffectMaterial,
     #[allow(unused)] state: Option<NSVisualEffectState>,
+    #[allow(unused)] radius: Option<f64>,
 ) -> Result<(), Error> {
     match window.raw_window_handle() {
         #[cfg(target_os = "macos")]
         raw_window_handle::RawWindowHandle::AppKit(handle) => {
-            macos::apply_vibrancy(handle.ns_window as _, effect, state)
+            macos::apply_vibrancy(handle.ns_window as _, effect, state, radius)
         }
         _ => Err(Error::UnsupportedPlatform(
             "\"apply_vibrancy()\" is only supported on macOS.",

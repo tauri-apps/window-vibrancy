@@ -93,6 +93,7 @@ mod internal {
         window: id,
         appearance: NSVisualEffectMaterial,
         state: Option<NSVisualEffectState>,
+        radius: Option<f64>,
     ) -> Result<(), Error> {
         unsafe {
             if NSAppKitVersionNumber < NSAppKitVersionNumber10_10 {
@@ -123,6 +124,7 @@ mod internal {
             blurred_view.autorelease();
 
             blurred_view.setMaterial_(m);
+            blurred_view.setCornerRadius_(radius.unwrap_or(0.0));
             blurred_view.setBlendingMode_(NSVisualEffectBlendingMode::BehindWindow);
             blurred_view.setState_(state.unwrap_or(NSVisualEffectState::FollowsWindowActiveState));
             NSVisualEffectView::setAutoresizingMask_(
@@ -172,6 +174,7 @@ mod internal {
         unsafe fn setEmphasized_(self, emphasized: BOOL);
 
         unsafe fn setMaterial_(self, material: NSVisualEffectMaterial);
+        unsafe fn setCornerRadius_(self, radius: f64);
         unsafe fn setState_(self, state: NSVisualEffectState);
         unsafe fn setBlendingMode_(self, mode: NSVisualEffectBlendingMode);
     }
@@ -226,6 +229,10 @@ mod internal {
 
         unsafe fn setMaterial_(self, material: NSVisualEffectMaterial) {
             msg_send![self, setMaterial: material]
+        }
+
+        unsafe fn setCornerRadius_(self, radius: f64) {
+            msg_send![self, setCornerRadius: radius]
         }
 
         unsafe fn setState_(self, state: NSVisualEffectState) {

@@ -9,12 +9,12 @@ edition = "2021"
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.0.3", features = ["api-all"] }
+tauri = { version = "1.1", features = ["api-all"] }
 window-vibrancy = { path = "../../../" }
 
 
 [build-dependencies]
-tauri-build = { version = "1.0.3" }
+tauri-build = { version = "1.1" }
 
 [features]
 default = ["custom-protocol"]
