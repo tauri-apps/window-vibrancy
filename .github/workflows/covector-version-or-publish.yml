@@ -20,7 +20,7 @@ jobs:
           fetch-depth: 0
       - run: rustup update
       - name: cargo login
-        run: cargo login ${{ secrets.CRATE_TOKEN }}
+        run: cargo login ${{ secrets.ORG_CRATES_IO_TOKEN }}
       - name: git config
         run: |
           git config --global user.name "${{ github.event.pusher.name }}"
