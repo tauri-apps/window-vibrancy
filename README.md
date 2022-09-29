@@ -8,6 +8,7 @@ Make your windows vibrant.
 ## Platform-specific
 
 - **Linux**: Unsupported, Blur and any vibrancy effects are controlled by the compositor installed on the end-user system.
+- **macOS**: Requires `"macOSPrivateApi": true` to be set in `tauri.conf.json`.
 
 ## Example
 
