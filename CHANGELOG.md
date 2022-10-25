@@ -1,5 +1,10 @@
 # Changelog
 
+## \[0.3.1]
+
+- Fix acrylic effect on Windows 11 build 22523 and higher
+  - [d05ef14](https://github.com/tauri-apps/window-vibrancy/commit/d05ef146b94a8ca66e091e62be112a1c57d14563) fix: fix acrylic on windows 11 22523, closes [#45](https://github.com/tauri-apps/window-vibrancy/pull/45) ([#69](https://github.com/tauri-apps/window-vibrancy/pull/69)) on 2022-10-25
+
 ## \[0.3.0]
 
 - Add a 3rd argument to `apply_vibrancy()` to control the vibrancy state, follows window active state by default.
