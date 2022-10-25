@@ -26,7 +26,7 @@ pub fn apply_blur(hwnd: HWND, color: Option<Color>) -> Result<(), Error> {
         unsafe {
             let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
         }
-    } else if is_win10_swca() || is_win11() {
+    } else if is_swca_supported() {
         unsafe {
             SetWindowCompositionAttribute(hwnd, ACCENT_STATE::ACCENT_ENABLE_BLURBEHIND, color);
         }
@@ -49,7 +49,7 @@ pub fn clear_blur(hwnd: HWND) -> Result<(), Error> {
         unsafe {
             let _ = DwmEnableBlurBehindWindow(hwnd, &bb);
         }
-    } else if is_win10_swca() || is_win11() {
+    } else if is_swca_supported() {
         unsafe {
             SetWindowCompositionAttribute(hwnd, ACCENT_STATE::ACCENT_DISABLED, None);
         }
@@ -62,16 +62,16 @@ pub fn clear_blur(hwnd: HWND) -> Result<(), Error> {
 }
 
 pub fn apply_acrylic(hwnd: HWND, color: Option<Color>) -> Result<(), Error> {
-    if is_win11_dwmsbt() {
+    if is_backdroptype_supported() {
         unsafe {
             DwmSetWindowAttribute(
                 hwnd,
-                DWMWA_SYSTEMBACKDROP_TYPE,
+                DWMWA_USE_IMMERSIVE_DARK_MODE,
                 &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TRANSIENTWINDOW as *const _ as _,
                 4,
             );
         }
-    } else if is_win10_swca() || is_win11() {
+    } else if is_swca_supported() {
         unsafe {
             SetWindowCompositionAttribute(
                 hwnd,
@@ -88,16 +88,16 @@ pub fn apply_acrylic(hwnd: HWND, color: Option<Color>) -> Result<(), Error> {
 }
 
 pub fn clear_acrylic(hwnd: HWND) -> Result<(), Error> {
-    if is_win11_dwmsbt() {
+    if is_backdroptype_supported() {
         unsafe {
             DwmSetWindowAttribute(
                 hwnd,
-                DWMWA_SYSTEMBACKDROP_TYPE,
+                DWMWA_USE_IMMERSIVE_DARK_MODE,
                 &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE as *const _ as _,
                 4,
             );
         }
-    } else if is_win10_swca() || is_win11() {
+    } else if is_swca_supported() {
         unsafe {
             SetWindowCompositionAttribute(hwnd, ACCENT_STATE::ACCENT_DISABLED, None);
         }
@@ -110,7 +110,7 @@ pub fn clear_acrylic(hwnd: HWND) -> Result<(), Error> {
 }
 
 pub fn apply_mica(hwnd: HWND) -> Result<(), Error> {
-    if is_win11_dwmsbt() {
+    if is_backdroptype_supported() {
         unsafe {
             DwmSetWindowAttribute(
                 hwnd,
@@ -119,7 +119,7 @@ pub fn apply_mica(hwnd: HWND) -> Result<(), Error> {
                 4,
             );
         }
-    } else if is_win11() {
+    } else if is_undocumented_mica_supported() {
         unsafe {
             DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &1 as *const _ as _, 4);
         }
@@ -132,7 +132,7 @@ pub fn apply_mica(hwnd: HWND) -> Result<(), Error> {
 }
 
 pub fn clear_mica(hwnd: HWND) -> Result<(), Error> {
-    if is_win11_dwmsbt() {
+    if is_backdroptype_supported() {
         unsafe {
             DwmSetWindowAttribute(
                 hwnd,
@@ -141,7 +141,7 @@ pub fn clear_mica(hwnd: HWND) -> Result<(), Error> {
                 4,
             );
         }
-    } else if is_win11() {
+    } else if is_undocumented_mica_supported() {
         unsafe {
             DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &0 as *const _ as _, 4);
         }
@@ -280,16 +280,15 @@ fn is_win7() -> bool {
     v.0 == 6 && v.1 == 1
 }
 
-fn is_win10_swca() -> bool {
-    let v = get_windows_ver().unwrap_or_default();
-    v.2 >= 17763 && v.2 < 22000
+fn is_swca_supported() -> bool {
+    is_at_least_build(17763)
 }
 
-fn is_win11() -> bool {
+fn is_undocumented_mica_supported() -> bool {
     is_at_least_build(22000)
 }
 
-fn is_win11_dwmsbt() -> bool {
+fn is_backdroptype_supported() -> bool {
     is_at_least_build(22523)
 }
 
