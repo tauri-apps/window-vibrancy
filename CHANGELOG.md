@@ -1,5 +1,12 @@
 # Changelog
 
+## \[0.3.2]
+
+- Fix `apply_acrylic` on Windows 11 22H2.
+  - [d05ef14](https://github.com/tauri-apps/window-vibrancy/commit/d05ef146b94a8ca66e091e62be112a1c57d14563) fix: fix acrylic on windows 11 22523, closes [#45](https://github.com/tauri-apps/window-vibrancy/pull/45) ([#69](https://github.com/tauri-apps/window-vibrancy/pull/69)) on 2022-10-25
+  - [aab46e3](https://github.com/tauri-apps/window-vibrancy/commit/aab46e35eaf014d63920999c4e0132baeb55fc50) publish new versions ([#70](https://github.com/tauri-apps/window-vibrancy/pull/70)) on 2022-10-25
+  - [d20161f](https://github.com/tauri-apps/window-vibrancy/commit/d20161fc1892908839e4f7d715e16256b2d96900) fix: fix acrylic on win11 22h2 on 2022-11-18
+
 ## \[0.3.1]
 
 - Fix acrylic effect on Windows 11 build 22523 and higher
