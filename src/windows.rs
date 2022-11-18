@@ -66,7 +66,7 @@ pub fn apply_acrylic(hwnd: HWND, color: Option<Color>) -> Result<(), Error> {
         unsafe {
             DwmSetWindowAttribute(
                 hwnd,
-                DWMWA_USE_IMMERSIVE_DARK_MODE,
+                DWMWA_SYSTEMBACKDROP_TYPE,
                 &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TRANSIENTWINDOW as *const _ as _,
                 4,
             );
@@ -92,7 +92,7 @@ pub fn clear_acrylic(hwnd: HWND) -> Result<(), Error> {
         unsafe {
             DwmSetWindowAttribute(
                 hwnd,
-                DWMWA_USE_IMMERSIVE_DARK_MODE,
+                DWMWA_SYSTEMBACKDROP_TYPE,
                 &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE as *const _ as _,
                 4,
             );

@@ -29,7 +29,7 @@ pub use macos::{NSVisualEffectMaterial, NSVisualEffectState};
 /// a tuple of RGBA colors. Each value has minimum of 0 and maximum of 255.
 pub type Color = (u8, u8, u8, u8);
 
-/// Applies blur effect to window. Works only on Windows 7, Windows 10 v1809 or newer and Windows 11.
+/// Applies blur effect to window. Works only on Windows 7, Windows 10 v1809 or newer up to Windows 11 22H1.
 ///
 /// ## Argumesnts:
 ///
@@ -53,7 +53,7 @@ pub fn apply_blur(
     }
 }
 
-/// Clears blur effect applied to window. Works only on Windows 7, Windows 10 v1809 or newer and Windows 11.
+/// Clears blur effect applied to window. Works only on Windows 7, Windows 10 v1809 or newer up to Windows 11 22H1.
 ///
 /// ## Platform-specific
 ///
