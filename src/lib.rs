@@ -29,14 +29,18 @@ pub use macos::{NSVisualEffectMaterial, NSVisualEffectState};
 /// a tuple of RGBA colors. Each value has minimum of 0 and maximum of 255.
 pub type Color = (u8, u8, u8, u8);
 
-/// Applies blur effect to window. Works only on Windows 7, Windows 10 v1809 or newer up to Windows 11 22H1.
+/// Applies blur effect to window. Works only on Windows 7, Windows 10 v1809 or newer.
 ///
-/// ## Argumesnts:
+/// ## WARNING:
 ///
-/// - *`color`* is ignored on Windows 7 and has no effect.
+/// This method has poor performance on Windows 11 build 22621,
+/// the window will lag when resizing or dragging.
+/// It is an issue in the undocumented api used for this method
+/// and microsoft needs to fix it (they probably won't).
 ///
 /// ## Platform-specific
 ///
+/// - **Windows**: *`color`* is ignored on Windows 7 and has no effect.
 /// - **Linux / macOS**: Unsupported.
 pub fn apply_blur(
     window: impl raw_window_handle::HasRawWindowHandle,
@@ -53,7 +57,7 @@ pub fn apply_blur(
     }
 }
 
-/// Clears blur effect applied to window. Works only on Windows 7, Windows 10 v1809 or newer up to Windows 11 22H1.
+/// Clears blur effect applied to window. Works only on Windows 7, Windows 10 v1809 or newer.
 ///
 /// ## Platform-specific
 ///
@@ -68,9 +72,7 @@ pub fn clear_blur(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
     }
 }
 
-/// Applies Acrylic effect to you window. Works only on Windows 10 v1809 or newer and Windows 11
-///
-/// - *`color`* is ignored on Windows 11 build 22523 and newer and has no effect.
+/// Applies Acrylic effect to you window. Works only on Windows 10 v1809 or newer.
 ///
 /// ## WARNING:
 ///
@@ -81,6 +83,7 @@ pub fn clear_blur(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
 ///
 /// ## Platform-specific
 ///
+/// - **Windows**: *`color`* is ignored on Windows 7 and has no effect.
 /// - **Linux / macOS**: Unsupported.
 pub fn apply_acrylic(
     window: impl raw_window_handle::HasRawWindowHandle,
@@ -97,7 +100,7 @@ pub fn apply_acrylic(
     }
 }
 
-/// Clears acrylic effect applied to window. Works only on Windows 10 v1809 or newer and Windows 11.
+/// Clears acrylic effect applied to window. Works only on Windows 10 v1809 or newer.
 ///
 /// ## Platform-specific
 ///
