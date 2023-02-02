@@ -21,7 +21,7 @@ raw-window-handle = "0.5"
 
 [dev-dependencies]
 tao = "0.17"
-winit = "0.27"
+winit = "0.28"
 
 [target."cfg(target_os = \"windows\")".dependencies.windows-sys]
 version = "0.45.0"
