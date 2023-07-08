@@ -109,7 +109,18 @@ pub fn clear_acrylic(hwnd: HWND) -> Result<(), Error> {
     Ok(())
 }
 
-pub fn apply_mica(hwnd: HWND) -> Result<(), Error> {
+pub fn apply_mica(hwnd: HWND, dark: bool) -> Result<(), Error> {
+    if is_undocumented_mica_supported() {
+        unsafe {
+            DwmSetWindowAttribute(
+                hwnd,
+                DWMWA_USE_IMMERSIVE_DARK_MODE,
+                &(dark as u32) as *const _ as _,
+                4,
+            );
+        }
+    }
+
     if is_backdroptype_supported() {
         unsafe {
             DwmSetWindowAttribute(
