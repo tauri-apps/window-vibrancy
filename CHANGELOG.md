@@ -1,5 +1,9 @@
 # Changelog
 
+## \[0.4.0]
+
+- [`a0f4712`](https://github.com/tauri-apps/window-vibrancy/commit/a0f4712db58cb1cb3685383de4d634fd5bda6383)([#90](https://github.com/tauri-apps/window-vibrancy/pull/90)) On Windows, Add option to specify dark for mica effect.
+
 ## \[0.3.2]
 
 - Fix `apply_acrylic` on Windows 11 22H2.
