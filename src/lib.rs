@@ -119,12 +119,16 @@ pub fn clear_acrylic(window: impl raw_window_handle::HasRawWindowHandle) -> Resu
 
 /// Applies mica effect to window. Works only on Windows 11.
 ///
+/// ## Arguments
+///
+/// - `dark`: If `None` is provide, it will match the system preference
+///
 /// ## Platform-specific
 ///
 /// - **Linux / macOS**: Unsupported.
 pub fn apply_mica(
     window: impl raw_window_handle::HasRawWindowHandle,
-    dark: bool,
+    dark: Option<bool>,
 ) -> Result<(), Error> {
     match window.raw_window_handle() {
         #[cfg(target_os = "windows")]
