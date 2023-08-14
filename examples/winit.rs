@@ -7,6 +7,7 @@ fn main() {
     use winit::{
         event::{ElementState, Event, MouseButton, WindowEvent},
         event_loop::{ControlFlow, EventLoop},
+        platform::windows::{WindowBuilderExtWindows, WindowExtWindows},
         window::WindowBuilder,
     };
 
@@ -14,6 +15,7 @@ fn main() {
 
     let window = WindowBuilder::new()
         .with_decorations(false)
+        .with_undecorated_shadow(false)
         .with_transparent(true)
         .build(&event_loop)
         .unwrap();
@@ -26,6 +28,7 @@ fn main() {
     let _ = apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None)
         .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
 
+    window.set_undecorated_shadow(true);
     window.set_title("A fantastic window!");
 
     event_loop.run(move |event, _, control_flow| {
