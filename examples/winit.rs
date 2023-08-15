@@ -4,21 +4,24 @@
 
 fn main() {
     use window_vibrancy::*;
+    #[cfg(target_os = "windows")]
+    use winit::platform::windows::{WindowBuilderExtWindows, WindowExtWindows};
     use winit::{
         event::{ElementState, Event, MouseButton, WindowEvent},
         event_loop::{ControlFlow, EventLoop},
-        platform::windows::{WindowBuilderExtWindows, WindowExtWindows},
         window::WindowBuilder,
     };
 
     let event_loop = EventLoop::new();
 
-    let window = WindowBuilder::new()
+    let mut builder = WindowBuilder::new()
         .with_decorations(false)
-        .with_undecorated_shadow(false)
-        .with_transparent(true)
-        .build(&event_loop)
-        .unwrap();
+        .with_transparent(true);
+    #[cfg(target_os = "windows")]
+    {
+        builder = builder.with_undecorated_shadow(false);
+    }
+    let window = builder.build(&event_loop).unwrap();
 
     #[cfg(target_os = "windows")]
     apply_acrylic(&window, None)
@@ -28,6 +31,7 @@ fn main() {
     let _ = apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None)
         .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
 
+    #[cfg(target_os = "windows")]
     window.set_undecorated_shadow(true);
     window.set_title("A fantastic window!");
 
