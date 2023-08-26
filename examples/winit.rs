@@ -14,7 +14,7 @@ fn main() {
 
     let event_loop = EventLoop::new();
 
-    let mut builder = WindowBuilder::new()
+    let builder = WindowBuilder::new()
         .with_decorations(false)
         .with_transparent(true);
     #[cfg(target_os = "windows")]
