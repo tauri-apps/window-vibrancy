@@ -14,6 +14,7 @@ fn main() {
 
     let event_loop = EventLoop::new();
 
+    #[allow(unused_mut)]
     let mut builder = WindowBuilder::new()
         .with_decorations(false)
         .with_transparent(true);

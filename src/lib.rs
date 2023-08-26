@@ -130,6 +130,8 @@ pub fn apply_mica(
     window: impl raw_window_handle::HasRawWindowHandle,
     dark: Option<bool>,
 ) -> Result<(), Error> {
+    #[cfg(not(target_os = "windows"))]
+    let _ = dark;
     match window.raw_window_handle() {
         #[cfg(target_os = "windows")]
         raw_window_handle::RawWindowHandle::Win32(handle) => {
