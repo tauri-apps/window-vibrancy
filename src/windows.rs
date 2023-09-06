@@ -164,6 +164,53 @@ pub fn clear_mica(hwnd: HWND) -> Result<(), Error> {
     Ok(())
 }
 
+pub fn apply_tabbed(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
+    if let Some(dark) = dark {
+        unsafe {
+            DwmSetWindowAttribute(
+                hwnd,
+                DWMWA_USE_IMMERSIVE_DARK_MODE,
+                &(dark as u32) as *const _ as _,
+                4,
+            );
+        }
+    }
+
+    if is_backdroptype_supported() {
+        unsafe {
+            DwmSetWindowAttribute(
+                hwnd,
+                DWMWA_SYSTEMBACKDROP_TYPE,
+                &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TABBEDWINDOW as *const _ as _,
+                4,
+            );
+        }
+    } else {
+        return Err(Error::UnsupportedPlatformVersion(
+            "\"apply_tabbed()\" is only available on Windows 11.",
+        ));
+    }
+    Ok(())
+}
+
+pub fn clear_tabbed(hwnd: HWND) -> Result<(), Error> {
+    if is_backdroptype_supported() {
+        unsafe {
+            DwmSetWindowAttribute(
+                hwnd,
+                DWMWA_SYSTEMBACKDROP_TYPE,
+                &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE as *const _ as _,
+                4,
+            );
+        }
+    } else {
+        return Err(Error::UnsupportedPlatformVersion(
+            "\"clear_tabbed()\" is only available on Windows 11.",
+        ));
+    }
+    Ok(())
+}
+
 fn get_function_impl(library: &str, function: &str) -> Option<FARPROC> {
     assert_eq!(library.chars().last(), Some('\0'));
     assert_eq!(function.chars().last(), Some('\0'));
