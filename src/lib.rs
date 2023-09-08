@@ -158,6 +158,49 @@ pub fn clear_mica(window: impl raw_window_handle::HasRawWindowHandle) -> Result<
     }
 }
 
+/// Applies mica tabbed effect to window. Works only on Windows 11.
+///
+/// ## Arguments
+///
+/// - `dark`: If `None` is provide, it will match the system preference
+///
+/// ## Platform-specific
+///
+/// - **Linux / macOS**: Unsupported.
+pub fn apply_tabbed(
+    window: impl raw_window_handle::HasRawWindowHandle,
+    dark: Option<bool>,
+) -> Result<(), Error> {
+    #[cfg(not(target_os = "windows"))]
+    let _ = dark;
+    match window.raw_window_handle() {
+        #[cfg(target_os = "windows")]
+        raw_window_handle::RawWindowHandle::Win32(handle) => {
+            windows::apply_tabbed(handle.hwnd as _, dark)
+        }
+        _ => Err(Error::UnsupportedPlatform(
+            "\"apply_tabbed()\" is only supported on Windows.",
+        )),
+    }
+}
+
+/// Clears mica tabbed effect applied to window. Works only on Windows 11.
+///
+/// ## Platform-specific
+///
+/// - **Linux / macOS**: Unsupported.
+pub fn clear_tabbed(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
+    match window.raw_window_handle() {
+        #[cfg(target_os = "windows")]
+        raw_window_handle::RawWindowHandle::Win32(handle) => {
+            windows::clear_tabbed(handle.hwnd as _)
+        }
+        _ => Err(Error::UnsupportedPlatform(
+            "\"clear_tabbed()\" is only supported on Windows.",
+        )),
+    }
+}
+
 /// Applies macos vibrancy effect to window. Works only on macOS 10.10 or newer.
 ///
 /// ## Platform-specific
