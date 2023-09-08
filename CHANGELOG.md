@@ -1,5 +1,9 @@
 # Changelog
 
+## \[0.4.1]
+
+- [`d7520d5`](https://github.com/tauri-apps/window-vibrancy/commit/d7520d5083e4d49cf63ba69566dceade8a8b3712)([#101](https://github.com/tauri-apps/window-vibrancy/pull/101)) On Windows, add `apply_tabbed` and `clear_tabbed`
+
 ## \[0.4.0]
 
 - [`a0f4712`](https://github.com/tauri-apps/window-vibrancy/commit/a0f4712db58cb1cb3685383de4d634fd5bda6383)([#90](https://github.com/tauri-apps/window-vibrancy/pull/90)) On Windows, Add option to specify dark for mica effect.
