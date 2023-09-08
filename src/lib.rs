@@ -192,7 +192,9 @@ pub fn apply_tabbed(
 pub fn clear_tabbed(window: impl raw_window_handle::HasRawWindowHandle) -> Result<(), Error> {
     match window.raw_window_handle() {
         #[cfg(target_os = "windows")]
-        raw_window_handle::RawWindowHandle::Win32(handle) => windows::clear_tabbed(handle.hwnd as _),
+        raw_window_handle::RawWindowHandle::Win32(handle) => {
+            windows::clear_tabbed(handle.hwnd as _)
+        }
         _ => Err(Error::UnsupportedPlatform(
             "\"clear_tabbed()\" is only supported on Windows.",
         )),
