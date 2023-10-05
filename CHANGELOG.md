@@ -1,5 +1,9 @@
 # Changelog
 
+## \[0.4.2]
+
+- [`df08bfa`](https://github.com/tauri-apps/window-vibrancy/commit/df08bfad8a5346a0ff00f372834011a162180cb2)([#105](https://github.com/tauri-apps/window-vibrancy/pull/105)) `window_vibrancy::Error` implements [`std::error::Error`](https://doc.rust-lang.org/std/error/trait.Error.html).
+
 ## \[0.4.1]
 
 - [`d7520d5`](https://github.com/tauri-apps/window-vibrancy/commit/d7520d5083e4d49cf63ba69566dceade8a8b3712)([#101](https://github.com/tauri-apps/window-vibrancy/pull/101)) On Windows, add `apply_tabbed` and `clear_tabbed`
