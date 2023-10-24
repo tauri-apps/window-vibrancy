@@ -111,9 +111,9 @@ mod internal {
             }
 
             let mut m = appearance;
-            if appearance as u32 > 9 && NSAppKitVersionNumber < NSAppKitVersionNumber10_14 {
-                m = NSVisualEffectMaterial::AppearanceBased;
-            } else if appearance as u32 > 4 && NSAppKitVersionNumber < NSAppKitVersionNumber10_11 {
+            if (appearance as u32 > 9 && NSAppKitVersionNumber < NSAppKitVersionNumber10_14)
+                || (appearance as u32 > 4 && NSAppKitVersionNumber < NSAppKitVersionNumber10_11)
+            {
                 m = NSVisualEffectMaterial::AppearanceBased;
             }
 
