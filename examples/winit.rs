@@ -36,26 +36,28 @@ fn main() {
     window.set_undecorated_shadow(true);
     window.set_title("A fantastic window!");
 
-    event_loop.run(move |event, event_loop| {
-        event_loop.set_control_flow(ControlFlow::Wait);
+    event_loop
+        .run(move |event, event_loop| {
+            event_loop.set_control_flow(ControlFlow::Wait);
 
-        match event {
-            Event::WindowEvent {
-                event: WindowEvent::CloseRequested,
-                ..
-            } => event_loop.exit(),
-            Event::WindowEvent {
-                event:
-                    WindowEvent::MouseInput {
-                        state: ElementState::Pressed,
-                        button: MouseButton::Left,
-                        ..
-                    },
-                ..
-            } => {
-                window.drag_window().unwrap();
+            match event {
+                Event::WindowEvent {
+                    event: WindowEvent::CloseRequested,
+                    ..
+                } => event_loop.exit(),
+                Event::WindowEvent {
+                    event:
+                        WindowEvent::MouseInput {
+                            state: ElementState::Pressed,
+                            button: MouseButton::Left,
+                            ..
+                        },
+                    ..
+                } => {
+                    window.drag_window().unwrap();
+                }
+                _ => (),
             }
-            _ => (),
-        }
-    }).unwrap();
+        })
+        .unwrap();
 }

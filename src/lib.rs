@@ -21,6 +21,8 @@
 //! apply_blur(&window, Some((18, 18, 18, 125))).expect("Unsupported platform! 'apply_blur' is only supported on Windows");
 //! ```
 
+#![allow(clippy::deprecated_semver)]
+
 mod macos;
 mod windows;
 
