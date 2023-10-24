@@ -10,6 +10,7 @@ fn main() {
         event_loop::{ControlFlow, EventLoop},
         window::WindowBuilder,
     };
+    #[cfg(any(target_os = "windows", target_os = "macos"))]
     use window_vibrancy::*;
 
     let event_loop = EventLoop::new();

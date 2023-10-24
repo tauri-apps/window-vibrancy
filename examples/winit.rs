@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 fn main() {
+    #[cfg(any(target_os = "windows", target_os = "macos"))]
     use window_vibrancy::*;
     #[cfg(target_os = "windows")]
     use winit::platform::windows::{WindowBuilderExtWindows, WindowExtWindows};
