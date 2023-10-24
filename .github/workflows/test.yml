@@ -1,15 +1,13 @@
-name: Test
+name: test
 
 on:
   push:
     branches:
       - dev
   pull_request:
-    branches:
-      - dev
 
 jobs:
-  build-and-test:
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
