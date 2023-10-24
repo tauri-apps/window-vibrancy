@@ -5,6 +5,7 @@
 #![cfg(target_os = "windows")]
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
+#![allow(clippy::upper_case_acronyms)]
 
 use std::ffi::c_void;
 pub use windows_sys::Win32::{
