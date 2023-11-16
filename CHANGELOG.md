@@ -1,5 +1,9 @@
 # Changelog
 
+## \[0.4.3]
+
+- [`49587a7`](https://github.com/tauri-apps/window-vibrancy/commit/49587a7b366845048e3945bf525847c01c54d170)([#110](https://github.com/tauri-apps/window-vibrancy/pull/110)) Update `windows-sys` crate to 0.52
+
 ## \[0.4.2]
 
 - [`df08bfa`](https://github.com/tauri-apps/window-vibrancy/commit/df08bfad8a5346a0ff00f372834011a162180cb2)([#105](https://github.com/tauri-apps/window-vibrancy/pull/105)) `window_vibrancy::Error` implements [`std::error::Error`](https://doc.rust-lang.org/std/error/trait.Error.html).
