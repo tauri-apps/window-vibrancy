@@ -67,7 +67,7 @@ pub fn apply_acrylic(hwnd: HWND, color: Option<Color>) -> Result<(), Error> {
         unsafe {
             DwmSetWindowAttribute(
                 hwnd,
-                DWMWA_SYSTEMBACKDROP_TYPE,
+                DWMWA_SYSTEMBACKDROP_TYPE as _,
                 &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TRANSIENTWINDOW as *const _ as _,
                 4,
             );
@@ -93,7 +93,7 @@ pub fn clear_acrylic(hwnd: HWND) -> Result<(), Error> {
         unsafe {
             DwmSetWindowAttribute(
                 hwnd,
-                DWMWA_SYSTEMBACKDROP_TYPE,
+                DWMWA_SYSTEMBACKDROP_TYPE as _,
                 &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE as *const _ as _,
                 4,
             );
@@ -115,7 +115,7 @@ pub fn apply_mica(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
         unsafe {
             DwmSetWindowAttribute(
                 hwnd,
-                DWMWA_USE_IMMERSIVE_DARK_MODE,
+                DWMWA_USE_IMMERSIVE_DARK_MODE as _,
                 &(dark as u32) as *const _ as _,
                 4,
             );
@@ -126,14 +126,14 @@ pub fn apply_mica(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
         unsafe {
             DwmSetWindowAttribute(
                 hwnd,
-                DWMWA_SYSTEMBACKDROP_TYPE,
+                DWMWA_SYSTEMBACKDROP_TYPE as _,
                 &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_MAINWINDOW as *const _ as _,
                 4,
             );
         }
     } else if is_undocumented_mica_supported() {
         unsafe {
-            DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &1 as *const _ as _, 4);
+            DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT as _, &1 as *const _ as _, 4);
         }
     } else {
         return Err(Error::UnsupportedPlatformVersion(
@@ -148,14 +148,14 @@ pub fn clear_mica(hwnd: HWND) -> Result<(), Error> {
         unsafe {
             DwmSetWindowAttribute(
                 hwnd,
-                DWMWA_SYSTEMBACKDROP_TYPE,
+                DWMWA_SYSTEMBACKDROP_TYPE as _,
                 &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE as *const _ as _,
                 4,
             );
         }
     } else if is_undocumented_mica_supported() {
         unsafe {
-            DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT, &0 as *const _ as _, 4);
+            DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT as _, &0 as *const _ as _, 4);
         }
     } else {
         return Err(Error::UnsupportedPlatformVersion(
@@ -170,7 +170,7 @@ pub fn apply_tabbed(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
         unsafe {
             DwmSetWindowAttribute(
                 hwnd,
-                DWMWA_USE_IMMERSIVE_DARK_MODE,
+                DWMWA_USE_IMMERSIVE_DARK_MODE as _,
                 &(dark as u32) as *const _ as _,
                 4,
             );
@@ -181,7 +181,7 @@ pub fn apply_tabbed(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
         unsafe {
             DwmSetWindowAttribute(
                 hwnd,
-                DWMWA_SYSTEMBACKDROP_TYPE,
+                DWMWA_SYSTEMBACKDROP_TYPE as _,
                 &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TABBEDWINDOW as *const _ as _,
                 4,
             );
@@ -199,7 +199,7 @@ pub fn clear_tabbed(hwnd: HWND) -> Result<(), Error> {
         unsafe {
             DwmSetWindowAttribute(
                 hwnd,
-                DWMWA_SYSTEMBACKDROP_TYPE,
+                DWMWA_SYSTEMBACKDROP_TYPE as _,
                 &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE as *const _ as _,
                 4,
             );
@@ -228,34 +228,6 @@ macro_rules! get_function {
         get_function_impl(concat!($lib, '\0'), concat!(stringify!($func), '\0'))
             .map(|f| std::mem::transmute::<::windows_sys::Win32::Foundation::FARPROC, $func>(f))
     };
-}
-
-/// Returns a tuple of (major, minor, buildnumber)
-fn get_windows_ver() -> Option<(u32, u32, u32)> {
-    type RtlGetVersion = unsafe extern "system" fn(*mut OSVERSIONINFOW) -> i32;
-    let handle = unsafe { get_function!("ntdll.dll", RtlGetVersion) };
-    if let Some(rtl_get_version) = handle {
-        unsafe {
-            let mut vi = OSVERSIONINFOW {
-                dwOSVersionInfoSize: 0,
-                dwMajorVersion: 0,
-                dwMinorVersion: 0,
-                dwBuildNumber: 0,
-                dwPlatformId: 0,
-                szCSDVersion: [0; 128],
-            };
-
-            let status = (rtl_get_version)(&mut vi as _);
-
-            if status >= 0 {
-                Some((vi.dwMajorVersion, vi.dwMinorVersion, vi.dwBuildNumber))
-            } else {
-                None
-            }
-        }
-    } else {
-        None
-    }
 }
 
 #[repr(C)]
@@ -322,8 +294,8 @@ unsafe fn SetWindowCompositionAttribute(
     }
 }
 
-const DWMWA_MICA_EFFECT: DWMWINDOWATTRIBUTE = 1029i32;
-const DWMWA_SYSTEMBACKDROP_TYPE: DWMWINDOWATTRIBUTE = 38i32;
+const DWMWA_MICA_EFFECT: DWMWINDOWATTRIBUTE = 1029;
+const DWMWA_SYSTEMBACKDROP_TYPE: DWMWINDOWATTRIBUTE = 38;
 
 #[allow(unused)]
 #[repr(C)]
@@ -335,8 +307,13 @@ enum DWM_SYSTEMBACKDROP_TYPE {
 }
 
 fn is_win7() -> bool {
-    let v = get_windows_ver().unwrap_or_default();
-    v.0 == 6 && v.1 == 1
+    let v = windows_version::OsVersion::current();
+    v.major == 6 && v.minor == 1
+}
+
+fn is_at_least_build(build: u32) -> bool {
+    let v = windows_version::OsVersion::current();
+    v.build >= build
 }
 
 fn is_swca_supported() -> bool {
@@ -349,9 +326,4 @@ fn is_undocumented_mica_supported() -> bool {
 
 fn is_backdroptype_supported() -> bool {
     is_at_least_build(22523)
-}
-
-fn is_at_least_build(build: u32) -> bool {
-    let v = get_windows_ver().unwrap_or_default();
-    v.2 >= build
 }
