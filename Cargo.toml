@@ -20,7 +20,7 @@ targets = [ "x86_64-apple-darwin", "x86_64-pc-windows-msvc" ]
 raw-window-handle = "0.5"
 
 [dev-dependencies]
-tao = { version = "0.24", features = ["rwh_05"] }
+tao = { version = "0.25", features = ["rwh_05"] }
 winit = { version = "0.29", default-features = false, features = [
   "x11",
   "wayland",
