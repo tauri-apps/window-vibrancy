@@ -79,7 +79,7 @@ mod internal {
     use cocoa::{
         appkit::{
             NSAppKitVersionNumber, NSAppKitVersionNumber10_10, NSAppKitVersionNumber10_11,
-            NSAutoresizingMaskOptions, NSView, NSViewHeightSizable, NSViewWidthSizable, NSWindow,
+            NSAutoresizingMaskOptions, NSView, NSViewHeightSizable, NSViewWidthSizable,
             NSWindowOrderingMode,
         },
         base::{id, nil, BOOL},
@@ -91,7 +91,7 @@ mod internal {
 
     #[allow(deprecated)]
     pub fn apply_vibrancy(
-        window: id,
+        ns_view: id,
         appearance: NSVisualEffectMaterial,
         state: Option<NSVisualEffectState>,
         radius: Option<f64>,
@@ -117,9 +117,7 @@ mod internal {
                 m = NSVisualEffectMaterial::AppearanceBased;
             }
 
-            let ns_view: id = window.contentView();
             let bounds = NSView::bounds(ns_view);
-
             let blurred_view =
                 NSVisualEffectView::initWithFrame_(NSVisualEffectView::alloc(nil), bounds);
             blurred_view.autorelease();
