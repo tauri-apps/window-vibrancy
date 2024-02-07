@@ -5,6 +5,9 @@
 
 Make your windows vibrant.
 
+> [!Tip]
+> If you're using `tauri@v1`, you need to use version `0.4` of this crate.
+
 ## Platform-specific
 
 - **Linux**: Unsupported, Blur and any vibrancy effects are controlled by the compositor installed on the end-user system.

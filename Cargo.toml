@@ -17,17 +17,11 @@ default-target = "x86_64-pc-windows-msvc"
 targets = [ "x86_64-apple-darwin", "x86_64-pc-windows-msvc" ]
 
 [dependencies]
-raw-window-handle = "0.5"
+raw-window-handle = "0.6"
 
 [dev-dependencies]
-tao = { version = "0.25", features = ["rwh_05"] }
-winit = { version = "0.29", default-features = false, features = [
-  "x11",
-  "wayland",
-  "wayland-dlopen",
-  "wayland-csd-adwaita",
-  "rwh_05"
-] }
+tao = "0.25"
+winit = "0.29"
 
 [target."cfg(target_os = \"windows\")".dependencies]
 windows-version = "0.1"
