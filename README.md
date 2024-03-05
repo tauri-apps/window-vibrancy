@@ -24,7 +24,7 @@ apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None).expect("U
 apply_blur(&window, Some((18, 18, 18, 125))).expect("Unsupported platform! 'apply_blur' is only supported on Windows");
 ```
 
-### Tauri
+## Tauri
 
 if you are using tauri, don't forget to:
 
