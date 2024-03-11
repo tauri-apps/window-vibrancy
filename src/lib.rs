@@ -76,7 +76,7 @@ pub fn clear_blur(window: impl raw_window_handle::HasWindowHandle) -> Result<(),
     }
 }
 
-/// Applies Acrylic effect to you window. Works only on Windows 10 v1809 or newer.
+/// Applies acrylic effect to window. Works only on Windows 10 v1809 or newer.
 ///
 /// ## WARNING:
 ///
