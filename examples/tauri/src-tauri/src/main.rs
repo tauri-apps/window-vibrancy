@@ -16,8 +16,17 @@ fn main() {
             let window = app.get_webview_window("main").unwrap();
 
             #[cfg(target_os = "macos")]
-            apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None)
-                .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
+            {
+                // Use liquid glass effect with Regular variant (automatically falls back to NSVisualEffectView on older macOS)
+                let options = LiquidGlassOptions {
+                    variant: NSGlassEffectVariant::Clear,
+                    radius: Some(26.0),
+                    ..Default::default()
+                };
+
+                apply_liquid_glass(&window, options)
+                    .expect("Unsupported platform! 'apply_liquid_glass' is only supported on macOS");
+            }
 
             #[cfg(target_os = "windows")]
             apply_blur(&window, Some((18, 18, 18, 125)))

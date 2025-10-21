@@ -7,7 +7,16 @@
   },
   "app": {
     "withGlobalTauri": true,
-    "windows": [{ "decorations": false, "transparent": true }],
+    "windows": [{
+      "transparent": true,
+      "titleBarStyle": "Overlay",
+      "decorations": true,
+      "hiddenTitle": true,
+      "trafficLightPosition": {
+        "x": 20,
+        "y": 22
+      }
+    }],
     "macOSPrivateApi": true,
     "security": {
       "csp": null
