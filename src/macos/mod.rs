@@ -89,13 +89,6 @@ mod ns_glass_effect_view;
 #[cfg(target_os = "macos")]
 pub use ns_glass_effect_view::NSGlassEffectVariant;
 
-// Color support
-#[cfg(target_os = "macos")]
-mod color;
-
-#[cfg(target_os = "macos")]
-pub use color::TintColor;
-
 // Liquid Glass support (macOS 26.0+)
 #[cfg(target_os = "macos")]
 mod liquid_glass;

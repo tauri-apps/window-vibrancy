@@ -11,11 +11,10 @@ use objc2_app_kit::{
 };
 use objc2_foundation::{MainThreadMarker, NSArray, NSRect};
 
-use crate::macos::color::TintColor;
 use crate::macos::ns_glass_effect_view::{
     NSGlassEffectVariant, NSGlassEffectView, NSGlassEffectViewExt,
 };
-use crate::Error;
+use crate::{Color, Error};
 
 const GLASS_EFFECT_KEY: &str = "WindowVibrancyGlassEffectKey";
 const MOVED_CONTENT_KEY: &str = "WindowVibrancyMovedContentKey";
@@ -37,7 +36,7 @@ const OBJC_ASSOCIATION_RETAIN: usize = 0x301;
 #[derive(Debug, Clone)]
 pub struct LiquidGlassOptions {
     pub variant: NSGlassEffectVariant,
-    pub tint: Option<TintColor>,
+    pub tint: Option<Color>,
     pub radius: Option<f64>,
     pub opaque: Option<bool>,
     pub state: Option<crate::macos::NSVisualEffectState>,
@@ -227,8 +226,8 @@ fn configure_glass_appearance(glass: &NSView, options: &LiquidGlassOptions) -> R
             }
         }
 
-        if let Some(ref tint) = options.tint {
-            let color = tint.to_nscolor()?;
+        if let Some(tint) = options.tint {
+            let color = color_to_nscolor(tint);
             let selector = sel!(setTintColor:);
             let responds: bool = msg_send![glass, respondsToSelector: selector];
 
@@ -255,6 +254,15 @@ fn configure_glass_appearance(glass: &NSView, options: &LiquidGlassOptions) -> R
         .unwrap_or(AppKitVisualEffectState::FollowsWindowActiveState);
     set_glass_state(glass, state)?;
     Ok(())
+}
+
+fn color_to_nscolor((r, g, b, a): Color) -> Retained<NSColor> {
+    let rf = r as f64 / 255.0;
+    let gf = g as f64 / 255.0;
+    let bf = b as f64 / 255.0;
+    let af = a as f64 / 255.0;
+
+    NSColor::colorWithRed_green_blue_alpha(rf, gf, bf, af)
 }
 
 unsafe fn apply_corner_radius_layer(view: &NSView, radius: f64) {
