@@ -81,3 +81,26 @@ mod ns_visual_effect_view_tagged;
 
 #[cfg(target_os = "macos")]
 pub use ns_visual_effect_view_tagged::NSVisualEffectViewTagged;
+
+// NSGlassEffectView wrapper (macOS 15.0+ / AppKit 26.0+)
+#[cfg(target_os = "macos")]
+mod ns_glass_effect_view;
+
+#[cfg(target_os = "macos")]
+pub use ns_glass_effect_view::NSGlassEffectVariant;
+
+// Color support
+#[cfg(target_os = "macos")]
+mod color;
+
+#[cfg(target_os = "macos")]
+pub use color::TintColor;
+
+// Liquid Glass support (macOS 26.0+)
+#[cfg(target_os = "macos")]
+mod liquid_glass;
+
+#[cfg(target_os = "macos")]
+pub use liquid_glass::{
+    apply_liquid_glass, clear_liquid_glass, is_liquid_glass_supported, LiquidGlassOptions,
+};

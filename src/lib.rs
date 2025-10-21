@@ -31,6 +31,10 @@ pub use macos::{NSVisualEffectMaterial, NSVisualEffectState};
 #[cfg(target_os = "macos")]
 pub use macos::NSVisualEffectViewTagged;
 
+// Liquid Glass types (macOS 26.0+)
+#[cfg(target_os = "macos")]
+pub use macos::{is_liquid_glass_supported, LiquidGlassOptions, NSGlassEffectVariant, TintColor};
+
 /// a tuple of RGBA colors. Each value has minimum of 0 and maximum of 255.
 pub type Color = (u8, u8, u8, u8);
 
@@ -254,12 +258,75 @@ pub fn clear_vibrancy(window: impl raw_window_handle::HasWindowHandle) -> Result
     }
 }
 
+/// Applies liquid glass effect to window. Works only on macOS 26.0+.
+///
+/// Automatically falls back to NSVisualEffectView on older macOS versions.
+///
+/// ## Platform-specific
+///
+/// - **Linux / Windows**: Unsupported.
+///
+/// # Example
+///
+/// ```no_run
+/// use window_vibrancy::{apply_liquid_glass, LiquidGlassOptions, NSGlassEffectVariant};
+///
+/// let options = LiquidGlassOptions {
+///     variant: NSGlassEffectVariant::Regular,
+///     radius: Some(12.0),
+///     opaque: Some(false),
+///     ..Default::default()
+/// };
+///
+/// # let window: &dyn raw_window_handle::HasWindowHandle = unsafe { std::mem::zeroed() };
+/// apply_liquid_glass(&window, options).expect("Failed to apply liquid glass");
+/// ```
+#[cfg(target_os = "macos")]
+pub fn apply_liquid_glass(
+    window: impl raw_window_handle::HasWindowHandle,
+    #[allow(unused)] options: LiquidGlassOptions,
+) -> Result<(), Error> {
+    match window.window_handle()?.as_raw() {
+        #[cfg(target_os = "macos")]
+        raw_window_handle::RawWindowHandle::AppKit(handle) => unsafe {
+            macos::apply_liquid_glass(handle.ns_view, options)
+        },
+        _ => Err(Error::UnsupportedPlatform(
+            "\"apply_liquid_glass()\" is only supported on macOS.",
+        )),
+    }
+}
+
+/// Clears liquid glass effect applied to window. Works only on macOS 26.0+.
+///
+/// ## Platform-specific
+///
+/// - **Linux / Windows**: Unsupported.
+///
+/// # Returns
+///
+/// - `Ok(true)` if the liquid glass effect was cleared
+/// - `Ok(false)` if the liquid glass effect was not previously applied by this crate.
+#[cfg(target_os = "macos")]
+pub fn clear_liquid_glass(window: impl raw_window_handle::HasWindowHandle) -> Result<bool, Error> {
+    match window.window_handle()?.as_raw() {
+        #[cfg(target_os = "macos")]
+        raw_window_handle::RawWindowHandle::AppKit(handle) => unsafe {
+            macos::clear_liquid_glass(handle.ns_view)
+        },
+        _ => Err(Error::UnsupportedPlatform(
+            "\"clear_liquid_glass()\" is only supported on macOS.",
+        )),
+    }
+}
+
 #[derive(Debug)]
 pub enum Error {
     UnsupportedPlatform(&'static str),
     UnsupportedPlatformVersion(&'static str),
     NotMainThread(&'static str),
     NoWindowHandle(raw_window_handle::HandleError),
+    InvalidHexColor(String),
 }
 
 impl std::fmt::Display for Error {
@@ -272,6 +339,9 @@ impl std::fmt::Display for Error {
             }
             Error::NoWindowHandle(e) => {
                 write!(f, "{}", e)
+            }
+            Error::InvalidHexColor(e) => {
+                write!(f, "Invalid hex color: {}", e)
             }
         }
     }
