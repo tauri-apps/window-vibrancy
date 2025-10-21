@@ -6,8 +6,8 @@ use objc2::runtime::{AnyClass, AnyObject, MessageReceiver, Sel};
 use objc2::{class, msg_send, sel};
 use objc2_app_kit::{
     NSAppKitVersionNumber, NSAutoresizingMaskOptions, NSBox, NSColor, NSView,
-    NSVisualEffectBlendingMode, NSVisualEffectMaterial, NSVisualEffectState as AppKitVisualEffectState, NSVisualEffectView,
-    NSWindowOrderingMode,
+    NSVisualEffectBlendingMode, NSVisualEffectMaterial,
+    NSVisualEffectState as AppKitVisualEffectState, NSVisualEffectView, NSWindowOrderingMode,
 };
 use objc2_foundation::{MainThreadMarker, NSArray, NSRect};
 
