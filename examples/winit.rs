@@ -31,15 +31,8 @@ fn main() {
 
     #[cfg(target_os = "macos")]
     {
-        // Use liquid glass effect with Regular variant (automatically falls back to NSVisualEffectView on older macOS)
-        let options = LiquidGlassOptions {
-            variant: NSGlassEffectVariant::Clear,
-            radius: Some(26.0),
-            ..Default::default()
-        };
-
-        apply_liquid_glass(&window, options)
-            .expect("Unsupported platform! 'apply_liquid_glass' is only supported on macOS");
+        apply_liquid_glass(&window, NSGlassEffectViewStyle::Clear, None, Some(26.0))
+            .expect("Unsupported platform! 'apply_liquid_glass' is only supported on macOS 26+");
     }
 
     #[cfg(target_os = "windows")]
