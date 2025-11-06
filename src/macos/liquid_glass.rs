@@ -54,15 +54,6 @@ impl Default for LiquidGlassOptions {
     }
 }
 
-/// Returns true when NSGlassEffectView available (macOS 26.0+).
-/// Falls back to NSVisualEffectView on older systems.
-pub fn is_liquid_glass_supported() -> bool {
-    const LIQUID_GLASS_APPKIT_VERSION: f64 = 26.0;
-
-    let has_required_appkit = unsafe { NSAppKitVersionNumber >= LIQUID_GLASS_APPKIT_VERSION };
-    has_required_appkit && <NSGlassEffectView as NSGlassEffectViewExt>::is_available()
-}
-
 pub unsafe fn apply_liquid_glass(
     ns_view: NonNull<c_void>,
     options: LiquidGlassOptions,

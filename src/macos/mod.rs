@@ -94,6 +94,4 @@ pub use ns_glass_effect_view::NSGlassEffectVariant;
 mod liquid_glass;
 
 #[cfg(target_os = "macos")]
-pub use liquid_glass::{
-    apply_liquid_glass, clear_liquid_glass, is_liquid_glass_supported, LiquidGlassOptions,
-};
+pub use liquid_glass::{apply_liquid_glass, clear_liquid_glass, LiquidGlassOptions};

@@ -33,7 +33,7 @@ pub use macos::NSVisualEffectViewTagged;
 
 // Liquid Glass types (macOS 26.0+)
 #[cfg(target_os = "macos")]
-pub use macos::{is_liquid_glass_supported, LiquidGlassOptions, NSGlassEffectVariant};
+pub use macos::{LiquidGlassOptions, NSGlassEffectVariant};
 
 /// a tuple of RGBA colors. Each value has minimum of 0 and maximum of 255.
 pub type Color = (u8, u8, u8, u8);
