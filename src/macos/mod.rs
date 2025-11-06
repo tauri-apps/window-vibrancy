@@ -68,13 +68,13 @@ pub enum NSVisualEffectState {
 }
 
 #[cfg(target_os = "macos")]
-mod internal;
+mod vibrancy;
 
 #[cfg(target_os = "macos")]
-pub use internal::apply_vibrancy;
+pub use vibrancy::apply_vibrancy;
 
 #[cfg(target_os = "macos")]
-pub use internal::clear_vibrancy;
+pub use vibrancy::clear_vibrancy;
 
 #[cfg(target_os = "macos")]
 mod ns_visual_effect_view_tagged;
