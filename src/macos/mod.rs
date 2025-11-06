@@ -67,14 +67,69 @@ pub enum NSVisualEffectState {
     Inactive = 2,
 }
 
+// TODO: Find references for styles other than 0 and 1
+/// Note that only the first two variants Regular (0) and Clear (1) are officially supported,
+/// see <https://developer.apple.com/documentation/appkit/nsglasseffectview/style-swift.enum>.
+///
+/// All other variants use private macOS APIs and may change or break at any time.
+#[repr(u64)]
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum NSGlassEffectViewStyle {
+    /// macOS 26.0+
+    Regular = 0,
+    /// macOS 26.0+
+    Clear = 1,
+    /// macOS 26.0+
+    Dock = 2,
+    /// macOS 26.0+
+    AppIcons = 3,
+    /// macOS 26.0+
+    Widgets = 4,
+    /// macOS 26.0+
+    Text = 5,
+    /// macOS 26.0+
+    AvPlayer = 6,
+    /// macOS 26.0+
+    FaceTime = 7,
+    /// macOS 26.0+
+    ControlCenter = 8,
+    /// macOS 26.0+
+    NotificationCenter = 9,
+    /// macOS 26.0+
+    Monogram = 10,
+    /// macOS 26.0+
+    Bubbles = 11,
+    /// macOS 26.0+
+    Identity = 12,
+    /// macOS 26.0+
+    FocusBorder = 13,
+    /// macOS 26.0+
+    FocusPlatter = 14,
+    /// macOS 26.0+
+    Keyboard = 15,
+    /// macOS 26.0+
+    Sidebar = 16,
+    /// macOS 26.0+
+    AbuttedSidebar = 17,
+    /// macOS 26.0+
+    Inspector = 18,
+    /// macOS 26.0+
+    Control = 19,
+    /// macOS 26.0+
+    Loupe = 20,
+    /// macOS 26.0+
+    Slider = 21,
+    /// macOS 26.0+
+    Camera = 22,
+    /// macOS 26.0+
+    CartouchePopover = 23,
+}
+
 #[cfg(target_os = "macos")]
 mod vibrancy;
 
 #[cfg(target_os = "macos")]
-pub use vibrancy::apply_vibrancy;
-
-#[cfg(target_os = "macos")]
-pub use vibrancy::clear_vibrancy;
+pub use vibrancy::{apply_vibrancy, clear_vibrancy};
 
 #[cfg(target_os = "macos")]
 mod ns_visual_effect_view_tagged;
@@ -82,16 +137,15 @@ mod ns_visual_effect_view_tagged;
 #[cfg(target_os = "macos")]
 pub use ns_visual_effect_view_tagged::NSVisualEffectViewTagged;
 
-// NSGlassEffectView wrapper (macOS 15.0+ / AppKit 26.0+)
-#[cfg(target_os = "macos")]
-mod ns_glass_effect_view;
-
-#[cfg(target_os = "macos")]
-pub use ns_glass_effect_view::NSGlassEffectVariant;
-
 // Liquid Glass support (macOS 26.0+)
 #[cfg(target_os = "macos")]
 mod liquid_glass;
 
 #[cfg(target_os = "macos")]
-pub use liquid_glass::{apply_liquid_glass, clear_liquid_glass, LiquidGlassOptions};
+pub use liquid_glass::{apply_liquid_glass, clear_liquid_glass};
+
+#[cfg(target_os = "macos")]
+mod ns_glass_effect_view_tagged;
+
+#[cfg(target_os = "macos")]
+pub use ns_glass_effect_view_tagged::NSGlassEffectViewTagged;
