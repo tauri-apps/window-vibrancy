@@ -36,7 +36,7 @@ pub unsafe fn apply_liquid_glass(
 
         if NSAppKitVersionNumber < 2685.0 {
             return Err(Error::UnsupportedPlatformVersion(
-                "\"apply_liquid_glass()\" is only available on macOS 10.0 or newer.",
+                "\"apply_liquid_glass()\" is only available on macOS 26.0 or newer.",
             ));
         }
 

@@ -256,8 +256,6 @@ pub fn clear_vibrancy(window: impl raw_window_handle::HasWindowHandle) -> Result
 
 /// Applies liquid glass effect to window. Works only on macOS 26.0+.
 ///
-/// Automatically falls back to NSVisualEffectView on older macOS versions.
-///
 /// ## Platform-specific
 ///
 /// - **Linux / Windows**: Unsupported.
@@ -317,7 +315,6 @@ pub enum Error {
     UnsupportedPlatformVersion(&'static str),
     NotMainThread(&'static str),
     NoWindowHandle(raw_window_handle::HandleError),
-    InvalidHexColor(String),
 }
 
 impl std::fmt::Display for Error {
@@ -330,9 +327,6 @@ impl std::fmt::Display for Error {
             }
             Error::NoWindowHandle(e) => {
                 write!(f, "{}", e)
-            }
-            Error::InvalidHexColor(e) => {
-                write!(f, "Invalid hex color: {}", e)
             }
         }
     }
