@@ -1,5 +1,15 @@
 # Changelog
 
+## \[0.7.0]
+
+### enhance
+
+- [`5178609`](https://github.com/tauri-apps/window-vibrancy/commit/517860970aef981c6c4f1ba4e3522615297833d2) ([#191](https://github.com/tauri-apps/window-vibrancy/pull/191) by [@ahonn](https://github.com/tauri-apps/window-vibrancy/../../ahonn)) Introduce macOS liquid glass support with `apply_liquid_glass` / `clear_liquid_glass`.
+
+### misc
+
+- [`5178609`](https://github.com/tauri-apps/window-vibrancy/commit/517860970aef981c6c4f1ba4e3522615297833d2) ([#191](https://github.com/tauri-apps/window-vibrancy/pull/191) by [@ahonn](https://github.com/tauri-apps/window-vibrancy/../../ahonn)) Increased the MSRV to `1.77`.
+
 ## \[0.6.0]
 
 - [`03fd627`](https://github.com/tauri-apps/window-vibrancy/commit/03fd627c4bbf740b4931b231095d08e27e838b91) ([#171](https://github.com/tauri-apps/window-vibrancy/pull/171) by [@FabianLars](https://github.com/tauri-apps/window-vibrancy/../../FabianLars)) Update `objc2` to 0.6.0. This raises the msrv to 1.71.
