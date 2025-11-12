@@ -1,5 +1,11 @@
 # Changelog
 
+## \[0.7.1]
+
+### bug
+
+- [`65f5d28`](https://github.com/tauri-apps/window-vibrancy/commit/65f5d28a385f3a92f2ab5c43d3dc599bc59c9419) ([#196](https://github.com/tauri-apps/window-vibrancy/pull/196) by [@FabianLars](https://github.com/tauri-apps/window-vibrancy/../../FabianLars)) Increased `objc2-app-kit` version to `0.3.2`. No user facing changes because cargo already resolves to that version because of the enabled features.
+
 ## \[0.7.0]
 
 ### enhance

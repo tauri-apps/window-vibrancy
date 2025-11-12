@@ -2332,7 +2332,7 @@ checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 
 [[package]]
 name = "window-vibrancy"
-version = "0.7.0"
+version = "0.7.1"
 dependencies = [
  "objc2 0.6.3",
  "objc2-app-kit 0.3.2",
