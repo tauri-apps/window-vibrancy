@@ -8,6 +8,7 @@
 #![allow(clippy::upper_case_acronyms)]
 
 use std::ffi::c_void;
+use windows_sys::core::BOOL;
 pub use windows_sys::Win32::{Foundation::*, Graphics::Dwm::*, System::LibraryLoader::*};
 
 use crate::{Color, Error};
