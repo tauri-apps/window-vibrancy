@@ -2,10 +2,10 @@ use std::{ffi::c_void, ptr::NonNull};
 
 use objc2::{msg_send, rc::Retained, runtime::AnyObject, sel, MainThreadMarker};
 use objc2_app_kit::{
-    NSAppKitVersionNumber, NSAutoresizingMaskOptions, NSColor, NSGlassEffectViewStyle, NSView,
-    NSWindowOrderingMode,
+    NSAppKitVersionNumber, NSAutoresizingMaskOptions, NSBox, NSColor, NSGlassEffectViewStyle,
+    NSView, NSWindowOrderingMode,
 };
-use objc2_foundation::{NSArray, NSInteger};
+use objc2_foundation::{NSArray, NSInteger, NSRect};
 
 use crate::{macos::ns_glass_effect_view_tagged::NSGlassEffectViewTagged, Error};
 
@@ -13,6 +13,7 @@ use crate::{macos::ns_glass_effect_view_tagged::NSGlassEffectViewTagged, Error};
 pub const NS_VIEW_TAG_GLASS_VIEW: NSInteger = 96945937;
 
 const MOVED_CONTENT_KEY: &str = "WindowVibrancyMovedContentKey";
+const BACKGROUND_VIEW_KEY: &str = "WindowVibrancyBackgroundViewKey";
 
 extern "C" {
     fn objc_setAssociatedObject(
@@ -25,18 +26,36 @@ extern "C" {
 }
 
 const OBJC_ASSOCIATION_ASSIGN: usize = 0x0;
+const OBJC_ASSOCIATION_RETAIN: usize = 0x301;
+
+#[derive(Debug, Clone)]
+pub struct LiquidGlassOptions {
+    pub style: super::NSGlassEffectViewStyle,
+    pub tint_color: Option<crate::Color>,
+    pub radius: Option<f64>,
+    pub opaque: Option<bool>,
+}
+
+impl Default for LiquidGlassOptions {
+    fn default() -> Self {
+        Self {
+            style: super::NSGlassEffectViewStyle::Regular,
+            tint_color: None,
+            radius: None,
+            opaque: None,
+        }
+    }
+}
 
 pub unsafe fn apply_liquid_glass(
     ns_view: NonNull<c_void>,
-    style: super::NSGlassEffectViewStyle,
-    tint_color: Option<crate::Color>,
-    radius: Option<f64>,
+    options: LiquidGlassOptions,
 ) -> Result<(), Error> {
     let mtm = MainThreadMarker::new().ok_or(Error::NotMainThread(
         "\"apply_liquid_glass()\" can only be used on the main thread.",
     ))?;
 
-    let tint_color = tint_color.map(|(r, g, b, a)| {
+    let tint_color = options.tint_color.map(|(r, g, b, a)| {
         NSColor::colorWithRed_green_blue_alpha(
             r as f64 / 255.0,
             g as f64 / 255.0,
@@ -54,14 +73,30 @@ pub unsafe fn apply_liquid_glass(
             ));
         }
 
-        let s = NSGlassEffectViewStyle(style as isize);
-
         let bounds = view.bounds();
+        let use_opaque = options.opaque.unwrap_or(false);
+
+        // Create opaque background if requested
+        let background_view = if use_opaque {
+            let bg = create_background_box(&mtm, bounds);
+            if let Some(radius) = options.radius {
+                if radius > 0.0 {
+                    apply_corner_radius_layer(bg.as_ref(), radius);
+                }
+            }
+            view.addSubview_positioned_relativeTo(&bg, NSWindowOrderingMode::Below, None::<&NSView>);
+            Some(bg)
+        } else {
+            None
+        };
+
+        let s = NSGlassEffectViewStyle(options.style as isize);
+
         let glass_view =
             NSGlassEffectViewTagged::initWithFrame(mtm.alloc(), bounds, NS_VIEW_TAG_GLASS_VIEW);
 
         glass_view.setStyle(s);
-        glass_view.setCornerRadius(radius.unwrap_or(0.0));
+        glass_view.setCornerRadius(options.radius.unwrap_or(0.0));
         glass_view.setTintColor(tint_color.as_deref());
 
         glass_view.setAutoresizingMask(
@@ -70,9 +105,30 @@ pub unsafe fn apply_liquid_glass(
         );
 
         // Move primary content view into glass view's contentView before adding to hierarchy
-        move_primary_content_view(view, &glass_view, radius.unwrap_or(0.0));
+        move_primary_content_view(view, &glass_view, options.radius.unwrap_or(0.0));
 
-        view.addSubview_positioned_relativeTo(&glass_view, NSWindowOrderingMode::Below, None);
+        // Add glass view above background (if exists) or below all other views
+        if let Some(ref bg) = background_view {
+            view.addSubview_positioned_relativeTo(
+                &glass_view,
+                NSWindowOrderingMode::Above,
+                Some(bg.as_ref()),
+            );
+        } else {
+            view.addSubview_positioned_relativeTo(&glass_view, NSWindowOrderingMode::Below, None);
+        }
+
+        // Store background view reference for later cleanup
+        if let Some(bg) = background_view {
+            let key = BACKGROUND_VIEW_KEY.as_ptr() as *const c_void;
+            let ptr = Retained::as_ptr(&bg) as *const c_void;
+            objc_setAssociatedObject(
+                view as *const _ as *const c_void,
+                key,
+                ptr,
+                OBJC_ASSOCIATION_RETAIN,
+            );
+        }
     }
 
     Ok(())
@@ -85,13 +141,19 @@ pub unsafe fn clear_liquid_glass(ns_view: NonNull<c_void>) -> Result<bool, Error
     if let Some(glass_view) = glass_view {
         restore_primary_content_view(view);
         glass_view.removeFromSuperview();
+
+        // Clean up background view if it exists
+        if let Some(background) = retained_background_view(view) {
+            background.removeFromSuperview();
+            clear_associated_background(view);
+        }
+
         return Ok(true);
     }
 
     Ok(false)
 }
 
-/// Gets the contentView of NSGlassEffectView
 fn glass_content_view(glass: &NSView) -> Option<*mut NSView> {
     unsafe {
         let has_content_view: bool = msg_send![glass, respondsToSelector: sel!(contentView)];
@@ -105,7 +167,6 @@ fn glass_content_view(glass: &NSView) -> Option<*mut NSView> {
     }
 }
 
-/// Applies corner radius to a view's layer
 unsafe fn apply_corner_radius_layer(view: &NSView, radius: f64) {
     let _: () = msg_send![view, setWantsLayer: true];
     let layer: *mut AnyObject = msg_send![view, layer];
@@ -115,7 +176,6 @@ unsafe fn apply_corner_radius_layer(view: &NSView, radius: f64) {
     }
 }
 
-/// Finds WKWebView recursively in the view hierarchy
 fn find_webview_recursive(view: &NSView) -> Option<Retained<NSView>> {
     unsafe {
         if let Some(wk_class) = objc2::runtime::AnyClass::get(c"WKWebView") {
@@ -143,7 +203,7 @@ fn find_webview_recursive(view: &NSView) -> Option<Retained<NSView>> {
     None
 }
 
-/// Moves primary content view beneath the glass view for layering effect
+/// Reparents primary content into glass view's contentView for proper layering
 fn move_primary_content_view(container: &NSView, glass: &NSView, radius: f64) {
     unsafe {
         let target_ptr = glass_content_view(glass).unwrap_or(glass as *const _ as *mut NSView);
@@ -180,7 +240,6 @@ fn move_primary_content_view(container: &NSView, glass: &NSView, radius: f64) {
     }
 }
 
-/// Restores primary content view to original position
 fn restore_primary_content_view(container: &NSView) {
     unsafe {
         let moved_key = MOVED_CONTENT_KEY.as_ptr() as *const c_void;
@@ -206,6 +265,54 @@ fn restore_primary_content_view(container: &NSView) {
             moved_key,
             std::ptr::null(),
             OBJC_ASSOCIATION_ASSIGN,
+        );
+    }
+}
+
+/// Creates opaque background layer using NSBox (approach from electron-liquid-glass)
+fn create_background_box(mtm: &MainThreadMarker, bounds: NSRect) -> Retained<NSView> {
+    unsafe {
+        let background_box = NSBox::initWithFrame(mtm.alloc(), bounds);
+
+        const NS_BOX_CUSTOM: isize = 4;
+        const NS_NO_BORDER: isize = 0;
+        let _: () = msg_send![&background_box, setBoxType: NS_BOX_CUSTOM];
+        let _: () = msg_send![&background_box, setBorderType: NS_NO_BORDER];
+
+        let window_bg_color = NSColor::windowBackgroundColor();
+        background_box.setFillColor(&window_bg_color);
+
+        let _: () = msg_send![&background_box, setWantsLayer: true];
+
+        let mask = NSAutoresizingMaskOptions::ViewWidthSizable
+            | NSAutoresizingMaskOptions::ViewHeightSizable;
+        let view: &NSView = background_box.as_ref();
+        view.setAutoresizingMask(mask);
+
+        Retained::into_super(background_box)
+    }
+}
+
+fn retained_background_view(container: &NSView) -> Option<Retained<NSView>> {
+    unsafe {
+        let key = BACKGROUND_VIEW_KEY.as_ptr() as *const c_void;
+        let ptr = objc_getAssociatedObject(container as *const _ as *const c_void, key);
+        if ptr.is_null() {
+            None
+        } else {
+            Retained::retain(ptr as *mut NSView)
+        }
+    }
+}
+
+fn clear_associated_background(container: &NSView) {
+    unsafe {
+        let key = BACKGROUND_VIEW_KEY.as_ptr() as *const c_void;
+        objc_setAssociatedObject(
+            container as *const _ as *const c_void,
+            key,
+            std::ptr::null(),
+            OBJC_ASSOCIATION_RETAIN,
         );
     }
 }

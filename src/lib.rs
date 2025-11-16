@@ -32,7 +32,7 @@ mod windows;
 pub use macos::{NSGlassEffectViewStyle, NSVisualEffectMaterial, NSVisualEffectState};
 
 #[cfg(target_os = "macos")]
-pub use macos::{NSGlassEffectViewTagged, NSVisualEffectViewTagged};
+pub use macos::{LiquidGlassOptions, NSGlassEffectViewTagged, NSVisualEffectViewTagged};
 
 /// a tuple of RGBA colors. Each value has minimum of 0 and maximum of 255.
 pub type Color = (u8, u8, u8, u8);
@@ -266,25 +266,30 @@ pub fn clear_vibrancy(window: impl raw_window_handle::HasWindowHandle) -> Result
 /// # Example
 ///
 /// ```no_run
-/// use window_vibrancy::{apply_liquid_glass, NSGlassEffectViewStyle};
+/// use window_vibrancy::{apply_liquid_glass, LiquidGlassOptions, NSGlassEffectViewStyle};
+///
+/// let options = LiquidGlassOptions {
+///     style: NSGlassEffectViewStyle::Regular,
+///     radius: Some(12.0),
+///     opaque: Some(false),
+///     ..Default::default()
+/// };
 ///
 /// # let window: &dyn raw_window_handle::HasWindowHandle = unsafe { std::mem::zeroed() };
-/// apply_liquid_glass(&window, NSGlassEffectViewStyle::Regular, None, Some(12.0));
+/// apply_liquid_glass(&window, options).expect("Failed to apply liquid glass");
 /// ```
 #[cfg(target_os = "macos")]
 pub fn apply_liquid_glass(
     window: impl raw_window_handle::HasWindowHandle,
-    #[allow(unused)] style: NSGlassEffectViewStyle,
-    #[allow(unused)] tint_color: Option<Color>,
-    #[allow(unused)] radius: Option<f64>,
+    #[allow(unused)] options: LiquidGlassOptions,
 ) -> Result<(), Error> {
     match window.window_handle()?.as_raw() {
         #[cfg(target_os = "macos")]
         raw_window_handle::RawWindowHandle::AppKit(handle) => unsafe {
-            macos::apply_liquid_glass(handle.ns_view, style, tint_color, radius)
+            macos::apply_liquid_glass(handle.ns_view, options)
         },
         _ => Err(Error::UnsupportedPlatform(
-            "\"apply_vibrancy()\" is only supported on macOS.",
+            "\"apply_liquid_glass()\" is only supported on macOS.",
         )),
     }
 }

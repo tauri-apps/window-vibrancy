@@ -31,8 +31,15 @@ fn main() {
 
     #[cfg(target_os = "macos")]
     {
-        apply_liquid_glass(&window, NSGlassEffectViewStyle::Clear, None, Some(26.0))
-            .expect("Unsupported platform! 'apply_liquid_glass' is only supported on macOS 26+");
+        apply_liquid_glass(
+            &window,
+            LiquidGlassOptions {
+                style: NSGlassEffectViewStyle::Clear,
+                radius: Some(26.0),
+                ..Default::default()
+            },
+        )
+        .expect("Unsupported platform! 'apply_liquid_glass' is only supported on macOS 26+");
     }
 
     #[cfg(target_os = "windows")]
