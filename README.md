@@ -34,17 +34,38 @@ For macOS 26 and newer, you can use the new `apply_liquid_glass` function with t
 use window_vibrancy::{apply_liquid_glass, LiquidGlassOptions, NSGlassEffectViewStyle};
 
 #[cfg(target_os = "macos")]
-apply_liquid_glass(
-    &window,
-    LiquidGlassOptions {
-        style: NSGlassEffectViewStyle::Clear,
-        radius: Some(26.0),
-        opaque: Some(false),
-        ..Default::default()
-    },
-)
-.expect("Unsupported platform! 'apply_liquid_glass' is only supported on macOS 26+");
+{
+    let options = LiquidGlassOptions::new(NSGlassEffectViewStyle::Clear)
+        .radius(26.0)
+        .opaque(false);
+
+    apply_liquid_glass(&window, options)
+        .expect("Unsupported platform! 'apply_liquid_glass' is only supported on macOS 26+");
+}
 ```
+
+**Advanced Usage with WebView:**
+
+If you manage the primary content view yourself (for example a `WKWebView`), you can pass its pointer via the `.content_view()` method so the crate can reparent it into the glass view's `contentView`:
+
+```rs
+use window_vibrancy::{apply_liquid_glass, LiquidGlassOptions, NSGlassEffectViewStyle};
+use std::ptr::NonNull;
+
+#[cfg(target_os = "macos")]
+{
+    let webview: NonNull<std::ffi::c_void> = find_webview(&window);
+
+    let options = LiquidGlassOptions::new(NSGlassEffectViewStyle::Clear)
+        .radius(26.0)
+        .content_view(webview);
+
+    apply_liquid_glass(&window, options)
+        .expect("Failed to apply liquid glass");
+}
+```
+
+For a complete example of WebView integration with Tauri, see [`examples/tauri/src-tauri/src/main.rs`](https://github.com/tauri-apps/window-vibrancy/blob/dev/examples/tauri/src-tauri/src/main.rs).
 
 ## Tauri
 

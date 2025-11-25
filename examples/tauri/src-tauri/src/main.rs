@@ -7,6 +7,9 @@
     windows_subsystem = "windows"
 )]
 
+#[cfg(target_os = "macos")]
+mod webview;
+
 use tauri::Manager;
 use window_vibrancy::*;
 
@@ -17,15 +20,29 @@ fn main() {
 
             #[cfg(target_os = "macos")]
             {
-                apply_liquid_glass(
-                    &window,
-                    LiquidGlassOptions {
-                        style: NSGlassEffectViewStyle::Clear,
-                        radius: Some(26.0),
-                        ..Default::default()
-                    },
-                )
-                .expect("Unsupported platform! 'apply_liquid_glass' is only supported on macOS 26+");
+                use webview::{find_webview_recursive, get_nsview_from_window};
+                use objc2_app_kit::NSView;
+
+                let nsview_ptr = get_nsview_from_window(&window);
+                let webview = if !nsview_ptr.is_null() {
+                    unsafe {
+                        let nsview = &*(nsview_ptr as *const NSView);
+                        find_webview_recursive(nsview)
+                    }
+                } else {
+                    None
+                };
+
+                let mut options = LiquidGlassOptions::new(NSGlassEffectViewStyle::Clear)
+                    .radius(26.0)
+                    .opaque(false);
+
+                if let Some(webview) = webview {
+                    options = options.content_view(webview.cast());
+                }
+
+                apply_liquid_glass(&window, options)
+                    .expect("Unsupported platform! 'apply_liquid_glass' is only supported on macOS 26+");
             }
 
             #[cfg(target_os = "windows")]

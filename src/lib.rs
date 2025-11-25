@@ -262,22 +262,6 @@ pub fn clear_vibrancy(window: impl raw_window_handle::HasWindowHandle) -> Result
 /// ## Platform-specific
 ///
 /// - **Linux / Windows**: Unsupported.
-///
-/// # Example
-///
-/// ```no_run
-/// use window_vibrancy::{apply_liquid_glass, LiquidGlassOptions, NSGlassEffectViewStyle};
-///
-/// let options = LiquidGlassOptions {
-///     style: NSGlassEffectViewStyle::Regular,
-///     radius: Some(12.0),
-///     opaque: Some(false),
-///     ..Default::default()
-/// };
-///
-/// # let window: &dyn raw_window_handle::HasWindowHandle = unsafe { std::mem::zeroed() };
-/// apply_liquid_glass(&window, options).expect("Failed to apply liquid glass");
-/// ```
 #[cfg(target_os = "macos")]
 pub fn apply_liquid_glass(
     window: impl raw_window_handle::HasWindowHandle,
