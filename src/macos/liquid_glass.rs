@@ -1,9 +1,12 @@
 use std::{ffi::c_void, ptr::NonNull};
 
-use objc2::{msg_send, rc::Retained, runtime::AnyObject, sel, MainThreadMarker};
+use objc2::{
+    ffi::{objc_getAssociatedObject, objc_setAssociatedObject},
+    msg_send, rc::Retained, runtime::AnyObject, sel, MainThreadMarker,
+};
 use objc2_app_kit::{
-    NSAppKitVersionNumber, NSAutoresizingMaskOptions, NSBox, NSColor, NSGlassEffectViewStyle,
-    NSView, NSWindowOrderingMode,
+    NSAppKitVersionNumber, NSAutoresizingMaskOptions, NSBox, NSBoxType, NSColor,
+    NSGlassEffectViewStyle, NSView, NSWindowOrderingMode,
 };
 use objc2_foundation::{NSInteger, NSRect};
 
@@ -14,16 +17,6 @@ pub const NS_VIEW_TAG_GLASS_VIEW: NSInteger = 96945937;
 
 const MOVED_CONTENT_KEY: &str = "WindowVibrancyMovedContentKey";
 const BACKGROUND_VIEW_KEY: &str = "WindowVibrancyBackgroundViewKey";
-
-extern "C" {
-    fn objc_setAssociatedObject(
-        object: *const c_void,
-        key: *const c_void,
-        value: *const c_void,
-        policy: usize,
-    );
-    fn objc_getAssociatedObject(object: *const c_void, key: *const c_void) -> *mut c_void;
-}
 
 const OBJC_ASSOCIATION_ASSIGN: usize = 0x0;
 const OBJC_ASSOCIATION_RETAIN: usize = 0x301;
@@ -155,9 +148,9 @@ pub unsafe fn apply_liquid_glass(
 
         if let Some(bg) = background_view {
             let key = BACKGROUND_VIEW_KEY.as_ptr() as *const c_void;
-            let ptr = Retained::as_ptr(&bg) as *const c_void;
+            let ptr = Retained::as_ptr(&bg) as *mut AnyObject;
             objc_setAssociatedObject(
-                view as *const _ as *const c_void,
+                view as *const _ as *mut AnyObject,
                 key,
                 ptr,
                 OBJC_ASSOCIATION_RETAIN,
@@ -201,7 +194,7 @@ fn glass_content_view(glass: &NSView) -> Option<*mut NSView> {
 }
 
 unsafe fn apply_corner_radius_layer(view: &NSView, radius: f64) {
-    let _: () = msg_send![view, setWantsLayer: true];
+    view.setWantsLayer(true);
     let layer: *mut AnyObject = msg_send![view, layer];
     if !layer.is_null() {
         let _: () = msg_send![layer, setCornerRadius: radius];
@@ -238,14 +231,14 @@ fn move_primary_content_view(
         target_view.addSubview(view_ref);
 
         let bounds = target_view.bounds();
-        let _: () = msg_send![view_ref, setFrame: bounds];
+        view_ref.setFrame(bounds);
         view_ref.setAutoresizingMask(mask);
 
         let moved_key = MOVED_CONTENT_KEY.as_ptr() as *const c_void;
         objc_setAssociatedObject(
-            container as *const _ as *const c_void,
+            container as *const _ as *mut AnyObject,
             moved_key,
-            content_ptr.as_ptr() as *const c_void,
+            content_ptr.as_ptr() as *mut AnyObject,
             OBJC_ASSOCIATION_ASSIGN,
         );
     }
@@ -254,7 +247,7 @@ fn move_primary_content_view(
 fn restore_primary_content_view(container: &NSView) {
     unsafe {
         let moved_key = MOVED_CONTENT_KEY.as_ptr() as *const c_void;
-        let moved_ptr = objc_getAssociatedObject(container as *const _ as *const c_void, moved_key)
+        let moved_ptr = objc_getAssociatedObject(container as *const _ as *const AnyObject, moved_key)
             as *mut NSView;
 
         if moved_ptr.is_null() {
@@ -266,47 +259,44 @@ fn restore_primary_content_view(container: &NSView) {
         container.addSubview(view);
 
         let bounds = container.bounds();
-        let _: () = msg_send![view, setFrame: bounds];
+        view.setFrame(bounds);
         let mask = NSAutoresizingMaskOptions::ViewWidthSizable
             | NSAutoresizingMaskOptions::ViewHeightSizable;
         view.setAutoresizingMask(mask);
 
         objc_setAssociatedObject(
-            container as *const _ as *const c_void,
+            container as *const _ as *mut AnyObject,
             moved_key,
-            std::ptr::null(),
+            std::ptr::null_mut(),
             OBJC_ASSOCIATION_ASSIGN,
         );
     }
 }
 
 fn create_background_box(mtm: &MainThreadMarker, bounds: NSRect) -> Retained<NSView> {
-    unsafe {
-        let background_box = NSBox::initWithFrame(mtm.alloc(), bounds);
+    let background_box = NSBox::initWithFrame(mtm.alloc(), bounds);
 
-        const NS_BOX_CUSTOM: isize = 4;
-        const NS_NO_BORDER: isize = 0;
-        let _: () = msg_send![&background_box, setBoxType: NS_BOX_CUSTOM];
-        let _: () = msg_send![&background_box, setBorderType: NS_NO_BORDER];
+    background_box.setBoxType(NSBoxType::Custom);
+    background_box.setTransparent(false);
+    background_box.setBorderWidth(0.0);
 
-        let window_bg_color = NSColor::windowBackgroundColor();
-        background_box.setFillColor(&window_bg_color);
+    let window_bg_color = NSColor::windowBackgroundColor();
+    background_box.setFillColor(&window_bg_color);
 
-        let _: () = msg_send![&background_box, setWantsLayer: true];
+    let view: &NSView = background_box.as_ref();
+    view.setWantsLayer(true);
 
-        let mask = NSAutoresizingMaskOptions::ViewWidthSizable
-            | NSAutoresizingMaskOptions::ViewHeightSizable;
-        let view: &NSView = background_box.as_ref();
-        view.setAutoresizingMask(mask);
+    let mask =
+        NSAutoresizingMaskOptions::ViewWidthSizable | NSAutoresizingMaskOptions::ViewHeightSizable;
+    view.setAutoresizingMask(mask);
 
-        Retained::into_super(background_box)
-    }
+    Retained::into_super(background_box)
 }
 
 fn retained_background_view(container: &NSView) -> Option<Retained<NSView>> {
     unsafe {
         let key = BACKGROUND_VIEW_KEY.as_ptr() as *const c_void;
-        let ptr = objc_getAssociatedObject(container as *const _ as *const c_void, key);
+        let ptr = objc_getAssociatedObject(container as *const _ as *const AnyObject, key);
         if ptr.is_null() {
             None
         } else {
@@ -319,9 +309,9 @@ fn clear_associated_background(container: &NSView) {
     unsafe {
         let key = BACKGROUND_VIEW_KEY.as_ptr() as *const c_void;
         objc_setAssociatedObject(
-            container as *const _ as *const c_void,
+            container as *const _ as *mut AnyObject,
             key,
-            std::ptr::null(),
+            std::ptr::null_mut(),
             OBJC_ASSOCIATION_RETAIN,
         );
     }
