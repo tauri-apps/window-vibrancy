@@ -2,11 +2,11 @@ use std::{ffi::c_void, ptr::NonNull};
 
 use objc2::{
     ffi::{objc_getAssociatedObject, objc_setAssociatedObject},
-    msg_send, rc::Retained, runtime::AnyObject, sel, MainThreadMarker,
+    rc::Retained, runtime::AnyObject, MainThreadMarker,
 };
 use objc2_app_kit::{
     NSAppKitVersionNumber, NSAutoresizingMaskOptions, NSBox, NSBoxType, NSColor,
-    NSGlassEffectViewStyle, NSView, NSWindowOrderingMode,
+    NSGlassEffectView, NSGlassEffectViewStyle, NSView, NSWindowOrderingMode,
 };
 use objc2_foundation::{NSInteger, NSRect};
 
@@ -180,32 +180,18 @@ pub unsafe fn clear_liquid_glass(ns_view: NonNull<c_void>) -> Result<bool, Error
     Ok(false)
 }
 
-fn glass_content_view(glass: &NSView) -> Option<*mut NSView> {
-    unsafe {
-        let has_content_view: bool = msg_send![glass, respondsToSelector: sel!(contentView)];
-        if has_content_view {
-            let content_ptr: *mut NSView = msg_send![glass, contentView];
-            if !content_ptr.is_null() {
-                return Some(content_ptr);
-            }
-        }
-        None
-    }
-}
-
 unsafe fn apply_corner_radius_layer(view: &NSView, radius: f64) {
     view.setWantsLayer(true);
-    let layer: *mut AnyObject = msg_send![view, layer];
-    if !layer.is_null() {
-        let _: () = msg_send![layer, setCornerRadius: radius];
-        let _: () = msg_send![layer, setMasksToBounds: true];
+    if let Some(layer) = view.layer() {
+        layer.setCornerRadius(radius);
+        layer.setMasksToBounds(true);
     }
 }
 
 fn move_primary_content_view(
     container: &NSView,
     content_view: Option<NonNull<NSView>>,
-    glass: &NSView,
+    glass: &NSGlassEffectView,
     radius: f64,
 ) {
     let Some(content_ptr) = content_view else {
@@ -213,7 +199,10 @@ fn move_primary_content_view(
     };
 
     unsafe {
-        let target_ptr = glass_content_view(glass).unwrap_or(glass as *const _ as *mut NSView);
+        let target_ptr = glass
+            .contentView()
+            .map(|view| Retained::as_ptr(&view) as *mut NSView)
+            .unwrap_or(glass as *const _ as *mut NSView);
         if target_ptr.is_null() {
             return;
         }
