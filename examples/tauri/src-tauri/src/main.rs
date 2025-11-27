@@ -38,7 +38,8 @@ fn main() {
                     .opaque(false);
 
                 if let Some(webview) = webview {
-                    options = options.content_view(webview.cast());
+                    let webview_ref = unsafe { webview.as_ref() };
+                    options = options.content_view(webview_ref);
                 }
 
                 apply_liquid_glass(&window, options)

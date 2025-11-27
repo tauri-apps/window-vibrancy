@@ -1,4 +1,4 @@
-use std::{ffi::c_void, ptr::NonNull};
+use std::ffi::c_void;
 
 use objc2::{
     ffi::{objc_getAssociatedObject, objc_setAssociatedObject},
@@ -23,19 +23,19 @@ const BACKGROUND_VIEW_KEY: &str = "WindowVibrancyBackgroundViewKey";
 const OBJC_ASSOCIATION_ASSIGN: usize = 0x0;
 const OBJC_ASSOCIATION_RETAIN: usize = 0x301;
 
-/// Minimum NSAppKitVersionNumber for liquid glass support (macOS 15.0+)
+/// Minimum NSAppKitVersionNumber for liquid glass support (macOS 26.0+)
 const MIN_APPKIT_VERSION_LIQUID_GLASS: f64 = 2685.0;
 
 #[derive(Debug, Clone)]
-pub struct LiquidGlassOptions {
+pub struct LiquidGlassOptions<'a> {
     pub(crate) style: super::NSGlassEffectViewStyle,
     pub(crate) tint_color: Option<crate::Color>,
     pub(crate) radius: Option<f64>,
     pub(crate) opaque: Option<bool>,
-    pub(crate) content_view: Option<NonNull<NSView>>,
+    pub(crate) content_view: Option<&'a NSView>,
 }
 
-impl LiquidGlassOptions {
+impl<'a> LiquidGlassOptions<'a> {
     pub fn new(style: super::NSGlassEffectViewStyle) -> Self {
         Self {
             style,
@@ -61,31 +61,26 @@ impl LiquidGlassOptions {
         self
     }
 
-    pub fn content_view(mut self, view: NonNull<c_void>) -> Self {
-        self.content_view = Some(view.cast::<NSView>());
+    pub fn content_view(mut self, view: &'a NSView) -> Self {
+        self.content_view = Some(view);
         self
     }
 }
 
-impl Default for LiquidGlassOptions {
+impl<'a> Default for LiquidGlassOptions<'a> {
     fn default() -> Self {
         Self::new(super::NSGlassEffectViewStyle::Regular)
     }
 }
 
-pub unsafe fn apply_liquid_glass(
-    ns_view: NonNull<c_void>,
-    options: LiquidGlassOptions,
-) -> Result<(), Error> {
+pub fn apply_liquid_glass(view: &NSView, options: LiquidGlassOptions<'_>) -> Result<(), Error> {
     let mtm = MainThreadMarker::new().ok_or(Error::NotMainThread(
         "apply_liquid_glass() can only be used on the main thread.",
     ))?;
 
-    let view: &NSView = unsafe { ns_view.cast().as_ref() };
-
-    if NSAppKitVersionNumber < MIN_APPKIT_VERSION_LIQUID_GLASS {
+    if unsafe { NSAppKitVersionNumber } < MIN_APPKIT_VERSION_LIQUID_GLASS {
         return Err(Error::UnsupportedPlatformVersion(
-            "apply_liquid_glass() is only available on macOS 15.0 or newer.",
+            "apply_liquid_glass() is only available on macOS 26.0 or newer.",
         ));
     }
 
@@ -105,7 +100,7 @@ pub unsafe fn apply_liquid_glass(
     let background_view = if use_opaque {
         let bg = create_background_box(&mtm, bounds);
         if radius > 0.0 {
-            apply_corner_radius_layer(bg.as_ref(), radius);
+            unsafe { apply_corner_radius_layer(bg.as_ref(), radius) };
         }
         view.addSubview_positioned_relativeTo(&bg, NSWindowOrderingMode::Below, None::<&NSView>);
         Some(bg)
@@ -114,8 +109,9 @@ pub unsafe fn apply_liquid_glass(
     };
 
     let style = NSGlassEffectViewStyle(options.style as isize);
-    let glass_view =
-        NSGlassEffectViewTagged::initWithFrame(mtm.alloc(), bounds, NS_VIEW_TAG_GLASS_VIEW);
+    let glass_view = unsafe {
+        NSGlassEffectViewTagged::initWithFrame(mtm.alloc(), bounds, NS_VIEW_TAG_GLASS_VIEW)
+    };
 
     glass_view.setStyle(style);
     glass_view.setCornerRadius(radius);
@@ -143,8 +139,7 @@ pub unsafe fn apply_liquid_glass(
     Ok(())
 }
 
-pub unsafe fn clear_liquid_glass(ns_view: NonNull<c_void>) -> Result<bool, Error> {
-    let view: &NSView = unsafe { ns_view.cast().as_ref() };
+pub fn clear_liquid_glass(view: &NSView) -> Result<bool, Error> {
     let glass_view = view.viewWithTag(NS_VIEW_TAG_GLASS_VIEW);
 
     if let Some(glass_view) = glass_view {
@@ -172,11 +167,11 @@ unsafe fn apply_corner_radius_layer(view: &NSView, radius: f64) {
 
 fn move_primary_content_view(
     container: &NSView,
-    content_view: Option<NonNull<NSView>>,
+    content_view: Option<&NSView>,
     glass: &NSGlassEffectView,
     radius: f64,
 ) {
-    let Some(content_ptr) = content_view else {
+    let Some(content) = content_view else {
         return;
     };
 
@@ -189,8 +184,6 @@ fn move_primary_content_view(
     if radius > 0.0 {
         unsafe { apply_corner_radius_layer(target_view, radius) };
     }
-
-    let content = unsafe { content_ptr.as_ref() };
 
     content.removeFromSuperview();
     target_view.addSubview(content);
@@ -206,7 +199,7 @@ fn move_primary_content_view(
         objc_setAssociatedObject(
             container as *const _ as *mut AnyObject,
             key,
-            content_ptr.as_ptr() as *mut AnyObject,
+            content as *const _ as *mut AnyObject,
             OBJC_ASSOCIATION_ASSIGN,
         );
     }

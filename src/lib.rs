@@ -265,13 +265,15 @@ pub fn clear_vibrancy(window: impl raw_window_handle::HasWindowHandle) -> Result
 #[cfg(target_os = "macos")]
 pub fn apply_liquid_glass(
     window: impl raw_window_handle::HasWindowHandle,
-    #[allow(unused)] options: LiquidGlassOptions,
+    #[allow(unused)] options: LiquidGlassOptions<'_>,
 ) -> Result<(), Error> {
     match window.window_handle()?.as_raw() {
         #[cfg(target_os = "macos")]
-        raw_window_handle::RawWindowHandle::AppKit(handle) => unsafe {
-            macos::apply_liquid_glass(handle.ns_view, options)
-        },
+        raw_window_handle::RawWindowHandle::AppKit(handle) => {
+            use objc2_app_kit::NSView;
+            let view = unsafe { handle.ns_view.cast::<NSView>().as_ref() };
+            macos::apply_liquid_glass(view, options)
+        }
         _ => Err(Error::UnsupportedPlatform(
             "\"apply_liquid_glass()\" is only supported on macOS.",
         )),
@@ -292,9 +294,11 @@ pub fn apply_liquid_glass(
 pub fn clear_liquid_glass(window: impl raw_window_handle::HasWindowHandle) -> Result<bool, Error> {
     match window.window_handle()?.as_raw() {
         #[cfg(target_os = "macos")]
-        raw_window_handle::RawWindowHandle::AppKit(handle) => unsafe {
-            macos::clear_liquid_glass(handle.ns_view)
-        },
+        raw_window_handle::RawWindowHandle::AppKit(handle) => {
+            use objc2_app_kit::NSView;
+            let view = unsafe { handle.ns_view.cast::<NSView>().as_ref() };
+            macos::clear_liquid_glass(view)
+        }
         _ => Err(Error::UnsupportedPlatform(
             "\"clear_liquid_glass()\" is only supported on macOS.",
         )),
