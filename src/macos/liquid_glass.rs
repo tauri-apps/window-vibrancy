@@ -158,10 +158,19 @@ pub fn clear_liquid_glass(view: &NSView) -> Result<bool, Error> {
 }
 
 unsafe fn apply_corner_radius_layer(view: &NSView, radius: f64) {
-    view.setWantsLayer(true);
+    if view.layer().is_none() {
+        view.setWantsLayer(true);
+    }
+
     if let Some(layer) = view.layer() {
-        layer.setCornerRadius(radius);
-        layer.setMasksToBounds(true);
+        let current_radius = layer.cornerRadius();
+        if (current_radius - radius).abs() > 0.001 {
+            layer.setCornerRadius(radius);
+        }
+
+        if !layer.masksToBounds() {
+            layer.setMasksToBounds(true);
+        }
     }
 }
 
