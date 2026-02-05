@@ -108,15 +108,14 @@ pub fn clear_acrylic(hwnd: HWND) -> Result<(), Error> {
 }
 
 pub fn apply_mica(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
-    if let Some(dark) = dark {
-        unsafe {
-            DwmSetWindowAttribute(
-                hwnd,
-                DWMWA_USE_IMMERSIVE_DARK_MODE as _,
-                &(dark as u32) as *const _ as _,
-                4,
-            );
-        }
+    let dark = dark.unwrap_or(false);
+    unsafe {
+        DwmSetWindowAttribute(
+            hwnd,
+            DWMWA_USE_IMMERSIVE_DARK_MODE as _,
+            &(dark as u32) as *const _ as _,
+            4,
+        );
     }
 
     if is_backdroptype_supported() {
@@ -141,6 +140,15 @@ pub fn apply_mica(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
 }
 
 pub fn clear_mica(hwnd: HWND) -> Result<(), Error> {
+    unsafe {
+        DwmSetWindowAttribute(
+            hwnd,
+            DWMWA_USE_IMMERSIVE_DARK_MODE as _,
+            &(false as u32) as *const _ as _,
+            4,
+        );
+    }
+
     if is_backdroptype_supported() {
         unsafe {
             DwmSetWindowAttribute(
@@ -163,15 +171,14 @@ pub fn clear_mica(hwnd: HWND) -> Result<(), Error> {
 }
 
 pub fn apply_tabbed(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
-    if let Some(dark) = dark {
-        unsafe {
-            DwmSetWindowAttribute(
-                hwnd,
-                DWMWA_USE_IMMERSIVE_DARK_MODE as _,
-                &(dark as u32) as *const _ as _,
-                4,
-            );
-        }
+    let dark = dark.unwrap_or(false);
+    unsafe {
+        DwmSetWindowAttribute(
+            hwnd,
+            DWMWA_USE_IMMERSIVE_DARK_MODE as _,
+            &(dark as u32) as *const _ as _,
+            4,
+        );
     }
 
     if is_backdroptype_supported() {
