@@ -150,7 +150,6 @@ pub fn apply_mica(
     }
 }
 
-
 /// Clears mica effect applied to window. Works only on Windows 11.
 ///
 /// ## Platform-specific
