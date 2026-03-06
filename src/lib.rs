@@ -23,6 +23,9 @@
 
 #![allow(clippy::deprecated_semver)]
 
+#[cfg(target_os = "windows")]
+use windows_sys::core::HRESULT;
+
 mod macos;
 mod windows;
 
@@ -315,6 +318,11 @@ pub enum Error {
     UnsupportedPlatformVersion(&'static str),
     NotMainThread(&'static str),
     NoWindowHandle(raw_window_handle::HandleError),
+    #[cfg(target_os = "windows")]
+    Win32Error {
+        api: &'static str,
+        result: HRESULT,
+    },
 }
 
 impl std::fmt::Display for Error {
@@ -327,6 +335,14 @@ impl std::fmt::Display for Error {
             }
             Error::NoWindowHandle(e) => {
                 write!(f, "{}", e)
+            }
+            #[cfg(target_os = "windows")]
+            Error::Win32Error { api, result } => {
+                write!(
+                    f,
+                    "Win32 API {api}() returned the error result 0x{:x}.",
+                    result,
+                )
             }
         }
     }

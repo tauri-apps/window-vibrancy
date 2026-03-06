@@ -62,12 +62,11 @@ pub fn clear_blur(hwnd: HWND) -> Result<(), Error> {
 pub fn apply_acrylic(hwnd: HWND, color: Option<Color>) -> Result<(), Error> {
     if is_backdroptype_supported() {
         unsafe {
-            DwmSetWindowAttribute(
+            set_window_attribute(
                 hwnd,
                 DWMWA_SYSTEMBACKDROP_TYPE as _,
-                &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TRANSIENTWINDOW as *const _ as _,
-                4,
-            );
+                &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TRANSIENTWINDOW,
+            )?;
         }
     } else if is_swca_supported() {
         unsafe {
@@ -88,12 +87,11 @@ pub fn apply_acrylic(hwnd: HWND, color: Option<Color>) -> Result<(), Error> {
 pub fn clear_acrylic(hwnd: HWND) -> Result<(), Error> {
     if is_backdroptype_supported() {
         unsafe {
-            DwmSetWindowAttribute(
+            set_window_attribute(
                 hwnd,
                 DWMWA_SYSTEMBACKDROP_TYPE as _,
-                &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE as *const _ as _,
-                4,
-            );
+                &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE,
+            )?;
         }
     } else if is_swca_supported() {
         unsafe {
@@ -110,27 +108,21 @@ pub fn clear_acrylic(hwnd: HWND) -> Result<(), Error> {
 pub fn apply_mica(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
     if let Some(dark) = dark {
         unsafe {
-            DwmSetWindowAttribute(
-                hwnd,
-                DWMWA_USE_IMMERSIVE_DARK_MODE as _,
-                &(dark as u32) as *const _ as _,
-                4,
-            );
+            set_window_attribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE as _, &(dark as u32))?;
         }
     }
 
     if is_backdroptype_supported() {
         unsafe {
-            DwmSetWindowAttribute(
+            set_window_attribute(
                 hwnd,
                 DWMWA_SYSTEMBACKDROP_TYPE as _,
-                &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_MAINWINDOW as *const _ as _,
-                4,
-            );
+                &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_MAINWINDOW,
+            )?;
         }
     } else if is_undocumented_mica_supported() {
         unsafe {
-            DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT as _, &1 as *const _ as _, 4);
+            set_window_attribute(hwnd, DWMWA_MICA_EFFECT as _, &1)?;
         }
     } else {
         return Err(Error::UnsupportedPlatformVersion(
@@ -143,16 +135,15 @@ pub fn apply_mica(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
 pub fn clear_mica(hwnd: HWND) -> Result<(), Error> {
     if is_backdroptype_supported() {
         unsafe {
-            DwmSetWindowAttribute(
+            set_window_attribute(
                 hwnd,
                 DWMWA_SYSTEMBACKDROP_TYPE as _,
-                &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE as *const _ as _,
-                4,
-            );
+                &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE,
+            )?;
         }
     } else if is_undocumented_mica_supported() {
         unsafe {
-            DwmSetWindowAttribute(hwnd, DWMWA_MICA_EFFECT as _, &0 as *const _ as _, 4);
+            set_window_attribute(hwnd, DWMWA_MICA_EFFECT as _, &0)?;
         }
     } else {
         return Err(Error::UnsupportedPlatformVersion(
@@ -165,23 +156,17 @@ pub fn clear_mica(hwnd: HWND) -> Result<(), Error> {
 pub fn apply_tabbed(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
     if let Some(dark) = dark {
         unsafe {
-            DwmSetWindowAttribute(
-                hwnd,
-                DWMWA_USE_IMMERSIVE_DARK_MODE as _,
-                &(dark as u32) as *const _ as _,
-                4,
-            );
+            set_window_attribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE as _, &(dark as u32))?;
         }
     }
 
-    if is_backdroptype_supported() {
+    if dbg!(is_backdroptype_supported()) {
         unsafe {
-            DwmSetWindowAttribute(
+            set_window_attribute(
                 hwnd,
                 DWMWA_SYSTEMBACKDROP_TYPE as _,
-                &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TABBEDWINDOW as *const _ as _,
-                4,
-            );
+                &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_TABBEDWINDOW,
+            )?;
         }
     } else {
         return Err(Error::UnsupportedPlatformVersion(
@@ -194,12 +179,11 @@ pub fn apply_tabbed(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
 pub fn clear_tabbed(hwnd: HWND) -> Result<(), Error> {
     if is_backdroptype_supported() {
         unsafe {
-            DwmSetWindowAttribute(
+            set_window_attribute(
                 hwnd,
                 DWMWA_SYSTEMBACKDROP_TYPE as _,
-                &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE as *const _ as _,
-                4,
-            );
+                &DWM_SYSTEMBACKDROP_TYPE::DWMSBT_DISABLE,
+            )?;
         }
     } else {
         return Err(Error::UnsupportedPlatformVersion(
@@ -288,6 +272,17 @@ unsafe fn SetWindowCompositionAttribute(
         };
 
         set_window_composition_attribute(hwnd, &mut data as *mut _ as _);
+    }
+}
+
+unsafe fn set_window_attribute<T>(hwnd: HWND, kind: u32, object: &T) -> Result<(), Error> {
+    let size = std::mem::size_of::<T>() as u32;
+    let result = unsafe { DwmSetWindowAttribute(hwnd, kind, object as *const _ as _, size) };
+    if result == S_OK {
+        Ok(())
+    } else {
+        let api = "DwmSetWindowAttribute";
+        Err(Error::Win32Error { api, result })
     }
 }
 
