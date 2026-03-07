@@ -62,7 +62,7 @@ pub fn clear_blur(hwnd: HWND) -> Result<(), Error> {
 pub fn apply_acrylic(hwnd: HWND, color: Option<Color>) -> Result<(), Error> {
     if is_backdroptype_supported() {
         unsafe {
-            set_window_attribute(
+            dwm_set_window_attribute(
                 hwnd,
                 DWMWA_SYSTEMBACKDROP_TYPE as _,
                 &DWMSBT_TRANSIENTWINDOW,
@@ -87,7 +87,7 @@ pub fn apply_acrylic(hwnd: HWND, color: Option<Color>) -> Result<(), Error> {
 pub fn clear_acrylic(hwnd: HWND) -> Result<(), Error> {
     if is_backdroptype_supported() {
         unsafe {
-            set_window_attribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE as _, &DWMSBT_NONE)?;
+            dwm_set_window_attribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE as _, &DWMSBT_NONE)?;
         }
     } else if is_swca_supported() {
         unsafe {
@@ -104,17 +104,17 @@ pub fn clear_acrylic(hwnd: HWND) -> Result<(), Error> {
 pub fn apply_mica(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
     if let Some(dark) = dark {
         unsafe {
-            set_window_attribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE as _, &(dark as u32))?;
+            dwm_set_window_attribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE as _, &(dark as u32))?;
         }
     }
 
     if is_backdroptype_supported() {
         unsafe {
-            set_window_attribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE as _, &DWMSBT_MAINWINDOW)?;
+            dwm_set_window_attribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE as _, &DWMSBT_MAINWINDOW)?;
         }
     } else if is_undocumented_mica_supported() {
         unsafe {
-            set_window_attribute(hwnd, DWMWA_MICA_EFFECT as _, &1)?;
+            dwm_set_window_attribute(hwnd, DWMWA_MICA_EFFECT as _, &1)?;
         }
     } else {
         return Err(Error::UnsupportedPlatformVersion(
@@ -127,11 +127,11 @@ pub fn apply_mica(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
 pub fn clear_mica(hwnd: HWND) -> Result<(), Error> {
     if is_backdroptype_supported() {
         unsafe {
-            set_window_attribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE as _, &DWMSBT_NONE)?;
+            dwm_set_window_attribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE as _, &DWMSBT_NONE)?;
         }
     } else if is_undocumented_mica_supported() {
         unsafe {
-            set_window_attribute(hwnd, DWMWA_MICA_EFFECT as _, &0)?;
+            dwm_set_window_attribute(hwnd, DWMWA_MICA_EFFECT as _, &0)?;
         }
     } else {
         return Err(Error::UnsupportedPlatformVersion(
@@ -144,13 +144,13 @@ pub fn clear_mica(hwnd: HWND) -> Result<(), Error> {
 pub fn apply_tabbed(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
     if let Some(dark) = dark {
         unsafe {
-            set_window_attribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE as _, &(dark as u32))?;
+            dwm_set_window_attribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE as _, &(dark as u32))?;
         }
     }
 
     if is_backdroptype_supported() {
         unsafe {
-            set_window_attribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE as _, &DWMSBT_TABBEDWINDOW)?;
+            dwm_set_window_attribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE as _, &DWMSBT_TABBEDWINDOW)?;
         }
     } else {
         return Err(Error::UnsupportedPlatformVersion(
@@ -163,7 +163,7 @@ pub fn apply_tabbed(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
 pub fn clear_tabbed(hwnd: HWND) -> Result<(), Error> {
     if is_backdroptype_supported() {
         unsafe {
-            set_window_attribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE as _, &DWMSBT_NONE)?;
+            dwm_set_window_attribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE as _, &DWMSBT_NONE)?;
         }
     } else {
         return Err(Error::UnsupportedPlatformVersion(
@@ -255,7 +255,7 @@ unsafe fn SetWindowCompositionAttribute(
     }
 }
 
-unsafe fn set_window_attribute<T>(hwnd: HWND, kind: u32, object: &T) -> Result<(), Error> {
+unsafe fn dwm_set_window_attribute<T>(hwnd: HWND, kind: u32, object: &T) -> Result<(), Error> {
     let size = std::mem::size_of::<T>() as u32;
     let result = unsafe { DwmSetWindowAttribute(hwnd, kind, object as *const _ as _, size) };
     if result == S_OK {
