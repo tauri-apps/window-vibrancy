@@ -148,7 +148,7 @@ pub fn apply_tabbed(hwnd: HWND, dark: Option<bool>) -> Result<(), Error> {
         }
     }
 
-    if dbg!(is_backdroptype_supported()) {
+    if is_backdroptype_supported() {
         unsafe {
             set_window_attribute(hwnd, DWMWA_SYSTEMBACKDROP_TYPE as _, &DWMSBT_TABBEDWINDOW)?;
         }
