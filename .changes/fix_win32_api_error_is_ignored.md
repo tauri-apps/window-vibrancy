@@ -2,4 +2,4 @@
 "window-vibrancy": patch
 ---
 
-Fix errors returned from `DwmSetWindowAttribute()` are ignored.
+propagate errors from `DwmSetWindowAttribute()` instead of ignoring it.
