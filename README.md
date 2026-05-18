@@ -10,7 +10,7 @@ Make your windows vibrant.
 
 ## Platform-specific
 
-- **Linux**: Unsupported, Blur and any vibrancy effects are controlled by the compositor installed on the end-user system.
+- **Linux**: Blur is supported on Wayland when the compositor exposes `ext-background-effect-v1` with the blur capability.
 
 ## Example
 
@@ -38,7 +38,7 @@ For a more complete example of usage with [tauri](https://tauri.app/), see [`exa
 
 | Function                          |     Supported platforms      | Notes                                                                                              |
 |:----------------------------------|:----------------------------:|:---------------------------------------------------------------------------------------------------|
-| `apply_blur`&`clear_blur`         | Windows  7/10/11 (22H1 only) | Bad performance when resizing/dragging the window on Windows 11 build 22621+.                      |
+| `apply_blur`&`clear_blur`         | Windows 7/10/11 (22H1 only), Linux Wayland with `ext-background-effect-v1` blur | Bad performance when resizing/dragging the window on Windows 11 build 22621+. On Linux Wayland, returns unsupported when the compositor does not advertise blur support. |
 | `apply_acrylic`&`clear_acrylic`   |        Windows 10/11         | Bad performance when resizing/dragging the window on Windows 10 v1903+ and Windows 11 build 22000. |
 | `apply_mica`&`clear_mica`         |          Windows 11          |                                                                                                    |
 | `apply_vibrancy`&`clear_vibrancy` |    macOS 10.10 and newer     |                                                                                                    |

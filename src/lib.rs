@@ -6,7 +6,7 @@
 //!
 //! ## Platform-specific
 //!
-//! - **Linux**: Unsupported, Blur and any vibrancy effects are controlled by the compositor installed on the end-user system.
+//! - **Linux**: Blur is supported on Wayland when the compositor exposes `ext-background-effect-v1` with the blur capability.
 //!
 //! # Example
 //!
@@ -29,6 +29,9 @@ use windows_sys::core::HRESULT;
 mod macos;
 mod windows;
 
+#[cfg(target_os = "linux")]
+mod linux;
+
 pub use macos::{NSGlassEffectViewStyle, NSVisualEffectMaterial, NSVisualEffectState};
 
 #[cfg(target_os = "macos")]
@@ -37,7 +40,7 @@ pub use macos::{NSGlassEffectViewTagged, NSVisualEffectViewTagged};
 /// a tuple of RGBA colors. Each value has minimum of 0 and maximum of 255.
 pub type Color = (u8, u8, u8, u8);
 
-/// Applies blur effect to window. Works only on Windows 7, Windows 10 v1809 or newer.
+/// Applies blur effect to window. Works on Windows 7, Windows 10 v1809 or newer, and supported Linux Wayland compositors.
 ///
 /// ## WARNING:
 ///
@@ -49,7 +52,9 @@ pub type Color = (u8, u8, u8, u8);
 /// ## Platform-specific
 ///
 /// - **Windows**: *`color`* is ignored on Windows 7 and has no effect.
-/// - **Linux / macOS**: Unsupported.
+/// - **Linux**: *`color`* is ignored. Only Wayland compositors that expose `ext-background-effect-v1` with the blur capability are supported.
+/// - **macOS**: Unsupported.
+#[cfg(not(target_os = "linux"))]
 pub fn apply_blur(
     window: impl raw_window_handle::HasWindowHandle,
     #[allow(unused)] color: Option<Color>,
@@ -65,19 +70,43 @@ pub fn apply_blur(
     }
 }
 
-/// Clears blur effect applied to window. Works only on Windows 7, Windows 10 v1809 or newer.
+/// Applies blur effect to window. Works on Windows 7, Windows 10 v1809 or newer, and supported Linux Wayland compositors.
 ///
 /// ## Platform-specific
 ///
-/// - **Linux / macOS**: Unsupported.
+/// - **Linux**: *`color`* is ignored. Only Wayland compositors that expose `ext-background-effect-v1` with the blur capability are supported.
+/// - **macOS**: Unsupported.
+#[cfg(target_os = "linux")]
+pub fn apply_blur(
+    window: impl raw_window_handle::HasWindowHandle + raw_window_handle::HasDisplayHandle,
+    #[allow(unused)] color: Option<Color>,
+) -> Result<(), Error> {
+    match (window.display_handle()?.as_raw(), window.window_handle()?.as_raw()) {
+        (
+            raw_window_handle::RawDisplayHandle::Wayland(display),
+            raw_window_handle::RawWindowHandle::Wayland(handle),
+        ) => linux::apply_blur(display, handle),
+        _ => Err(Error::UnsupportedPlatform(
+            "\"apply_blur()\" is only supported on Wayland compositors with ext-background-effect-v1 blur support.",
+        )),
+    }
+}
+
+/// Clears blur effect applied to window. Works on Windows 7, Windows 10 v1809 or newer, and supported Linux Wayland compositors.
+///
+/// ## Platform-specific
+///
+/// - **macOS**: Unsupported.
 pub fn clear_blur(window: impl raw_window_handle::HasWindowHandle) -> Result<(), Error> {
     match window.window_handle()?.as_raw() {
         #[cfg(target_os = "windows")]
         raw_window_handle::RawWindowHandle::Win32(handle) => {
             windows::clear_blur(handle.hwnd.get() as _)
         }
+        #[cfg(target_os = "linux")]
+        raw_window_handle::RawWindowHandle::Wayland(handle) => linux::clear_blur(handle),
         _ => Err(Error::UnsupportedPlatform(
-            "\"clear_blur()\" is only supported on Windows.",
+            "\"clear_blur()\" is only supported on Windows and Wayland.",
         )),
     }
 }

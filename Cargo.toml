@@ -14,7 +14,11 @@ categories = ["gui"]
 
 [package.metadata.docs.rs]
 default-target = "x86_64-pc-windows-msvc"
-targets = ["x86_64-apple-darwin", "x86_64-pc-windows-msvc"]
+targets = [
+  "x86_64-apple-darwin",
+  "x86_64-pc-windows-msvc",
+  "x86_64-unknown-linux-gnu",
+]
 
 [dependencies]
 raw-window-handle = "0.6"
@@ -59,3 +63,8 @@ objc2-foundation = { version = "0.3", default-features = false, features = [
 objc2-core-foundation = { version = "0.3", default-features = false, features = [
   "std",
 ] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+wayland-client = "0.31.14"
+wayland-protocols = { version = "0.32.12", features = ["client", "staging"] }
+wayland-sys = { version = "0.31.11", features = ["client", "dlopen"] }
