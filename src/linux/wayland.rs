@@ -67,7 +67,8 @@ pub(super) unsafe fn clear_blur(surface: *mut wl_proxy) -> Result<(), Error> {
     ffi::ensure_wayland_client()?;
 
     let _operation = ffi::lock(operations());
-    let effect = ffi::lock(effects()).remove(&(surface as usize));
+    let surface_key = unsafe { SurfaceKey::new(surface) };
+    let effect = ffi::lock(effects()).remove(&surface_key);
     let Some(effect) = effect else {
         return Ok(());
     };
@@ -90,7 +91,8 @@ unsafe fn ensure_effect(
     manager: *mut wl_proxy,
 ) -> Result<*mut wl_proxy, Error> {
     let mut effects = ffi::lock(effects());
-    if let Some(effect) = effects.get(&(surface as usize)) {
+    let surface_key = unsafe { SurfaceKey::new(surface) };
+    if let Some(effect) = effects.get(&surface_key) {
         return Ok(effect.effect as *mut wl_proxy);
     }
 
@@ -117,7 +119,7 @@ unsafe fn ensure_effect(
     }
 
     effects.insert(
-        surface as usize,
+        surface_key,
         EffectState {
             display: display as usize,
             effect: effect as usize,
@@ -188,8 +190,23 @@ struct EffectState {
     effect: usize,
 }
 
-fn effects() -> &'static Mutex<HashMap<usize, EffectState>> {
-    static EFFECTS: OnceLock<Mutex<HashMap<usize, EffectState>>> = OnceLock::new();
+#[derive(Clone, Copy, Hash, PartialEq, Eq)]
+struct SurfaceKey {
+    ptr: usize,
+    id: u32,
+}
+
+impl SurfaceKey {
+    unsafe fn new(surface: *mut wl_proxy) -> Self {
+        Self {
+            ptr: surface as usize,
+            id: unsafe { ffi::proxy_id(surface) },
+        }
+    }
+}
+
+fn effects() -> &'static Mutex<HashMap<SurfaceKey, EffectState>> {
+    static EFFECTS: OnceLock<Mutex<HashMap<SurfaceKey, EffectState>>> = OnceLock::new();
     EFFECTS.get_or_init(|| Mutex::new(HashMap::new()))
 }
 

@@ -96,6 +96,10 @@ pub(super) unsafe fn roundtrip_queue(
     Ok(())
 }
 
+pub(super) unsafe fn proxy_id(proxy: *mut wl_proxy) -> u32 {
+    unsafe { wayland_sys::ffi_dispatch!(client::wayland_client_handle(), wl_proxy_get_id, proxy) }
+}
+
 pub(super) fn c_interface(interface: &'static Interface) -> *const wl_interface {
     interface
         .c_ptr
