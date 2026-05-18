@@ -5,7 +5,6 @@
 use std::{
     collections::HashMap,
     ffi::c_void,
-    ptr,
     sync::{Mutex, OnceLock},
 };
 
@@ -95,9 +94,12 @@ unsafe fn ensure_effect(
         return Ok(effect.effect as *mut wl_proxy);
     }
 
-    let mut args = [wl_argument {
-        o: surface.cast::<c_void>(),
-    }];
+    let mut args = [
+        wl_argument { n: 0 },
+        wl_argument {
+            o: surface.cast::<c_void>(),
+        },
+    ];
     let effect = unsafe {
         wayland_sys::ffi_dispatch!(
             client::wayland_client_handle(),
@@ -130,12 +132,13 @@ unsafe fn set_full_blur_region(
     effect: *mut wl_proxy,
 ) -> Result<(), Error> {
     let region = unsafe {
+        let mut args = [wl_argument { n: 0 }];
         wayland_sys::ffi_dispatch!(
             client::wayland_client_handle(),
             wl_proxy_marshal_array_constructor,
             compositor,
             wl_compositor::REQ_CREATE_REGION_OPCODE.into(),
-            ptr::null_mut(),
+            args.as_mut_ptr(),
             ffi::c_interface(wl_region::WlRegion::interface())
         )
     };

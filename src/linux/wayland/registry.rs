@@ -5,7 +5,6 @@
 use std::{
     collections::HashMap,
     ffi::{c_char, c_void, CStr},
-    ptr,
     sync::{Mutex, OnceLock},
 };
 
@@ -79,12 +78,13 @@ impl DisplayState {
         }
 
         let registry = unsafe {
+            let mut args = [wl_argument { n: 0 }];
             wayland_sys::ffi_dispatch!(
                 client::wayland_client_handle(),
                 wl_proxy_marshal_array_constructor,
                 display_wrapper,
                 wl_display_proto::REQ_GET_REGISTRY_OPCODE.into(),
-                ptr::null_mut(),
+                args.as_mut_ptr(),
                 ffi::c_interface(wl_registry::WlRegistry::interface())
             )
         };
@@ -431,6 +431,7 @@ unsafe fn bind_global(
                 s: (*interface).name,
             },
             wl_argument { u: version },
+            wl_argument { n: 0 },
         ]
     };
 
