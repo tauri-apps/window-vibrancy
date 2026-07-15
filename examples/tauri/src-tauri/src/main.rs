@@ -7,9 +7,6 @@
     windows_subsystem = "windows"
 )]
 
-#[cfg(target_os = "macos")]
-mod webview;
-
 use tauri::Manager;
 use window_vibrancy::*;
 
@@ -19,32 +16,21 @@ fn main() {
             let window = app.get_webview_window("main").unwrap();
 
             #[cfg(target_os = "macos")]
-            {
-                use webview::{find_webview_recursive, get_nsview_from_window};
-                use objc2_app_kit::NSView;
+            let window_ = window.clone();
 
-                let nsview_ptr = get_nsview_from_window(&window);
-                let webview = if !nsview_ptr.is_null() {
-                    unsafe {
-                        let nsview = &*(nsview_ptr as *const NSView);
-                        find_webview_recursive(nsview)
-                    }
-                } else {
-                    None
-                };
+            #[cfg(target_os = "macos")]
+            window.with_webview(move |webview| {
+                use objc2_web_kit::WKWebView;
+                let webview: &WKWebView = unsafe {&*webview.inner().cast()};
 
-                let mut options = LiquidGlassOptions::new(NSGlassEffectViewStyle::Clear)
+                let mut options = LiquidGlassOptions::new(NSGlassEffectViewStyle::Sidebar)
                     .radius(26.0)
-                    .opaque(false);
+                    .opaque(true)
+                    .content_view(webview);
 
-                if let Some(webview) = webview {
-                    let webview_ref = unsafe { webview.as_ref() };
-                    options = options.content_view(webview_ref);
-                }
-
-                apply_liquid_glass(&window, options)
+                apply_liquid_glass(&window_, options)
                     .expect("Unsupported platform! 'apply_liquid_glass' is only supported on macOS 26+");
-            }
+            });
 
             #[cfg(target_os = "windows")]
             apply_blur(&window, Some((18, 18, 18, 125)))
