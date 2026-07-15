@@ -142,7 +142,7 @@ pub use ns_visual_effect_view_tagged::NSVisualEffectViewTagged;
 mod liquid_glass;
 
 #[cfg(target_os = "macos")]
-pub use liquid_glass::{apply_liquid_glass, clear_liquid_glass};
+pub use liquid_glass::{apply_liquid_glass, clear_liquid_glass, LiquidGlassOptions};
 
 #[cfg(target_os = "macos")]
 mod ns_glass_effect_view_tagged;

@@ -22,7 +22,6 @@ define_class!(
     /// A custom NSVisualEffectView subclass
     /// that overrides the tag method to provide a custom tag, to later identify the view
     #[unsafe(super(NSVisualEffectView))]
-    #[name = "NSVisualEffectViewTagged"]
     #[ivars = NSVisualEffectViewTaggedIvars]
     pub struct NSVisualEffectViewTagged;
 

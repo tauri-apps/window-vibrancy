@@ -16,12 +16,21 @@ fn main() {
             let window = app.get_webview_window("main").unwrap();
 
             #[cfg(target_os = "macos")]
-            {
-                apply_liquid_glass(&window, NSGlassEffectViewStyle::Clear, None, Some(26.0))
-                    .expect(
-                        "Unsupported platform! 'apply_liquid_glass' is only supported on macOS 26+",
-                    );
-            }
+            let window_ = window.clone();
+
+            #[cfg(target_os = "macos")]
+            window.with_webview(move |webview| {
+                use objc2_web_kit::WKWebView;
+                let webview: &WKWebView = unsafe {&*webview.inner().cast()};
+
+                let mut options = LiquidGlassOptions::new(NSGlassEffectViewStyle::Sidebar)
+                    .radius(26.0)
+                    .opaque(true)
+                    .content_view(webview);
+
+                apply_liquid_glass(&window_, options)
+                    .expect("Unsupported platform! 'apply_liquid_glass' is only supported on macOS 26+");
+            });
 
             #[cfg(target_os = "windows")]
             apply_blur(&window, Some((18, 18, 18, 125)))
