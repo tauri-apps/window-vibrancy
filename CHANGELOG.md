@@ -1,5 +1,10 @@
 # Changelog
 
+## \[0.8.0]
+
+- [`a3a3ff3`](https://github.com/tauri-apps/window-vibrancy/commit/a3a3ff347ef50d7c327e32ccf52df23e85460f91) ([#205](https://github.com/tauri-apps/window-vibrancy/pull/205) by [@rhysd](https://github.com/tauri-apps/window-vibrancy/../../rhysd)) propagate errors from `DwmSetWindowAttribute()` instead of ignoring it.
+- [`4b0899a`](https://github.com/tauri-apps/window-vibrancy/commit/4b0899a7b9a9cf9285e8d03362ae275b573d7570) ([#199](https://github.com/tauri-apps/window-vibrancy/pull/199) by [@ahonn](https://github.com/tauri-apps/window-vibrancy/../../ahonn)) Changed the `apply_liquid_glass` API to use a `LiquidGlassOptions` struct configured via the Builder pattern. Added `content_view` and `opaque` settings.
+
 ## \[0.7.1]
 
 ### bug
