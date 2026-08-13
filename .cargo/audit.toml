@@ -1,0 +1,7 @@
+[advisories]
+ignore = [
+    # quick-xml, pulled in by dev-dependency wayland-scanner > winit
+    "RUSTSEC-2026-0194",
+    # quick-xml, pulled in by dev-dependency wayland-scanner > winit
+    "RUSTSEC-2026-0195",
+]
