@@ -10,8 +10,7 @@ Use the following format:
 
 ```md
 ---
-"package-a": patch
-"package-b": minor
+"window-vibrancy": patch
 ---
 
 Change summary goes here
