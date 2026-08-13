@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.8.1]
+
+- [`e9f765a`](https://github.com/tauri-apps/window-vibrancy/commit/e9f765a4c5a291d8eb636ffabf638b39d9783ebe) ([#181](https://github.com/tauri-apps/window-vibrancy/pull/181) by [@renovate](https://github.com/tauri-apps/window-vibrancy/../../renovate)) Relaxed `windows-sys` dependency to `>=0.60, <=0.61` instead of `0.60`
+
 ## \[0.8.0]
 
 - [`a3a3ff3`](https://github.com/tauri-apps/window-vibrancy/commit/a3a3ff347ef50d7c327e32ccf52df23e85460f91) ([#205](https://github.com/tauri-apps/window-vibrancy/pull/205) by [@rhysd](https://github.com/tauri-apps/window-vibrancy/../../rhysd)) propagate errors from `DwmSetWindowAttribute()` instead of ignoring it.
