@@ -23,9 +23,10 @@ fn main() {
                 use objc2_web_kit::WKWebView;
                 let webview: &WKWebView = unsafe {&*webview.inner().cast()};
 
-                let mut options = LiquidGlassOptions::new(NSGlassEffectViewStyle::Sidebar)
+                let options = LiquidGlassOptions::new(NSGlassEffectViewStyle::Sidebar)
                     .radius(26.0)
                     .opaque(true)
+                    .interactive(true)
                     .content_view(webview);
 
                 apply_liquid_glass(&window_, options)

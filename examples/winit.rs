@@ -39,7 +39,9 @@ impl ApplicationHandler for App {
 
         #[cfg(target_os = "macos")]
         {
-            let options = LiquidGlassOptions::new(NSGlassEffectViewStyle::Clear).radius(26.0);
+            let options = LiquidGlassOptions::new(NSGlassEffectViewStyle::Clear)
+                .radius(26.0)
+                .interactive(true);
 
             apply_liquid_glass(&window, options).expect(
                 "Unsupported platform! 'apply_liquid_glass' is only supported on macOS 26+",

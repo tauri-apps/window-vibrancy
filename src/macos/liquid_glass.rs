@@ -32,6 +32,7 @@ pub struct LiquidGlassOptions<'a> {
     pub(crate) tint_color: Option<crate::Color>,
     pub(crate) radius: Option<f64>,
     pub(crate) opaque: Option<bool>,
+    pub(crate) interactive: Option<bool>,
     pub(crate) content_view: Option<&'a NSView>,
 }
 
@@ -42,6 +43,7 @@ impl<'a> LiquidGlassOptions<'a> {
             tint_color: None,
             radius: None,
             opaque: None,
+            interactive: None,
             content_view: None,
         }
     }
@@ -58,6 +60,23 @@ impl<'a> LiquidGlassOptions<'a> {
 
     pub fn opaque(mut self, opaque: bool) -> Self {
         self.opaque = Some(opaque);
+        self
+    }
+
+    /// Enables interactive glass behavior, which adds a visual response to user interactions.
+    ///
+    /// This should be enabled for glass that is used as the background for interactive controls
+    /// or when used as the container of interactive controls.
+    ///
+    /// Maps to [`NSGlassEffectView.effectIsInteractive`](https://developer.apple.com/documentation/appkit/nsglasseffectview/effectisinteractive).
+    /// Defaults to `false`.
+    ///
+    /// ## Platform-specific
+    ///
+    /// - **macOS**: Only available on macOS 27.0 or newer. On macOS 26 this option is ignored
+    ///   and the glass effect is still applied.
+    pub fn interactive(mut self, interactive: bool) -> Self {
+        self.interactive = Some(interactive);
         self
     }
 
@@ -116,6 +135,10 @@ pub fn apply_liquid_glass(view: &NSView, options: LiquidGlassOptions<'_>) -> Res
     glass_view.setStyle(style);
     glass_view.setCornerRadius(radius);
     glass_view.setTintColor(tint_color.as_deref());
+    if let Some(interactive) = options.interactive {
+        // no-op on macOS 26 and under, where the property does not exist
+        glass_view.setEffectIsInteractive(interactive);
+    }
     glass_view.setAutoresizingMask(
         NSAutoresizingMaskOptions::ViewWidthSizable | NSAutoresizingMaskOptions::ViewHeightSizable,
     );

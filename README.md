@@ -37,12 +37,16 @@ use window_vibrancy::{apply_liquid_glass, LiquidGlassOptions, NSGlassEffectViewS
 {
     let options = LiquidGlassOptions::new(NSGlassEffectViewStyle::Clear)
         .radius(26.0)
-        .opaque(false);
+        .opaque(false)
+        // macOS 27+ only, ignored on macOS 26
+        .interactive(true);
 
     apply_liquid_glass(&window, options)
         .expect("Unsupported platform! 'apply_liquid_glass' is only supported on macOS 26+");
 }
 ```
+
+The `.interactive(true)` option enables the glass' visual response to user interactions (`NSGlassEffectView.effectIsInteractive`). It requires macOS 27 or newer and is silently ignored on macOS 26 and older.
 
 **Advanced Usage with WebView:**
 
@@ -85,7 +89,7 @@ For a more complete example of usage with [tauri](https://tauri.app/), see [`exa
 | `apply_acrylic`&`clear_acrylic`           |        Windows 10/11         | Bad performance when resizing/dragging the window on Windows 10 v1903+ and Windows 11 build 22000. |
 | `apply_mica`&`clear_mica`                 |          Windows 11          |                                                                                                    |
 | `apply_vibrancy`&`clear_vibrancy`         |    macOS 10.10 and newer     |                                                                                                    |
-| `apply_liquid_glass`&`clear_liquid_glass` |      macOS 26 and newer      | Modern glass effect with customizable radius, tint color, and opacity options.                     |
+| `apply_liquid_glass`&`clear_liquid_glass` |      macOS 26 and newer      | Modern glass effect with customizable radius, tint color, opacity and interactive (macOS 27+) options. |
 
 ## Screenshots
 
