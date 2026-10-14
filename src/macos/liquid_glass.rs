@@ -134,6 +134,9 @@ pub fn apply_liquid_glass(view: &NSView, options: LiquidGlassOptions<'_>) -> Res
 
     glass_view.setStyle(style);
     glass_view.setCornerRadius(radius);
+    // Without clipping, the glass draws square corners wherever no window frame clips it
+    // (undecorated windows). Apple pairs `cornerRadius` with `clipsToBounds`.
+    glass_view.setClipsToBounds(radius > 0.0);
     glass_view.setTintColor(tint_color.as_deref());
     if let Some(interactive) = options.interactive {
         // no-op on macOS 26 and under, where the property does not exist
