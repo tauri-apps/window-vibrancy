@@ -11,7 +11,7 @@ repository = "https://github.com/tauri-apps/tauri-plugin-vibrancy"
 documentation = "https://docs.rs/tauri-plugin-vibrancy"
 keywords = ["vibrancy", "acrylic", "mica", "blur", "windowing"]
 categories = ["gui"]
-include = ["Cargo.toml", "Cargo.lock", "/src/**/*.rs", "README.md", "CHANGELOG.md", "LICENSE-APACHE", "LICENSE-MIT", "LICENSE.spdx"] 
+include = ["src/**/*.rs", "README.md", "CHANGELOG.md", "LICENSE*"] 
 
 [package.metadata.docs.rs]
 default-target = "x86_64-pc-windows-msvc"
