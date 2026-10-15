@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.8.2]
+
+- [`d4c1b54`](https://github.com/tauri-apps/window-vibrancy/commit/d4c1b5494c5224002826e7755953fc4b461e1024) ([#231](https://github.com/tauri-apps/window-vibrancy/pull/231) by [@oguzyilmaznet](https://github.com/tauri-apps/window-vibrancy/../../oguzyilmaznet)) On macOS, `apply_liquid_glass` now clips the glass view to its corner radius (`clipsToBounds`), so undecorated windows no longer show square corners outside the rounded glass.
+
 ## [0.8.1]
 
 - [`cf3390e`](https://github.com/tauri-apps/window-vibrancy/commit/cf3390eb7a0977aa2a1bcfbfeff88cc60d1e2cb7) Added the `LiquidGlassOptions::interactive` option, which sets `NSGlassEffectView.effectIsInteractive` (macOS 27.0+) to enable the glass' visual response to user interactions. Also added `effectIsInteractive`, `setEffectIsInteractive` and `supportsEffectIsInteractive` methods to `NSGlassEffectViewTagged`.
