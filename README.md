@@ -97,6 +97,6 @@ For a more complete example of usage with [tauri](https://tauri.app/), see [`exa
 
 | apply_blur | apply_acrylic | apply_mica | apply_vibrancy |
 | :---:      | :---:         | :---:      | :---:          |
-| ![apply_blur screenshot](./screenshots/apply_blur.png) | ![apply_blur screenshot](./screenshots/apply_acrylic.png) | ![apply_mica screenshot](./screenshots/apply_mica.png) | ![apply_vibrancy screenshot](./screenshots/apply_vibrancy.png) |
+| ![apply_blur screenshot](https://github.com/tauri-apps/window-vibrancy/blob/dev/screenshots/apply_blur.png?raw=true) | ![apply_blur screenshot](https://github.com/tauri-apps/window-vibrancy/blob/dev/screenshots/apply_acrylic.png?raw=true) | ![apply_mica screenshot](https://github.com/tauri-apps/window-vibrancy/blob/dev/screenshots/apply_mica.png?raw=true) | ![apply_vibrancy screenshot](https://github.com/tauri-apps/window-vibrancy/blob/dev/screenshots/apply_vibrancy.png?raw=true) |
 
 </p>
