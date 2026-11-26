@@ -24,6 +24,10 @@ raw-window-handle = "0.6"
 tao = "0.34"
 winit = "0.30"
 
+[target.'cfg(target_os = "linux")'.dependencies]
+wayland-client = { version = "0.31.15", features = ["system", "dlopen"] }
+wayland-protocols = { version = "0.32.12", features = ["client", "staging"] }
+
 [target.'cfg(target_os = "windows")'.dependencies]
 windows-version = "0.1"
 
