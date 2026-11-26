@@ -10,7 +10,6 @@ fn main() {
         event_loop::{ControlFlow, EventLoop},
         window::WindowBuilder,
     };
-    #[cfg(any(target_os = "windows", target_os = "macos"))]
     use window_vibrancy::*;
 
     let event_loop = EventLoop::new();
@@ -28,6 +27,10 @@ fn main() {
     #[cfg(target_os = "windows")]
     apply_acrylic(&window, None)
         .expect("Unsupported platform! 'apply_blur' is only supported on Windows");
+
+    #[cfg(target_os = "linux")]
+    apply_wayland_blur(&window, None)
+        .expect("Unsupported platform! 'apply_wayland_blur' needs a Wayland compositor with blur");
 
     #[cfg(target_os = "macos")]
     {

@@ -10,7 +10,7 @@ Make your windows vibrant.
 
 ## Platform-specific
 
-- **Linux**: Unsupported, Blur and any vibrancy effects are controlled by the compositor installed on the end-user system.
+- **Linux**: Blur on Wayland compositors that support `ext-background-effect-v1` (KDE Plasma 6.8 and newer), through `apply_wayland_blur`. Other effects are controlled by the compositor installed on the end-user system.
 
 ## Example
 
@@ -24,6 +24,22 @@ apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None)
 #[cfg(target_os = "windows")]
 apply_blur(&window, Some((18, 18, 18, 125)))
     .expect("Unsupported platform! 'apply_blur' is only supported on Windows");
+
+#[cfg(target_os = "linux")]
+apply_wayland_blur(&window, None)
+    .expect("Unsupported platform! 'apply_wayland_blur' needs a Wayland compositor with blur");
+```
+
+### Wayland blur with rounded corners
+
+A page that rounds its corners should only be blurred inside them. Pass the window's logical size and the radius, and pass them again when the window is resized:
+
+```rs
+use window_vibrancy::{apply_wayland_blur, RoundedRect};
+
+#[cfg(target_os = "linux")]
+apply_wayland_blur(&window, Some(RoundedRect { width: 1000, height: 670, radius: 8 }))
+    .expect("Unsupported platform! 'apply_wayland_blur' needs a Wayland compositor with blur");
 ```
 
 ### macOS Liquid Glass Effect (macOS 26+)
@@ -90,13 +106,14 @@ For a more complete example of usage with [tauri](https://tauri.app/), see [`exa
 | `apply_mica`&`clear_mica`                 |          Windows 11          |                                                                                                    |
 | `apply_vibrancy`&`clear_vibrancy`         |    macOS 10.10 and newer     |                                                                                                    |
 | `apply_liquid_glass`&`clear_liquid_glass` |      macOS 26 and newer      | Modern glass effect with customizable radius, tint color, opacity and interactive (macOS 27+) options. |
+| `apply_wayland_blur`&`clear_wayland_blur` | Linux, Wayland with `ext-background-effect-v1` | KDE Plasma 6.8 and newer. Optional rounded region for windows with rounded corners. |
 
 ## Screenshots
 
 <p align="center">
 
-| apply_blur | apply_acrylic | apply_mica | apply_vibrancy |
-| :---:      | :---:         | :---:      | :---:          |
-| ![apply_blur screenshot](https://github.com/tauri-apps/window-vibrancy/blob/dev/screenshots/apply_blur.png?raw=true) | ![apply_blur screenshot](https://github.com/tauri-apps/window-vibrancy/blob/dev/screenshots/apply_acrylic.png?raw=true) | ![apply_mica screenshot](https://github.com/tauri-apps/window-vibrancy/blob/dev/screenshots/apply_mica.png?raw=true) | ![apply_vibrancy screenshot](https://github.com/tauri-apps/window-vibrancy/blob/dev/screenshots/apply_vibrancy.png?raw=true) |
+| apply_blur | apply_acrylic | apply_mica | apply_vibrancy | apply_wayland_blur |
+| :---:      | :---:         | :---:      | :---:          | :---:              |
+| ![apply_blur screenshot](https://github.com/tauri-apps/window-vibrancy/blob/dev/screenshots/apply_blur.png?raw=true) | ![apply_blur screenshot](https://github.com/tauri-apps/window-vibrancy/blob/dev/screenshots/apply_acrylic.png?raw=true) | ![apply_mica screenshot](https://github.com/tauri-apps/window-vibrancy/blob/dev/screenshots/apply_mica.png?raw=true) | ![apply_vibrancy screenshot](https://github.com/tauri-apps/window-vibrancy/blob/dev/screenshots/apply_vibrancy.png?raw=true) | ![apply_wayland_blur screenshot](screenshots/apply_wayland_blur.png) |
 
 </p>

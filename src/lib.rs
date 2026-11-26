@@ -6,7 +6,7 @@
 //!
 //! ## Platform-specific
 //!
-//! - **Linux**: Unsupported, Blur and any vibrancy effects are controlled by the compositor installed on the end-user system.
+//! - **Linux**: Blur on Wayland compositors with `ext-background-effect-v1` (KDE Plasma 6.8 and newer), through [`apply_wayland_blur`]. Other effects are up to the compositor installed on the end-user system.
 //!
 //! # Example
 //!
@@ -26,6 +26,7 @@
 #[cfg(target_os = "windows")]
 use windows_sys::core::HRESULT;
 
+mod linux;
 mod macos;
 mod windows;
 
@@ -36,6 +37,14 @@ pub use macos::{LiquidGlassOptions, NSGlassEffectViewTagged, NSVisualEffectViewT
 
 /// a tuple of RGBA colors. Each value has minimum of 0 and maximum of 255.
 pub type Color = (u8, u8, u8, u8);
+
+/// A rectangle with rounded corners, in logical pixels.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct RoundedRect {
+    pub width: u32,
+    pub height: u32,
+    pub radius: u32,
+}
 
 /// Applies blur effect to window. Works only on Windows 7, Windows 10 v1809 or newer.
 ///
@@ -123,6 +132,61 @@ pub fn clear_acrylic(window: impl raw_window_handle::HasWindowHandle) -> Result<
         }
         _ => Err(Error::UnsupportedPlatform(
             "\"clear_acrylic()\" is only supported on Windows.",
+        )),
+    }
+}
+
+/// Blurs what is behind a window on Wayland, through `ext-background-effect-v1`.
+///
+/// `rect`: `None` blurs the whole window and follows it when it is resized. With a rounded
+/// rectangle, only that area is blurred, so a page with rounded corners has no blur outside them;
+/// call it again with the new size when the window is resized.
+///
+/// The window must be transparent. Calling it again on the same window updates the blur.
+///
+/// ## Platform-specific
+///
+/// - **Linux**: Wayland only, and only on compositors that announce blur (KDE Plasma 6.8 and newer).
+///   Call it on the thread that runs the window's event loop.
+/// - **Windows / macOS**: Unsupported.
+pub fn apply_wayland_blur(
+    window: impl raw_window_handle::HasWindowHandle + raw_window_handle::HasDisplayHandle,
+    #[allow(unused)] rect: Option<RoundedRect>,
+) -> Result<(), Error> {
+    match (
+        window.display_handle()?.as_raw(),
+        window.window_handle()?.as_raw(),
+    ) {
+        #[cfg(target_os = "linux")]
+        (
+            raw_window_handle::RawDisplayHandle::Wayland(display),
+            raw_window_handle::RawWindowHandle::Wayland(surface),
+        ) => linux::apply_blur(display.display, surface.surface, rect),
+        _ => Err(Error::UnsupportedPlatform(
+            "\"apply_wayland_blur()\" is only supported on Wayland.",
+        )),
+    }
+}
+
+/// Clears the blur applied by [`apply_wayland_blur`].
+///
+/// ## Platform-specific
+///
+/// - **Windows / macOS**: Unsupported.
+pub fn clear_wayland_blur(
+    window: impl raw_window_handle::HasWindowHandle + raw_window_handle::HasDisplayHandle,
+) -> Result<(), Error> {
+    match (
+        window.display_handle()?.as_raw(),
+        window.window_handle()?.as_raw(),
+    ) {
+        #[cfg(target_os = "linux")]
+        (
+            raw_window_handle::RawDisplayHandle::Wayland(display),
+            raw_window_handle::RawWindowHandle::Wayland(surface),
+        ) => linux::clear_blur(display.display, surface.surface),
+        _ => Err(Error::UnsupportedPlatform(
+            "\"clear_wayland_blur()\" is only supported on Wayland.",
         )),
     }
 }
